@@ -1,0 +1,286 @@
+{
+  "schema": 1,
+  "meta": {
+    "title": "The Salt Road",
+    "author": "Example",
+    "logline": "A caravan master discovers the truce she has been hauling salt under was sold to her by the man who broke it.",
+    "genre": "political fantasy",
+    "pov": "mara"
+  },
+  "characters": {
+    "mara": {
+      "name": "Mara Vale",
+      "role": "Caravan master of the Ash Guild",
+      "need": "Admit she left the valley for a reason, and that the reason was fear",
+      "want": "Get the salt carts through the ford before the thaw",
+      "voice": {
+        "register": "Plain, unhurried, faintly amused",
+        "rhythm": "Short declaratives. Rarely more than one clause per sentence.",
+        "favored": ["right", "no", "that's the price"],
+        "forbidden": ["perhaps", "I feel"],
+        "tics": ["counts on her fingers while thinking"],
+        "tells": ["goes quiet before she gets dangerous"]
+      },
+      "traits": ["pragmatic", "loyal to her crews before her guild", "unwilling to be thanked"],
+      "relationships": [
+        {
+          "to": { "kind": "character", "id": "harek" },
+          "trust": 2,
+          "note": "he held the ford for her once, and she has not forgotten"
+        },
+        {
+          "to": { "kind": "faction", "id": "ash-guild" },
+          "trust": 1,
+          "debt": 3,
+          "note": "the guild bought her carts; she owes them a season"
+        }
+      ]
+    },
+    "harek": {
+      "name": "Harek",
+      "role": "Warden of the ford",
+      "need": "Be seen as more than the man his father bought the post for",
+      "want": "Keep the ford closed until the duke's factor pays him",
+      "voice": {
+        "register": "Formal, too precise, a man performing competence",
+        "rhythm": "Long sentences that circle the point and never land on it",
+        "forbidden": ["I don't know"],
+        "tics": ["repeats your last three words back to you"]
+      },
+      "relationships": [
+        {
+          "to": { "kind": "character", "id": "mara" },
+          "fear": 1,
+          "debt": 2,
+          "note": "she saw him take the purse and said nothing"
+        }
+      ]
+    },
+    "ilse": {
+      "name": "Ilse of the Factor's Office",
+      "role": "The duke's factor at the ford",
+      "need": "Matter to a court that sends her to count salt",
+      "want": "Close the season's ledger without a shortage",
+      "voice": {
+        "register": "Brisk, courteous, entirely without warmth",
+        "rhythm": "Clauses stacked like ledger lines",
+        "favored": ["per the seal", "on the tally"]
+      },
+      "relationships": [
+        {
+          "to": { "kind": "character", "id": "mara" },
+          "trust": -1,
+          "note": "an unlicensed caravan is a line item, not a person"
+        }
+      ]
+    }
+  },
+  "factions": {
+    "ash-guild": {
+      "name": "The Ash Guild",
+      "resources": { "salt": 3, "coin": 7, "carts": 2 },
+      "territory": ["the low road", "the salt pans"],
+      "posture": "defensive",
+      "friction": [
+        "the western houses want the ford wardenship for their own candidate",
+        "the guild's clerk has been selling tallies to the factor's office"
+      ]
+    },
+    "ducal-office": {
+      "name": "The Duke's Factor Office",
+      "resources": { "coin": 12, "soldiers": 4 },
+      "territory": ["the ford", "the north bank"],
+      "posture": "covert",
+      "friction": ["the duke has not read a ledger in two years"]
+    }
+  },
+  "rules": {
+    "salt-is-scarce": {
+      "kind": "hard",
+      "statement": "No salt crosses the ford without the duke's seal. There is no exception, and no one has ever been forgiven for one.",
+      "scope": "the ford"
+    },
+    "ford-is-haunted": {
+      "kind": "soft",
+      "statement": "The locals say the ford is haunted by the men who drowned building it.",
+      "scope": "the ford"
+    }
+  },
+  "facts": {
+    "truce-broken": {
+      "statement": "The truce at the ford was broken three weeks ago; the road is closed to unsealed traffic.",
+      "secret": false
+    },
+    "harek-burned-the-ford": {
+      "statement": "It was Harek who ordered the ford burned, not the raiders.",
+      "secret": true
+    },
+    "the-seal-is-forged": {
+      "statement": "The seal on Ilse's writ is a forgery; the duke's office has not issued a writ this season.",
+      "secret": true
+    },
+    "ilse-bought-the-warden": {
+      "statement": "Ilse paid Harek two hundredweight of salt to close the ford.",
+      "secret": true
+    }
+  },
+  "threads": {
+    "who-burned-the-ford": {
+      "kind": "mystery",
+      "label": "Someone burned the ford and let the raiders take the blame.",
+      "opened_in": "s1",
+      "promised_payoff": "s3",
+      "note": "the smell of lamp oil is the first clue"
+    },
+    "the-forged-seal": {
+      "kind": "gun",
+      "label": "Ilse's writ carries a seal that does not match the register.",
+      "opened_in": "s2",
+      "promised_payoff": "s4",
+      "note": "Mara has seen the register"
+    }
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "index": 1,
+      "title": "The ford",
+      "summary": "Mara brings her carts to a ford that is closed, and is told the truce broke three weeks ago.",
+      "pov": "mara",
+      "location": "The ford, north bank",
+      "present": ["mara", "harek"],
+      "status": "canon",
+      "value_start": "a routine crossing",
+      "value_end": "a road she cannot use",
+      "dependencies": [],
+      "delta": {
+        "changes": [
+          {
+            "at_line": 12,
+            "kind": "learned",
+            "character": "mara",
+            "fact": "truce-broken"
+          },
+          { "kind": "revealed", "fact": "truce-broken" },
+          {
+            "kind": "relationship",
+            "from": "mara",
+            "to": { "kind": "character", "id": "harek" },
+            "axis": "trust",
+            "value": 2,
+            "note": "he is apologetic, which is not the same as sorry"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s2",
+      "index": 2,
+      "title": "The tally",
+      "summary": "Ilse arrives to count the guild's carts and shows a writ Mara has seen the register for.",
+      "pov": "mara",
+      "location": "The tally-house",
+      "present": ["mara", "ilse"],
+      "status": "canon",
+      "value_start": "an inspection",
+      "value_end": "a forged seal",
+      "dependencies": [
+        {
+          "kind": "because",
+          "scene": "s1",
+          "note": "a closed ford is what brings the factor out to count"
+        }
+      ],
+      "delta": {
+        "changes": [
+          {
+            "at_line": 30,
+            "kind": "learned",
+            "character": "mara",
+            "fact": "the-seal-is-forged"
+          },
+          {
+            "kind": "relationship",
+            "from": "mara",
+            "to": { "kind": "character", "id": "ilse" },
+            "axis": "trust",
+            "value": -2,
+            "note": "the seal is wrong and Ilse knows it is wrong"
+          },
+          {
+            "kind": "resource",
+            "faction": "ash-guild",
+            "resource": "salt",
+            "delta": -1
+          }
+        ]
+      }
+    },
+    {
+      "id": "s3",
+      "index": 3,
+      "title": "Ash on the water",
+      "summary": "Mara finds lamp oil in the reeds and works out who ordered the ford burned.",
+      "pov": "mara",
+      "location": "The ford, south bank",
+      "present": ["mara", "harek"],
+      "status": "drafted",
+      "value_start": "suspicion",
+      "value_end": "certainty, and no proof anyone will accept",
+      "dependencies": [
+        {
+          "kind": "therefore",
+          "scene": "s2",
+          "note": "if the writ is forged, the closure is not the duke's doing"
+        }
+      ],
+      "delta": {
+        "changes": [
+          {
+            "at_line": 40,
+            "kind": "learned",
+            "character": "mara",
+            "fact": "harek-burned-the-ford"
+          },
+          { "kind": "revealed", "fact": "harek-burned-the-ford" },
+          { "kind": "thread_paid_off", "thread": "who-burned-the-ford" },
+          {
+            "kind": "relationship",
+            "from": "mara",
+            "to": { "kind": "character", "id": "harek" },
+            "axis": "trust",
+            "value": -5,
+            "note": "he burned the ford and let her think it was raiders"
+          },
+          {
+            "kind": "relationship",
+            "from": "mara",
+            "to": { "kind": "character", "id": "harek" },
+            "axis": "resentment",
+            "value": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "s4",
+      "index": 4,
+      "title": "The seal",
+      "summary": "Mara puts the forged seal in front of the guild and makes them choose.",
+      "pov": "mara",
+      "location": "The guild hall",
+      "present": ["mara", "ilse"],
+      "status": "planned",
+      "value_start": "certainty without proof",
+      "value_end": "a guild split in two",
+      "dependencies": [
+        {
+          "kind": "but",
+          "scene": "s3",
+          "note": "knowing is not the same as being believed"
+        }
+      ],
+      "delta": { "changes": [] }
+    }
+  ]
+}

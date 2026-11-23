@@ -275,11 +275,11 @@ impl Story {
             ..StoryState::default()
         };
         for (from, character) in &self.characters {
-            for (to, value) in &character.relationships {
+            for edge in &character.relationships {
                 state.relationships.push(RelationshipRecord {
                     from: from.clone(),
-                    to: to.clone(),
-                    value: value.clone(),
+                    to: edge.to.clone(),
+                    value: edge.value.clone(),
                 });
             }
         }

@@ -66,17 +66,24 @@ chapter is a harness that gets uninstalled.
 
 | Piece | State |
 | --- | --- |
-| Story State Graph: characters, factions, world rules, facts, threads, scenes | Implemented, 26 tests |
+| Story State Graph: characters, factions, world rules, facts, threads, scenes | Implemented, 44 tests |
 | Temporal projection (`state_before`, `state_at`, `knowledge_at`) | Implemented |
 | Delta model and fold (knowledge, relationships, resources, injuries, deaths) | Implemented |
 | Dirty-state propagation over the causal graph | Implemented |
 | Deterministic lint (value shift, dangling setups, unearned payoffs, continuity) | Implemented |
 | Evidence gate (`substantiate` a reviewer's claim) | Implemented |
 | Spoiler-free scene brief renderer | Implemented |
-| Agent tools: `story_read`, `story_brief`, `story_lint`, `story_substantiate` | Wired into the tool registry |
+| Scene writes with whole-document validation; rejected writes change nothing | Implemented |
+| Canon commit and review tracking (`reviewed_against` premise digests) | Implemented |
+| Agent tools: `story_read`, `story_brief`, `story_lint`, `story_substantiate`, `story_apply`, `story_commit`, `story_review` | Wired into the `story` tool domain |
 | Reviewer and editor agents | Not started |
 | Story persistence in SQLite | JSON on disk for now |
 | Desktop UI | Inherited from OpenBaD; not yet repurposed |
+
+A worked example — three characters, two factions, four scenes, and a thread
+that pays off — lives at
+[`crates/canonwright-story/tests/fixtures/the-salt-road.json`](crates/canonwright-story/tests/fixtures/the-salt-road.json)
+and is asserted against by the test suite.
 
 ## The scene pipeline
 
@@ -94,8 +101,8 @@ The intended loop, mirroring `plan → edit → test → review → commit`:
 6. **Commit** — a state extractor proposes a delta for the finished scene; on
    approval it becomes canon, and the next scene's brief changes accordingly.
 
-Steps 1, 4 (the deterministic half), and 6 (the model) exist. Steps 2, 3, and 5
-do not.
+Steps 1, 4 (the deterministic half), and 6 exist as tools. Steps 2, 3, and 5 —
+the collaborators, drafting, and the mutating editors — do not.
 
 ## Repository layout
 
@@ -134,10 +141,9 @@ Linux) and `pnpm` for the UI.
 
 ## Roadmap
 
-1. Make scenes writable: a `story_apply` tool, canon commit with approval, and
-   dirty-scene surfacing after a revision.
-2. Split reviewers into their own crates with structured, claim-bearing output,
-   and run them concurrently.
-3. Add line editors that accept a ticket and a line range, and nothing else.
-4. Project story state into SQLite so briefs are queries rather than file reads.
-5. Repurpose the desktop UI from a repository pane to a manuscript pane.
+1. Split reviewers into their own crates with structured, claim-bearing output,
+   and run them concurrently against a scene brief.
+2. Add line editors that accept a ticket and a line range, and nothing else.
+3. Project story state into SQLite so briefs are queries rather than file reads,
+   and the dirty queue survives a machine.
+4. Repurpose the desktop UI from a repository pane to a manuscript pane.

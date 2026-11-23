@@ -380,3 +380,262 @@ impl Tool for StorySubstantiateTool {
         })))
     }
 }
+use canonwright_story::WriteOutcome;
+
+fn require_writes(context: &ToolContext, tool: &str) -> Result<(), ToolError> {
+    if context.allow_writes {
+        return Ok(());
+    }
+    Err(ToolError::ApprovalRequired(format!(
+        "{tool} (switch the composer access mode to Can edit or Full access)"
+    )))
+}
+
+fn render_outcome(story: &Story, scene: &SceneId, outcome: &WriteOutcome) -> String {
+    if !outcome.accepted {
+        let mut out = String::from(
+            "Rejected: the story would be structurally invalid, and was left unchanged.\n\n",
+        );
+        for error in &outcome.errors {
+            out.push_str(&format!("- {error}\n"));
+        }
+        return out;
+    }
+
+    let verb = if outcome.created { "Added" } else { "Updated" };
+    let index = story
+        .scene(scene)
+        .map(|scene| scene.index)
+        .unwrap_or_default();
+    let mut out = format!("{verb} scene {index} `{scene}`.\n");
+
+    if outcome.dirty.is_empty() {
+        out.push_str("\nNo canon scene downstream needs rechecking.\n");
+    } else {
+        out.push_str("\n## Needs a continuity pass\n\n");
+        out.push_str(
+            "These scenes are canon and were accepted against premises that just changed:\n\n",
+        );
+        for id in &outcome.dirty {
+            let index = story
+                .scene(id)
+                .map(|scene| scene.index.to_string())
+                .unwrap_or_else(|| "?".to_owned());
+            out.push_str(&format!("- scene {index} `{id}`\n"));
+        }
+    }
+
+    if !outcome.tickets.is_empty() {
+        out.push_str(&format!(
+            "\n## Findings ({}), all advisory\n\n",
+            outcome.tickets.len()
+        ));
+        for ticket in &outcome.tickets {
+            out.push_str(&format!("- {} {}\n", ticket.code, ticket.message));
+        }
+    }
+    out
+}
+
+/// Write a whole scene: body, status, causal links, and delta.
+pub struct StoryApplyTool;
+
+#[async_trait]
+impl Tool for StoryApplyTool {
+    fn definition(&self) -> ToolDefinition {
+        ToolDefinition::new(
+            "story_apply",
+            "Add or replace one scene in the story state graph. The whole scene is validated \
+             before anything is kept: if the document would become structurally invalid the \
+             write is rejected and the story is left untouched. Changing a scene's delta marks \
+             canon scenes downstream as needing a continuity pass.",
+            RiskLevel::Write,
+        )
+        .with_schema(json!({
+            "type": "object",
+            "properties": {
+                "scene": {
+                    "type": "object",
+                    "description": "The scene object. Fields: id, index, pov, title, summary, location, present[], status, value_start, value_end, dependencies[], delta{changes[]}.",
+                    "additionalProperties": true
+                },
+                "path": path_schema()
+            },
+            "required": ["scene"],
+            "additionalProperties": false
+        }))
+    }
+
+    async fn execute(
+        &self,
+        arguments: Value,
+        context: &ToolContext,
+    ) -> Result<ToolResult, ToolError> {
+        require_writes(context, "story_apply")?;
+        let path = story_path(&arguments, context);
+        let mut story = load(&arguments, context)?;
+        let scene: Scene = serde_json::from_value(
+            arguments
+                .get("scene")
+                .cloned()
+                .ok_or_else(|| ToolError::InvalidArgument("scene is required".to_owned()))?,
+        )
+        .map_err(|error| {
+            ToolError::InvalidArgument(format!("scene is not a valid scene object: {error}"))
+        })?;
+        let id = scene.id.clone();
+        let status = scene.status;
+
+        let outcome = story.write_scene(scene);
+        if !outcome.accepted {
+            return Ok(ToolResult::error(render_outcome(&story, &id, &outcome))
+                .with_metadata(json!({"accepted": false})));
+        }
+        // Accepting a scene as canon *is* the review; the record exists so a
+        // later upstream change can invalidate it.
+        if status == SceneStatus::Canon {
+            story
+                .mark_reviewed(&id)
+                .map_err(|error| ToolError::Failed(error.to_string()))?;
+        }
+        story.save(&path).map_err(|error| {
+            ToolError::Failed(format!("could not write {}: {error}", path.display()))
+        })?;
+
+        Ok(
+            ToolResult::ok(render_outcome(&story, &id, &outcome)).with_metadata(json!({
+                "accepted": true,
+                "created": outcome.created,
+                "dirty": outcome.dirty.iter().map(ToString::to_string).collect::<Vec<_>>(),
+                "tickets": outcome.tickets.len(),
+            })),
+        )
+    }
+}
+
+/// Promote a scene to canon.
+pub struct StoryCommitTool;
+
+#[async_trait]
+impl Tool for StoryCommitTool {
+    fn definition(&self) -> ToolDefinition {
+        ToolDefinition::new(
+            "story_commit",
+            "Accept an existing scene as canon. Records what the scene was accepted against, so \
+             a later change upstream will mark it as needing a continuity pass. Reports the canon \
+             scenes this commit invalidated and any findings, which are advisory.",
+            RiskLevel::Write,
+        )
+        .with_schema(json!({
+            "type": "object",
+            "properties": {
+                "scene": { "type": "string", "description": "Scene id to accept as canon." },
+                "path": path_schema()
+            },
+            "required": ["scene"],
+            "additionalProperties": false
+        }))
+    }
+
+    async fn execute(
+        &self,
+        arguments: Value,
+        context: &ToolContext,
+    ) -> Result<ToolResult, ToolError> {
+        require_writes(context, "story_commit")?;
+        let path = story_path(&arguments, context);
+        let mut story = load(&arguments, context)?;
+        let id = scene_argument(&arguments)?;
+
+        let outcome = story.set_scene_status(&id, SceneStatus::Canon);
+        if !outcome.accepted {
+            return Ok(ToolResult::error(render_outcome(&story, &id, &outcome))
+                .with_metadata(json!({"accepted": false})));
+        }
+        story
+            .mark_reviewed(&id)
+            .map_err(|error| ToolError::Failed(error.to_string()))?;
+        story.save(&path).map_err(|error| {
+            ToolError::Failed(format!("could not write {}: {error}", path.display()))
+        })?;
+
+        let mut out = render_outcome(&story, &id, &outcome);
+        let still_dirty = story.dirty_scenes();
+        if !still_dirty.is_empty() {
+            out.push_str(&format!(
+                "\n{} canon scene(s) still need a continuity pass: {}\n",
+                still_dirty.len(),
+                still_dirty
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ));
+        }
+        Ok(ToolResult::ok(out).with_metadata(json!({
+            "accepted": true,
+            "dirty": outcome.dirty.iter().map(ToString::to_string).collect::<Vec<_>>(),
+            "still_dirty": still_dirty.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        })))
+    }
+}
+
+/// Sign off a scene after a continuity pass.
+pub struct StoryReviewTool;
+
+#[async_trait]
+impl Tool for StoryReviewTool {
+    fn definition(&self) -> ToolDefinition {
+        ToolDefinition::new(
+            "story_review",
+            "Record that a canon scene has been re-read against its current premises and is no \
+             longer stale. Use after a downstream scene shows up as needing a continuity pass.",
+            RiskLevel::Write,
+        )
+        .with_schema(json!({
+            "type": "object",
+            "properties": {
+                "scene": { "type": "string", "description": "Scene id that was rechecked." },
+                "path": path_schema()
+            },
+            "required": ["scene"],
+            "additionalProperties": false
+        }))
+    }
+
+    async fn execute(
+        &self,
+        arguments: Value,
+        context: &ToolContext,
+    ) -> Result<ToolResult, ToolError> {
+        require_writes(context, "story_review")?;
+        let path = story_path(&arguments, context);
+        let mut story = load(&arguments, context)?;
+        let id = scene_argument(&arguments)?;
+
+        story
+            .mark_reviewed(&id)
+            .map_err(|error| ToolError::InvalidArgument(format!("{error}")))?;
+        story.save(&path).map_err(|error| {
+            ToolError::Failed(format!("could not write {}: {error}", path.display()))
+        })?;
+
+        let still_dirty = story.dirty_scenes();
+        let mut out = format!("Rechecked `{id}`; it is up to date.\n");
+        if still_dirty.is_empty() {
+            out.push_str("No canon scene needs a continuity pass.\n");
+        } else {
+            out.push_str(&format!(
+                "Still dirty: {}\n",
+                still_dirty
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ));
+        }
+        Ok(ToolResult::ok(out).with_metadata(json!({
+            "still_dirty": still_dirty.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        })))
+    }
+}

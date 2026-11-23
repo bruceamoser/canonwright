@@ -1659,6 +1659,9 @@ impl ToolRegistry {
         registry.register(story_tools::StoryBriefTool);
         registry.register(story_tools::StoryLintTool);
         registry.register(story_tools::StorySubstantiateTool);
+        registry.register(story_tools::StoryApplyTool);
+        registry.register(story_tools::StoryCommitTool);
+        registry.register(story_tools::StoryReviewTool);
         registry.grouped = true;
         registry
     }
@@ -2602,7 +2605,8 @@ fn tool_domain(name: &str) -> &'static str {
         "team_task_create" | "team_task_list" | "team_task_update" | "team_task_get" => {
             "orchestration"
         }
-        "story_brief" | "story_lint" | "story_read" | "story_substantiate" => "story",
+        "story_apply" | "story_brief" | "story_commit" | "story_lint" | "story_read"
+        | "story_review" | "story_substantiate" => "story",
         _ => "general",
     }
 }
@@ -21318,7 +21322,7 @@ invariants:
             "provider tool limit: {} built-ins registered",
             definitions.len()
         );
-        for domain in [
+        let domains = [
             "artifacts",
             "collaboration",
             "context",
@@ -21336,9 +21340,11 @@ invariants:
             "search",
             "session",
             "snapshots",
+            "story",
             "vault",
             "web",
-        ] {
+        ];
+        for domain in domains {
             for suffix in ["list", "run"] {
                 let expected = format!("{domain}_{suffix}");
                 assert!(
@@ -21349,7 +21355,7 @@ invariants:
         }
         assert_eq!(
             definitions.len(),
-            38,
+            domains.len() * 2,
             "{:?}",
             definitions
                 .iter()
@@ -22478,5 +22484,143 @@ invariants:
             !directory.path().join(".canonwright/pipeline.yaml").exists(),
             "a dry run writes nothing"
         );
+    }
+
+    const STORY: &str = r#"{
+      "schema": 1,
+      "meta": {"title": "T"},
+      "characters": {"mara": {"name": "Mara"}},
+      "facts": {"x": {"statement": "x is true"}},
+      "scenes": [
+        {"id": "s1", "index": 1, "pov": "mara", "status": "canon",
+         "value_start": "a", "value_end": "b",
+         "delta": {"changes": [
+           {"at_line": 3, "kind": "learned", "character": "mara", "fact": "x"}]}},
+        {"id": "s2", "index": 2, "pov": "mara", "status": "canon",
+         "value_start": "b", "value_end": "c",
+         "dependencies": [{"kind": "because", "scene": "s1"}],
+         "delta": {"changes": []}},
+        {"id": "s3", "index": 3, "pov": "mara", "status": "planned",
+         "value_start": "c", "value_end": "d",
+         "dependencies": [{"kind": "therefore", "scene": "s2"}],
+         "delta": {"changes": []}}
+      ]
+    }"#;
+
+    fn story_file(jail: &Path) -> std::path::PathBuf {
+        let directory = jail.join(".canonwright");
+        fs::create_dir_all(&directory).expect("dir");
+        let path = directory.join("story.json");
+        fs::write(&path, STORY).expect("story");
+        path
+    }
+
+    fn reviewed_story(jail: &Path) -> std::path::PathBuf {
+        let path = story_file(jail);
+        let mut story = canonwright_story::Story::load(&path).expect("load");
+        for id in ["s1", "s2"] {
+            story
+                .mark_reviewed(&canonwright_story::SceneId::new(id).unwrap())
+                .expect("mark");
+        }
+        story.save(&path).expect("save");
+        path
+    }
+
+    #[tokio::test]
+    async fn committing_a_scene_writes_canon_and_reports_the_queue() {
+        let jail = tempdir().expect("tempdir");
+        let path = reviewed_story(jail.path());
+        let mut context = context(jail.path());
+        context.allow_writes = true;
+
+        let result = story_tools::StoryCommitTool
+            .execute(json!({"scene": "s3"}), &context)
+            .await
+            .expect("commit runs");
+        assert!(!result.is_error, "{}", result.content);
+
+        let story = canonwright_story::Story::load(&path).expect("load");
+        let scene = story
+            .scene(&canonwright_story::SceneId::new("s3").unwrap())
+            .expect("s3");
+        assert_eq!(scene.status, canonwright_story::SceneStatus::Canon);
+        assert!(
+            story.dirty_scenes().is_empty(),
+            "committing accepts the scene against its premises"
+        );
+    }
+
+    #[tokio::test]
+    async fn editing_an_upstream_delta_queues_the_downstream_scene() {
+        let jail = tempdir().expect("tempdir");
+        let path = reviewed_story(jail.path());
+        let mut context = context(jail.path());
+        context.allow_writes = true;
+
+        let story = canonwright_story::Story::load(&path).expect("load");
+        let mut one = story
+            .scene(&canonwright_story::SceneId::new("s1").unwrap())
+            .expect("s1")
+            .clone();
+        one.delta.changes.push(canonwright_story::SceneChange::at(
+            9,
+            canonwright_story::Change::CanonNote {
+                note: "a new beat".to_owned(),
+            },
+        ));
+
+        let result = story_tools::StoryApplyTool
+            .execute(
+                json!({"scene": serde_json::to_value(&one).unwrap()}),
+                &context,
+            )
+            .await
+            .expect("apply runs");
+        assert!(!result.is_error, "{}", result.content);
+
+        let dirty = result.metadata["dirty"].as_array().expect("dirty list");
+        assert_eq!(dirty.len(), 1, "{dirty:?}");
+        assert_eq!(dirty[0], "s2");
+
+        let stored = canonwright_story::Story::load(&path).expect("load");
+        assert!(stored.is_dirty(&canonwright_story::SceneId::new("s2").unwrap()));
+    }
+
+    #[tokio::test]
+    async fn an_invalid_scene_is_refused_and_nothing_is_written() {
+        let jail = tempdir().expect("tempdir");
+        let path = reviewed_story(jail.path());
+        let mut context = context(jail.path());
+        context.allow_writes = true;
+        let before = fs::read_to_string(&path).expect("read");
+
+        let result = story_tools::StoryApplyTool
+            .execute(
+                json!({"scene": {
+                    "id": "s9", "index": 9, "pov": "nobody",
+                    "status": "drafted", "value_start": "a", "value_end": "b"
+                }}),
+                &context,
+            )
+            .await
+            .expect("apply runs");
+        assert!(result.is_error, "{}", result.content);
+        assert!(result.content.contains("Rejected"), "{}", result.content);
+        assert_eq!(fs::read_to_string(&path).expect("read"), before);
+    }
+
+    #[tokio::test]
+    async fn story_writes_are_gated_when_the_session_cannot_edit() {
+        let jail = tempdir().expect("tempdir");
+        story_file(jail.path());
+        let context = context(jail.path());
+        assert!(!context.allow_writes);
+
+        let error = story_tools::StoryCommitTool
+            .execute(json!({"scene": "s3"}), &context)
+            .await
+            .expect_err("a write without permission is refused");
+        assert!(error.is_recoverable(), "{error}");
     }
 }

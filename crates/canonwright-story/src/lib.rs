@@ -55,6 +55,7 @@
 
 pub mod context;
 pub mod delta;
+pub mod edit;
 pub mod error;
 pub mod ids;
 pub mod lint;
@@ -66,6 +67,7 @@ use std::path::Path;
 
 pub use context::{SceneContext, Withheld};
 pub use delta::{Change, Harm, SceneChange, SceneDelta};
+pub use edit::WriteOutcome;
 pub use error::StoryError;
 pub use ids::{CharacterId, FactId, FactionId, RuleId, SceneId, TargetRef, ThreadId, TicketId};
 pub use lint::COLD_THREAD_GAP;
@@ -92,8 +94,9 @@ pub mod prelude {
         CharacterId, FactId, FactionId, RuleId, SceneId, TargetRef, ThreadId, TicketId,
     };
     pub use crate::model::{
-        Axis, CausalKind, CausalLink, Character, Fact, Faction, Posture, Relationship, Rule,
-        RuleKind, Scene, SceneStatus, Story, StoryMeta, Thread, ThreadKind, VoiceProfile,
+        Axis, CausalKind, CausalLink, Character, Fact, Faction, Posture, Relationship,
+        RelationshipEdge, Rule, RuleKind, Scene, SceneStatus, Story, StoryMeta, Thread, ThreadKind,
+        VoiceProfile,
     };
     pub use crate::state::{StoryState, ThreadStatus};
     pub use crate::ticket::{Claim, Severity, Substantiation, Ticket, TicketCode};
@@ -129,6 +132,7 @@ impl Default for Scene {
             value_end: String::new(),
             dependencies: Vec::new(),
             delta: SceneDelta::default(),
+            reviewed_against: None,
         }
     }
 }

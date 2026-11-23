@@ -71,8 +71,20 @@ pub struct Character {
     #[serde(default)]
     pub traits: Vec<String>,
     /// Starting opinions, before any scene moves them.
+    ///
+    /// An edge list rather than a map: a `TargetRef` is a tagged object, and
+    /// JSON object keys must be strings. Flattening the edge keeps the authored
+    /// form readable and the Rust form typed.
     #[serde(default)]
-    pub relationships: BTreeMap<TargetRef, Relationship>,
+    pub relationships: Vec<RelationshipEdge>,
+}
+
+/// One directed starting opinion.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct RelationshipEdge {
+    pub to: TargetRef,
+    #[serde(flatten)]
+    pub value: Relationship,
 }
 
 /// What a character sounds like, in terms a line editor can act on.
@@ -346,6 +358,10 @@ pub struct Scene {
     pub dependencies: Vec<CausalLink>,
     #[serde(default)]
     pub delta: SceneDelta,
+    /// Digest of the premises this scene was accepted against. `None` means it
+    /// has never been reviewed; a mismatch means an upstream delta moved.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reviewed_against: Option<String>,
 }
 
 impl Scene {

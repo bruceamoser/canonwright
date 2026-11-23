@@ -121,6 +121,23 @@ knows. It reports what it withheld — later scenes, unrevealed facts, facts the
 POV has not learned, unplanted threads — so the author can see the filter working
 instead of trusting that it did.
 
+## The write path
+
+Writing goes through `Story::write_scene`, which clones the document, applies the
+scene, runs `check()` on the candidate, and keeps the result only if the story is
+still sound. A rejected write leaves the story byte-identical — there is no
+half-applied scene to clean up.
+
+Accepting a scene as canon records `reviewed_against`: a blake3 digest of every
+transitive dependency's *delta*, at the moment a human signed off. Nothing else
+is stored. When an upstream delta later changes, the digest no longer matches and
+the scene is dirty again — a build system, with scenes as targets and deltas as
+inputs. Rewriting a scene's prose without changing what it did leaves its
+dependents clean, which is the whole point.
+
+`dirty_scenes()` is the continuity queue. Only canon scenes can be dirty: a
+drafted scene is unfinished, not stale.
+
 ## Storage
 
 A story is a JSON document on disk at `.canonwright/story.json` today, written
@@ -128,9 +145,23 @@ atomically. SQLite projection is planned; the crate deliberately does not depend
 on `canonwright-store`, so the projection can be added without touching the
 model.
 
+## Tools
+
+Seven tools expose the graph to the agent. None of them reason about the story;
+they ask it questions.
+
+| Tool | Risk | What it does |
+| --- | --- | --- |
+| `story_read` | read | Cast, scenes, structural faults |
+| `story_brief` | read | The spoiler-free prompt context for one scene |
+| `story_lint` | read | Deterministic findings, with claim verdicts |
+| `story_substantiate` | read | Settle a reviewer's claim against the timeline |
+| `story_apply` | write | Add or replace a scene, validated wholesale |
+| `story_commit` | write | Accept a scene as canon and record its premises |
+| `story_review` | write | Sign off a scene after a continuity pass |
+
 ## What is not built yet
 
 - Reviewer and editor agents, and the concurrency that runs them.
-- A `story_apply` tool and canon commit with approval.
 - Persistence in the store and querying briefs as SQL.
 - Multi-scene arcs: the model has scenes, not acts or books.

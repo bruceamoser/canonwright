@@ -232,13 +232,14 @@ impl Story {
         } else {
             out.push_str(&format!("- Knows: {}\n", knowledge.join("; ")));
         }
-        for (target, relationship) in &character.relationships {
-            let now = state.relationship(id, target);
-            if now == *relationship {
+        for edge in &character.relationships {
+            let now = state.relationship(id, &edge.to);
+            if now == edge.value {
                 continue;
             }
             out.push_str(&format!(
-                "- Feels toward {target}: {}\n",
+                "- Feels toward {}: {}\n",
+                edge.to,
                 render_relationship(&now)
             ));
         }
