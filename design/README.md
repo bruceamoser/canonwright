@@ -53,12 +53,12 @@ Nineteen links, checked. `python3 verify_prototype.py` re-checks them.
 2. **Main.** The harness's home screen, with **New project** and **New
    discussion** where it used to say *New session*. Projects and discussions are
    listed at left; the centre says what a project is and what it holds.
-3. **New project — setup only.** Name, kind (novel or rulebook), and what it
-   starts from: **blank, one file, a folder, or a GitHub repository**. Nothing
-   is read until the project exists, so a half-read file can never leave a broken
-   workspace. The screen lists what is deliberately *not* asked: genre, tone,
-   point of view, tense, the protagonist, what the book is about, classes,
-   ancestries, items, rules.
+3. **New project — setup only.** Name, kind, and four named actions:
+   **Start blank**, **Open a file…**, **Open a folder…**, **Connect a
+   repository…**. Each button is the action, so there is no separate Create
+   step and nothing to explain. No questions about the book: genre, point of
+   view, the protagonist and the world are the collaborator's to ask, in
+   discussion, afterwards.
 4. **Project.** The collaborator's opening discussion — proposals, not a
    questionnaire. This is where the book is actually started.
 
@@ -69,6 +69,10 @@ Nineteen links, checked. `python3 verify_prototype.py` re-checks them.
 - **Every clickable thing must be legible.** Interactions live on the button's
   own rect; the label is a layer above it. An overlay in the button's fill hides
   the label and turns the prototype into a guessing game.
+- **No explaining, no hedging.** The interface never spends space on what it is
+  *not* doing, what will *not* happen, or why a decision was made. Name the
+  control accurately and the behaviour is obvious. A panel headed "NOT ASKED
+  HERE" is an admission that the naming failed.
 
 ## The screens
 
