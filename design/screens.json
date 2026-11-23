@@ -6,7 +6,14 @@
   }
  },
  {
+  "command": "page.select",
+  "params": {
+   "index": 1
+  }
+ },
+ {
   "command": "frame.create",
+  "as": "screen:00 First run \u2014 GitHub",
   "params": {
    "x": 0,
    "y": 0,
@@ -16,8 +23,215 @@
    "props": {
     "fill": "#14161C"
    }
-  },
-  "as": "screen:00 First run \u2014 GitHub"
+  }
+ },
+ {
+  "command": "page.add",
+  "params": {
+   "name": "01 Welcome"
+  }
+ },
+ {
+  "command": "page.select",
+  "params": {
+   "index": 2
+  }
+ },
+ {
+  "command": "frame.create",
+  "as": "screen:01 Welcome",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1440,
+   "height": 900,
+   "name": "01 Welcome",
+   "props": {
+    "fill": "#F7F3FF"
+   }
+  }
+ },
+ {
+  "command": "page.add",
+  "params": {
+   "name": "02 New story \u2014 what"
+  }
+ },
+ {
+  "command": "page.select",
+  "params": {
+   "index": 3
+  }
+ },
+ {
+  "command": "frame.create",
+  "as": "screen:02 New story \u2014 what",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1440,
+   "height": 900,
+   "name": "02 New story \u2014 what",
+   "props": {
+    "fill": "#F7F3FF"
+   }
+  }
+ },
+ {
+  "command": "page.add",
+  "params": {
+   "name": "03 New manuscript \u2014 start"
+  }
+ },
+ {
+  "command": "page.select",
+  "params": {
+   "index": 4
+  }
+ },
+ {
+  "command": "frame.create",
+  "as": "screen:03 New manuscript \u2014 start",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1440,
+   "height": 900,
+   "name": "03 New manuscript \u2014 start",
+   "props": {
+    "fill": "#F7F3FF"
+   }
+  }
+ },
+ {
+  "command": "page.add",
+  "params": {
+   "name": "04 Existing manuscript \u2014 what I read"
+  }
+ },
+ {
+  "command": "page.select",
+  "params": {
+   "index": 5
+  }
+ },
+ {
+  "command": "frame.create",
+  "as": "screen:04 Existing manuscript \u2014 what I read",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1440,
+   "height": 900,
+   "name": "04 Existing manuscript \u2014 what I read",
+   "props": {
+    "fill": "#F7F3FF"
+   }
+  }
+ },
+ {
+  "command": "page.add",
+  "params": {
+   "name": "05 First session \u2014 collaborator"
+  }
+ },
+ {
+  "command": "page.select",
+  "params": {
+   "index": 6
+  }
+ },
+ {
+  "command": "frame.create",
+  "as": "screen:05 First session \u2014 collaborator",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1440,
+   "height": 900,
+   "name": "05 First session \u2014 collaborator",
+   "props": {
+    "fill": "#14161C"
+   }
+  }
+ },
+ {
+  "command": "page.add",
+  "params": {
+   "name": "06 Workspace \u2014 novel"
+  }
+ },
+ {
+  "command": "page.select",
+  "params": {
+   "index": 7
+  }
+ },
+ {
+  "command": "frame.create",
+  "as": "screen:06 Workspace \u2014 novel",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1440,
+   "height": 900,
+   "name": "06 Workspace \u2014 novel",
+   "props": {
+    "fill": "#14161C"
+   }
+  }
+ },
+ {
+  "command": "page.add",
+  "params": {
+   "name": "07 Workspace \u2014 rulebook"
+  }
+ },
+ {
+  "command": "page.select",
+  "params": {
+   "index": 8
+  }
+ },
+ {
+  "command": "frame.create",
+  "as": "screen:07 Workspace \u2014 rulebook",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1440,
+   "height": 900,
+   "name": "07 Workspace \u2014 rulebook",
+   "props": {
+    "fill": "#F7F3FF"
+   }
+  }
+ },
+ {
+  "command": "page.add",
+  "params": {
+   "name": "08 Source control"
+  }
+ },
+ {
+  "command": "page.select",
+  "params": {
+   "index": 9
+  }
+ },
+ {
+  "command": "frame.create",
+  "as": "screen:08 Source control",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1440,
+   "height": 900,
+   "name": "08 Source control",
+   "props": {
+    "fill": "#14161C"
+   }
+  }
  },
  {
   "command": "shape.rectangle",
@@ -439,7 +653,8 @@
    "parent": {
     "$ref": "screen:00 First run \u2014 GitHub"
    }
-  }
+  },
+  "as": "go:open-browser"
  },
  {
   "command": "text.create",
@@ -450,12 +665,29 @@
    "props": {
     "fontSize": 13,
     "fontFamily": "DejaVu Sans",
-    "fill": "#FFFFFF",
+    "fill": "#25243A",
     "fontStyle": "Bold"
    },
    "name": "Open the browser",
    "parent": {
     "$ref": "screen:00 First run \u2014 GitHub"
+   }
+  }
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "go:open-browser"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:01 Welcome"
+    }
    }
   }
  },
@@ -476,7 +708,8 @@
    "parent": {
     "$ref": "screen:00 First run \u2014 GitHub"
    }
-  }
+  },
+  "as": "go:skip"
  },
  {
   "command": "text.create",
@@ -492,6 +725,23 @@
    "name": "Skip for now",
    "parent": {
     "$ref": "screen:00 First run \u2014 GitHub"
+   }
+  }
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "go:skip"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:01 Welcome"
+    }
    }
   }
  },
@@ -753,26 +1003,6 @@
     "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
- },
- {
-  "command": "page.add",
-  "params": {
-   "name": "01 Welcome"
-  }
- },
- {
-  "command": "frame.create",
-  "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 900,
-   "name": "01 Welcome",
-   "props": {
-    "fill": "#F7F3FF"
-   }
-  },
-  "as": "screen:01 Welcome"
  },
  {
   "command": "shape.rectangle",
@@ -1086,7 +1316,8 @@
    "parent": {
     "$ref": "screen:01 Welcome"
    }
-  }
+  },
+  "as": "go:new-story"
  },
  {
   "command": "text.create",
@@ -1103,6 +1334,23 @@
    "name": "New story",
    "parent": {
     "$ref": "screen:01 Welcome"
+   }
+  }
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "go:new-story"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:02 New story \u2014 what"
+    }
    }
   }
  },
@@ -1211,7 +1459,8 @@
    "parent": {
     "$ref": "screen:01 Welcome"
    }
-  }
+  },
+  "as": "go:open-folder"
  },
  {
   "command": "text.create",
@@ -1228,6 +1477,23 @@
    "name": "Open folder",
    "parent": {
     "$ref": "screen:01 Welcome"
+   }
+  }
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "go:open-folder"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:06 Workspace \u2014 novel"
+    }
    }
   }
  },
@@ -1368,26 +1634,6 @@
     "$ref": "screen:01 Welcome"
    }
   }
- },
- {
-  "command": "page.add",
-  "params": {
-   "name": "02 New story \u2014 what"
-  }
- },
- {
-  "command": "frame.create",
-  "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 900,
-   "name": "02 New story \u2014 what",
-   "props": {
-    "fill": "#F7F3FF"
-   }
-  },
-  "as": "screen:02 New story \u2014 what"
  },
  {
   "command": "shape.rectangle",
@@ -1751,7 +1997,8 @@
    "parent": {
     "$ref": "screen:02 New story \u2014 what"
    }
-  }
+  },
+  "as": "go:kind-novel"
  },
  {
   "command": "shape.rectangle",
@@ -1978,7 +2225,8 @@
    "parent": {
     "$ref": "screen:02 New story \u2014 what"
    }
-  }
+  },
+  "as": "go:kind-rules"
  },
  {
   "command": "text.create",
@@ -2200,7 +2448,8 @@
    "parent": {
     "$ref": "screen:02 New story \u2014 what"
    }
-  }
+  },
+  "as": "go:continue"
  },
  {
   "command": "text.create",
@@ -2221,6 +2470,57 @@
   }
  },
  {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "go:kind-novel"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:03 New manuscript \u2014 start"
+    }
+   }
+  }
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "go:kind-rules"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:07 Workspace \u2014 rulebook"
+    }
+   }
+  }
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "go:continue"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:03 New manuscript \u2014 start"
+    }
+   }
+  }
+ },
+ {
   "command": "text.create",
   "params": {
    "text": "Cancel",
@@ -2236,26 +2536,6 @@
     "$ref": "screen:02 New story \u2014 what"
    }
   }
- },
- {
-  "command": "page.add",
-  "params": {
-   "name": "03 New manuscript \u2014 start"
-  }
- },
- {
-  "command": "frame.create",
-  "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 900,
-   "name": "03 New manuscript \u2014 start",
-   "props": {
-    "fill": "#F7F3FF"
-   }
-  },
-  "as": "screen:03 New manuscript \u2014 start"
  },
  {
   "command": "shape.rectangle",
@@ -2875,7 +3155,8 @@
    "parent": {
     "$ref": "screen:03 New manuscript \u2014 start"
    }
-  }
+  },
+  "as": "go:create"
  },
  {
   "command": "text.create",
@@ -2896,24 +3177,21 @@
   }
  },
  {
-  "command": "page.add",
+  "command": "proto.interaction.add",
   "params": {
-   "name": "04 Existing manuscript \u2014 what I read"
-  }
- },
- {
-  "command": "frame.create",
-  "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 900,
-   "name": "04 Existing manuscript \u2014 what I read",
-   "props": {
-    "fill": "#F7F3FF"
+   "id": {
+    "$ref": "go:create"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:05 First session \u2014 collaborator"
+    }
    }
-  },
-  "as": "screen:04 Existing manuscript \u2014 what I read"
+  }
  },
  {
   "command": "shape.rectangle",
@@ -3603,7 +3881,8 @@
    "parent": {
     "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
-  }
+  },
+  "as": "go:import-later"
  },
  {
   "command": "text.create",
@@ -3637,7 +3916,8 @@
    "parent": {
     "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
-  }
+  },
+  "as": "go:import-continue"
  },
  {
   "command": "text.create",
@@ -3658,24 +3938,38 @@
   }
  },
  {
-  "command": "page.add",
+  "command": "proto.interaction.add",
   "params": {
-   "name": "05 First session \u2014 collaborator"
+   "id": {
+    "$ref": "go:import-later"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:05 First session \u2014 collaborator"
+    }
+   }
   }
  },
  {
-  "command": "frame.create",
+  "command": "proto.interaction.add",
   "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 900,
-   "name": "05 First session \u2014 collaborator",
-   "props": {
-    "fill": "#14161C"
+   "id": {
+    "$ref": "go:import-continue"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:05 First session \u2014 collaborator"
+    }
    }
-  },
-  "as": "screen:05 First session \u2014 collaborator"
+  }
  },
  {
   "command": "shape.rectangle",
@@ -4287,7 +4581,8 @@
    "parent": {
     "$ref": "screen:05 First session \u2014 collaborator"
    }
-  }
+  },
+  "as": "go:accept-0"
  },
  {
   "command": "text.create",
@@ -4375,6 +4670,23 @@
    "name": "Start over",
    "parent": {
     "$ref": "screen:05 First session \u2014 collaborator"
+   }
+  }
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "go:accept-0"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:06 Workspace \u2014 novel"
+    }
    }
   }
  },
@@ -4854,26 +5166,6 @@
     "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
- },
- {
-  "command": "page.add",
-  "params": {
-   "name": "06 Workspace \u2014 novel"
-  }
- },
- {
-  "command": "frame.create",
-  "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 900,
-   "name": "06 Workspace \u2014 novel",
-   "props": {
-    "fill": "#14161C"
-   }
-  },
-  "as": "screen:06 Workspace \u2014 novel"
  },
  {
   "command": "shape.rectangle",
@@ -6203,26 +6495,6 @@
   }
  },
  {
-  "command": "page.add",
-  "params": {
-   "name": "07 Workspace \u2014 rulebook"
-  }
- },
- {
-  "command": "frame.create",
-  "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 900,
-   "name": "07 Workspace \u2014 rulebook",
-   "props": {
-    "fill": "#F7F3FF"
-   }
-  },
-  "as": "screen:07 Workspace \u2014 rulebook"
- },
- {
   "command": "shape.rectangle",
   "params": {
    "x": 0,
@@ -7345,26 +7617,6 @@
     "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
- },
- {
-  "command": "page.add",
-  "params": {
-   "name": "08 Source control"
-  }
- },
- {
-  "command": "frame.create",
-  "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 900,
-   "name": "08 Source control",
-   "props": {
-    "fill": "#14161C"
-   }
-  },
-  "as": "screen:08 Source control"
  },
  {
   "command": "shape.rectangle",
@@ -8681,255 +8933,6 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 200,
-   "y": 566,
-   "width": 240,
-   "height": 40,
-   "name": "sso-open",
-   "props": {
-    "fill": "#C5A7FF",
-    "cornerRadius": 8
-   },
-   "parent": {
-    "$ref": "screen:00 First run \u2014 GitHub"
-   }
-  },
-  "as": "hot:sso-open"
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "hot:sso-open"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:01 Welcome"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 452,
-   "y": 566,
-   "width": 180,
-   "height": 40,
-   "name": "sso-skip",
-   "props": {
-    "fill": "#1B1F27",
-    "cornerRadius": 8,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:00 First run \u2014 GitHub"
-   }
-  },
-  "as": "hot:sso-skip"
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "hot:sso-skip"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:01 Welcome"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 148,
-   "y": 486,
-   "width": 150,
-   "height": 34,
-   "name": "new-story",
-   "props": {
-    "fill": "#8058C5",
-    "cornerRadius": 8
-   },
-   "parent": {
-    "$ref": "screen:01 Welcome"
-   }
-  },
-  "as": "hot:new-story"
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "hot:new-story"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:02 New story \u2014 what"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 620,
-   "y": 486,
-   "width": 150,
-   "height": 34,
-   "name": "open-folder",
-   "props": {
-    "fill": "#F1ECFB",
-    "cornerRadius": 8,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:01 Welcome"
-   }
-  },
-  "as": "hot:open-folder"
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "hot:open-folder"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:06 Workspace \u2014 novel"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 320,
-   "y": 226,
-   "width": 470,
-   "height": 300,
-   "name": "kind-novel",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 14
-   },
-   "parent": {
-    "$ref": "screen:02 New story \u2014 what"
-   }
-  },
-  "as": "hot:kind-novel"
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "hot:kind-novel"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:03 New manuscript \u2014 start"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 820,
-   "y": 226,
-   "width": 470,
-   "height": 300,
-   "name": "kind-rules",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 14
-   },
-   "parent": {
-    "$ref": "screen:02 New story \u2014 what"
-   }
-  },
-  "as": "hot:kind-rules"
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "hot:kind-rules"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:07 Workspace \u2014 rulebook"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1116,
-   "y": 806,
-   "width": 174,
-   "height": 38,
-   "name": "continue",
-   "props": {
-    "fill": "#8058C5",
-    "cornerRadius": 8
-   },
-   "parent": {
-    "$ref": "screen:02 New story \u2014 what"
-   }
-  },
-  "as": "hot:continue"
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "hot:continue"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:03 New manuscript \u2014 start"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
    "x": 1120,
    "y": 556,
    "width": 170,
@@ -8984,155 +8987,13 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 900,
-   "y": 828,
-   "width": 200,
-   "height": 38,
-   "name": "create",
-   "props": {
-    "fill": "#8058C5",
-    "cornerRadius": 8
-   },
-   "parent": {
-    "$ref": "screen:03 New manuscript \u2014 start"
-   }
-  },
-  "as": "hot:create"
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "hot:create"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:05 First session \u2014 collaborator"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 880,
-   "y": 828,
-   "width": 220,
-   "height": 38,
-   "name": "import-continue",
-   "props": {
-    "fill": "#8058C5",
-    "cornerRadius": 8
-   },
-   "parent": {
-    "$ref": "screen:04 Existing manuscript \u2014 what I read"
-   }
-  },
-  "as": "hot:import-continue"
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "hot:import-continue"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:05 First session \u2014 collaborator"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 200,
-   "y": 828,
-   "width": 220,
-   "height": 38,
-   "name": "import-later",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 8,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:04 Existing manuscript \u2014 what I read"
-   }
-  },
-  "as": "hot:import-later"
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "hot:import-later"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:05 First session \u2014 collaborator"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 700,
-   "y": 296,
-   "width": 108,
-   "height": 22,
-   "name": "accept-proposals",
-   "props": {
-    "fill": "#232833",
-    "cornerRadius": 11
-   },
-   "parent": {
-    "$ref": "screen:05 First session \u2014 collaborator"
-   }
-  },
-  "as": "hot:accept-proposals"
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "hot:accept-proposals"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:06 Workspace \u2014 novel"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
    "x": 1240,
    "y": 60,
    "width": 96,
    "height": 26,
    "name": "Source",
    "props": {
-    "fill": "#232833",
+    "fill": "#1B1F27",
     "cornerRadius": 8,
     "stroke": "#2E3542",
     "strokeWeight": 1
@@ -9186,7 +9047,7 @@
    "height": 26,
    "name": "Source",
    "props": {
-    "fill": "#F1ECFB",
+    "fill": "#FFFFFF",
     "cornerRadius": 8,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
@@ -9238,22 +9099,41 @@
    "y": 54,
    "width": 96,
    "height": 28,
-   "name": "tab-manuscript",
+   "name": "Manuscript",
    "props": {
     "fill": "#1B1F27",
-    "cornerRadius": 6
+    "cornerRadius": 8,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
    },
    "parent": {
     "$ref": "screen:08 Source control"
    }
   },
-  "as": "hot:tab-manuscript"
+  "as": "nav:tab-manuscript"
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Manuscript",
+   "x": 24,
+   "y": 62.0,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Manuscript",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
+  }
  },
  {
   "command": "proto.interaction.add",
   "params": {
    "id": {
-    "$ref": "hot:tab-manuscript"
+    "$ref": "nav:tab-manuscript"
    },
    "trigger": {
     "type": "onClick"

@@ -17,16 +17,17 @@ MONO = "DejaVu Sans Mono"
 
 DARK = dict(
     bg="#14161C", surface="#1B1F27", raised="#232833", line="#2E3542",
-    text="#F2EFF9", body="#CFC9DE", muted="#9A93AD", accent="#C5A7FF", accent2="#8058C5",
+    text="#F2EFF9", body="#CFC9DE", muted="#9A93AD", on_accent="#25243A", accent="#C5A7FF", accent2="#8058C5",
     ink="#25243A", good="#7BD88F", bad="#FF8A8A", warn="#F2C879",
 )
 LIGHT = dict(
     bg="#F7F3FF", surface="#FFFFFF", raised="#F1ECFB", line="#E2DAF0",
-    text="#25243A", body="#4A4360", muted="#6F6885", accent="#8058C5", accent2="#C5A7FF",
+    text="#25243A", body="#4A4360", muted="#6F6885", on_accent="#FFFFFF", accent="#8058C5", accent2="#C5A7FF",
     ink="#25243A", good="#3F8F55", bad="#B4443C", warn="#9A6B12",
 )
 
-commands = []
+commands = []      # content, drawn into frames
+frames = []        # every page and frame, created first so links can point anywhere
 
 # The frame every layer on the current screen is added to.
 CURRENT = {"ref": None}
@@ -41,10 +42,18 @@ def cmd(command, as_=None, **params):
 
 def screen(name, palette):
     """One page, one frame. The frame is what a prototype interaction navigates to."""
-    cmd("page.add", name=name)
     ref = f"screen:{name}"
-    cmd("frame.create", as_=ref, x=0, y=0, width=1440, height=900, name=name,
-        props={"fill": palette["bg"]})
+    frames.append({"command": "page.add", "params": {"name": name}})
+    # page.add appends; index 0 is the document's own page until it is deleted.
+    frames.append(
+        {"command": "page.select", "params": {"index": sum(1 for f in frames if f["command"] == "page.add")}}
+    )
+    frames.append({
+        "command": "frame.create",
+        "as": ref,
+        "params": {"x": 0, "y": 0, "width": 1440, "height": 900, "name": name,
+                   "props": {"fill": palette["bg"]}},
+    })
     CURRENT["ref"] = ref
 
 
@@ -143,10 +152,12 @@ def first_run_github():
     text(248, 470, "ABCD-1234", 22, p["accent"], bold=True, mono=True)
     text(224, 516, "github.com/login/device     ·     this window updates by itself", 10, p["muted"])
 
-    rect(200, 566, 240, 40, p["accent"], radius=8)
-    text(228, 578, "Open the browser", 13, "#FFFFFF", bold=True)
-    rect(452, 566, 180, 40, p["surface"], radius=8, stroke=p["line"])
+    rect(200, 566, 240, 40, p["accent"], radius=8, as_="go:open-browser")
+    text(228, 578, "Open the browser", 13, p["on_accent"], bold=True)
+    link("go:open-browser", "01 Welcome")
+    rect(452, 566, 180, 40, p["surface"], radius=8, stroke=p["line"], as_="go:skip")
     text(478, 578, "Skip for now", 12, p["muted"])
+    link("go:skip", "01 Welcome")
 
     text(200, 640, "Skipping is fine. Settings → GitHub connects later, and reading from a repository", 10, p["muted"])
     text(200, 658, "simply stays unavailable until you do.", 10, p["muted"])
@@ -206,8 +217,9 @@ def new_manuscript_setup():
     text(224, 752, "No cast, no world rules, no theme, no chapter list. The collaborator proposes them,", 11, p["text"], width=860)
     text(224, 770, "you push back, and nothing becomes canon until you accept it.", 11, p["text"], width=860)
 
-    rect(900, 828, 200, 38, p["accent"], radius=8)
-    text(936, 841, "Create project", 13, "#FFFFFF", bold=True)
+    rect(900, 828, 200, 38, p["accent"], radius=8, as_="go:create")
+    text(936, 841, "Create project", 13, p["on_accent"], bold=True)
+    link("go:create", "05 First session — collaborator")
 
 
 # ---------------------------------------------------------------- 1. welcome
@@ -225,16 +237,18 @@ def welcome():
     text(148, 406, "Start a new story", 17, p["text"], bold=True)
     text(148, 434, "A novel or a rulebook. Answer a short interview,", 11, p["muted"])
     text(148, 452, "or import a draft you already have.", 11, p["muted"])
-    rect(148, 486, 150, 34, p["accent"], radius=8)
-    text(172, 496, "New story", 12, "#FFFFFF", bold=True)
+    rect(148, 486, 150, 34, p["accent"], radius=8, as_="go:new-story")
+    text(172, 496, "New story", 12, p["on_accent"], bold=True)
+    link("go:new-story", "02 New story — what")
     text(316, 496, "or press ⌘N", 10, p["muted"])
 
     rect(592, 380, 440, 190, p["surface"], radius=14, stroke=p["line"])
     text(620, 406, "Open a project", 17, p["text"], bold=True)
     text(620, 434, "A folder, or a GitHub repository you already", 11, p["muted"])
     text(620, 452, "keep your manuscript in.", 11, p["muted"])
-    rect(620, 486, 150, 34, p["raised"], radius=8, stroke=p["line"])
+    rect(620, 486, 150, 34, p["raised"], radius=8, stroke=p["line"], as_="go:open-folder")
     text(644, 496, "Open folder", 12, p["text"], bold=True)
+    link("go:open-folder", "06 Workspace — novel")
 
     text(120, 610, "RECENT", 9, p["muted"])
     rect(120, 630, 912, 1, p["line"])
@@ -270,7 +284,7 @@ def step_one():
     text(320, 178, "the workspace. You can change it later, but the defaults differ.", 12, p["muted"])
 
     # novel card, selected
-    rect(320, 226, 470, 300, p["surface"], radius=14, stroke=p["accent"])
+    rect(320, 226, 470, 300, p["surface"], radius=14, stroke=p["accent"], as_="go:kind-novel")
     rect(320, 226, 470, 4, p["accent"], radius=2)
     text(348, 254, "A novel", 20, p["text"], bold=True)
     text(348, 286, "Scenes with a viewpoint, characters with knowledge,", 11, p["muted"])
@@ -285,7 +299,7 @@ def step_one():
     chip(348, 446, "default", p, "accent", w=70)
 
     # rulebook card
-    rect(820, 226, 470, 300, p["surface"], radius=14, stroke=p["line"])
+    rect(820, 226, 470, 300, p["surface"], radius=14, stroke=p["line"], as_="go:kind-rules")
     text(848, 254, "A rulebook", 20, p["text"], bold=True)
     text(848, 286, "Chapters, procedures, classes, items and monsters,", 11, p["muted"])
     text(848, 304, "with cross-references that must resolve.", 11, p["muted"])
@@ -301,8 +315,11 @@ def step_one():
     text(320, 590, "Hybrid books — a setting with rules, a campaign with scenes — are supported:", 11, p["muted"])
     text(320, 608, "choose either and turn on the other's checks in the project settings.", 11, p["muted"])
 
-    rect(1116, 806, 174, 38, p["accent"], radius=8)
-    text(1160, 819, "Continue", 13, "#FFFFFF", bold=True)
+    rect(1116, 806, 174, 38, p["accent"], radius=8, as_="go:continue")
+    text(1160, 819, "Continue", 13, p["on_accent"], bold=True)
+    link("go:kind-novel", "03 New manuscript — start")
+    link("go:kind-rules", "07 Workspace — rulebook")
+    link("go:continue", "03 New manuscript — start")
     text(960, 819, "Cancel", 12, p["muted"])
 
 
@@ -350,10 +367,12 @@ def existing_manuscript_setup():
     text(224, 700, "The manuscript becomes 24 drafted scenes with the prose kept and the state empty.", 11, p["text"], width=860)
     text(224, 718, "The collaborator then works through these answers and fills the graph — you are not starting over.", 11, p["text"], width=860)
 
-    rect(200, 828, 220, 38, p["surface"], radius=8, stroke=p["line"])
+    rect(200, 828, 220, 38, p["surface"], radius=8, stroke=p["line"], as_="go:import-later")
     text(228, 841, "Answer later", 12, p["muted"])
-    rect(880, 828, 220, 38, p["accent"], radius=8)
-    text(910, 841, "Import and continue", 13, "#FFFFFF", bold=True)
+    rect(880, 828, 220, 38, p["accent"], radius=8, as_="go:import-continue")
+    text(910, 841, "Import and continue", 13, p["on_accent"], bold=True)
+    link("go:import-later", "05 First session — collaborator")
+    link("go:import-continue", "05 First session — collaborator")
 
 
 # ------------------------------------------- 3b. first session — collaborator opens
@@ -398,8 +417,10 @@ def collaborating():
         ("Accept all three", "accent"), ("Edit one", "muted"), ("Start over", "muted"),
     ]):
         x = 700 + i * 116
-        rect(x, 296, 108, 22, p["raised"], radius=11, stroke=p["line"])
+        rect(x, 296, 108, 22, p["raised"], radius=11, stroke=p["line"],
+             as_=f"go:accept-{i}" if i == 0 else None)
         text(x + 10, 301, label, 9, p[tone])
+    link("go:accept-0", "06 Workspace — novel")
 
     # the author's turn
     rect(336, 360, 760, 54, p["raised"], radius=12, stroke=p["line"])
@@ -686,21 +707,13 @@ source_control()
 
 
 # --------------------------------------------------------------- the prototype
-# Hotspots sit on top of the drawn buttons, in the same colour and corner radius,
-# so the clickable thing and the visible thing are the same rectangle. Each one
-# navigates to a frame, which is what makes the file runnable rather than a set
-# of pictures.
+# Interactions are bound to the buttons themselves, not to rectangles laid over
+# them: an overlay in the button's fill hides its label, which turns a prototype
+# into a guessing game. Only controls that are *added* for navigation live here.
 
 
-def hotspot(screen_name, x, y, w, h, target, name, fill, palette, radius=8, stroke=None):
-    CURRENT["ref"] = f"screen:{screen_name}"
-    as_ = f"hot:{name}"
-    rect(x, y, w, h, fill, radius=radius, stroke=stroke, name=name, as_=as_)
-    link(as_, target)
-
-
-def nav_button(screen_name, x, y, w, h, label, target, name, palette, fill=None,
-               text_color=None, radius=8, stroke=None, size=10):
+def nav_button(screen_name, x, y, w, h, label, target, name, palette,
+               fill=None, text_color=None, stroke=None, radius=8, size=10):
     CURRENT["ref"] = f"screen:{screen_name}"
     as_ = f"nav:{name}"
     rect(x, y, w, h, fill or palette["raised"], radius=radius,
@@ -709,40 +722,27 @@ def nav_button(screen_name, x, y, w, h, label, target, name, palette, fill=None,
     link(as_, target)
 
 
-# 00 first run → welcome (both "open the browser" and "skip")
-hotspot("00 First run — GitHub", 200, 566, 240, 40, "01 Welcome", "sso-open", DARK["accent"], DARK)
-hotspot("00 First run — GitHub", 452, 566, 180, 40, "01 Welcome", "sso-skip", DARK["surface"], DARK, stroke=DARK["line"])
+# The entry to the import path, which the screens otherwise do not offer.
+nav_button("02 New story — what", 1120, 556, 170, 34, "Import a draft →",
+           "04 Existing manuscript — what I read", "import-link", LIGHT)
 
-# 01 welcome → new story, or straight into a project
-hotspot("01 Welcome", 148, 486, 150, 34, "02 New story — what", "new-story", LIGHT["accent"], LIGHT)
-hotspot("01 Welcome", 620, 486, 150, 34, "06 Workspace — novel", "open-folder", LIGHT["raised"], LIGHT, stroke=LIGHT["line"])
+# Both workspaces route to source control from their panel header.
+nav_button("06 Workspace — novel", 1240, 60, 96, 26, "Source", "08 Source control",
+           "to-source", DARK, fill=DARK["surface"], stroke=DARK["line"])
+nav_button("07 Workspace — rulebook", 1240, 60, 96, 26, "Source", "08 Source control",
+           "to-source-rules", LIGHT, fill=LIGHT["surface"], stroke=LIGHT["line"])
 
-# 02 what → novel setup, rulebook workspace, or import
-hotspot("02 New story — what", 320, 226, 470, 300, "03 New manuscript — start", "kind-novel", LIGHT["surface"], LIGHT, radius=14)
-hotspot("02 New story — what", 820, 226, 470, 300, "07 Workspace — rulebook", "kind-rules", LIGHT["surface"], LIGHT, radius=14)
-hotspot("02 New story — what", 1116, 806, 174, 38, "03 New manuscript — start", "continue", LIGHT["accent"], LIGHT)
-nav_button("02 New story — what", 1120, 556, 170, 34, "Import a draft →", "04 Existing manuscript — what I read", "import-link", LIGHT)
+# Source control routes back to the manuscript through its tab.
+nav_button("08 Source control", 14, 54, 96, 28, "Manuscript", "06 Workspace — novel",
+           "tab-manuscript", DARK, fill=DARK["surface"], stroke=DARK["line"])
 
-# 03 new manuscript → collaborator
-hotspot("03 New manuscript — start", 900, 828, 200, 38, "05 First session — collaborator", "create", LIGHT["accent"], LIGHT)
-
-# 04 existing manuscript → collaborator (either answer route)
-hotspot("04 Existing manuscript — what I read", 880, 828, 220, 38, "05 First session — collaborator", "import-continue", LIGHT["accent"], LIGHT)
-hotspot("04 Existing manuscript — what I read", 200, 828, 220, 38, "05 First session — collaborator", "import-later", LIGHT["surface"], LIGHT, stroke=LIGHT["line"])
-
-# 05 collaborator → the novel workspace, once the proposals are accepted
-hotspot("05 First session — collaborator", 700, 296, 108, 22, "06 Workspace — novel", "accept-proposals", DARK["raised"], DARK, radius=11)
-
-# 06 / 07 → source control
-nav_button("06 Workspace — novel", 1240, 60, 96, 26, "Source", "08 Source control", "to-source", DARK, size=10)
-nav_button("07 Workspace — rulebook", 1240, 60, 96, 26, "Source", "08 Source control", "to-source-rules", LIGHT, size=10)
-
-# 08 source → back to the manuscript
-hotspot("08 Source control", 14, 54, 96, 28, "06 Workspace — novel", "tab-manuscript", DARK["surface"], DARK, radius=6)
-
-# Drop the empty page the document starts with, so page index == screen index.
+# Remove the empty page the document starts with, so page index == screen index.
 cmd("page.delete", id=1)
 
 out = Path(__file__).with_name("screens.json")
-out.write_text(json.dumps(commands, indent=1))
-print(f"{len(commands)} commands → {out}")
+# Content may reference any frame, and every frame now comes first. The trailing
+# page delete has to stay last, so it is split back out of the content list.
+deletes = [step for step in commands if step["command"] == "page.delete"]
+body = [step for step in commands if step["command"] != "page.delete"]
+out.write_text(json.dumps(frames + body + deletes, indent=1))
+print(f"{len(frames)} frame steps + {len(body)} content steps → {out}")
