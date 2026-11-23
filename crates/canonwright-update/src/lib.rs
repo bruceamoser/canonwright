@@ -37,6 +37,8 @@ pub enum UpdateError {
     Io(#[from] std::io::Error),
     #[error("no published release was found")]
     NoRelease,
+    #[error("this repository is private: an update check needs a GitHub token")]
+    NeedsAuth,
     #[error("no installer asset matches {platform}")]
     NoAsset { platform: String },
     #[error("the download exceeds the {0}-byte limit")]
@@ -180,6 +182,7 @@ pub struct UpdateService {
     target: Target,
     timeout: Duration,
     prefer_self_installable: bool,
+    token: Option<String>,
 }
 
 impl Default for UpdateService {
@@ -197,6 +200,7 @@ impl UpdateService {
             target: Target::current(),
             timeout: DEFAULT_TIMEOUT,
             prefer_self_installable: false,
+            token: None,
         }
     }
 
@@ -209,6 +213,17 @@ impl UpdateService {
     #[must_use]
     pub fn with_api_base(mut self, api_base: impl Into<String>) -> Self {
         self.api_base = api_base.into();
+        self
+    }
+
+    /// Send a GitHub token with the release query.
+    ///
+    /// A private repository answers `404` to an anonymous request, which is
+    /// indistinguishable from "no release" — so without a token the check can
+    /// only report that it needs one.
+    #[must_use]
+    pub fn with_token(mut self, token: Option<String>) -> Self {
+        self.token = token.filter(|value| !value.trim().is_empty());
         self
     }
 
@@ -412,14 +427,29 @@ impl UpdateService {
                 "refusing to query an insecure update endpoint: {url}"
             )));
         }
-        let response = self
+        let mut request = self
             .client()?
             .get(&url)
-            .header("Accept", "application/vnd.github+json")
+            .header("Accept", "application/vnd.github+json");
+        if let Some(token) = self.token.as_deref() {
+            request = request.bearer_auth(token);
+        }
+        let response = request
             .send()
             .map_err(|error| UpdateError::Network(error.to_string()))?;
         if response.status() == reqwest::StatusCode::NOT_FOUND {
-            return Ok(None);
+            // A private repository hides itself from anonymous callers, so the
+            // same 404 means "no release" to a token and "you cannot see this"
+            // to anyone else. Guessing "up to date" here is what made 0.2.0
+            // invisible after it shipped.
+            return if self.token.is_some() {
+                Ok(None)
+            } else {
+                Err(UpdateError::NeedsAuth)
+            };
+        }
+        if response.status() == reqwest::StatusCode::UNAUTHORIZED {
+            return Err(UpdateError::NeedsAuth);
         }
         if !response.status().is_success() {
             return Err(UpdateError::Network(format!(
@@ -1107,6 +1137,22 @@ mod tests {
     }
 
     #[test]
+    fn an_anonymous_404_asks_for_a_token_instead_of_claiming_up_to_date() {
+        // A private repository answers 404 to callers without a token. Treating
+        // that as "no release" is what hid 0.2.0 after it shipped.
+        let service = UpdateService::new("bruceamoser/canonwright");
+        assert!(service.token.is_none());
+
+        let with_token = service.with_token(Some("ghp_example".to_owned()));
+        assert_eq!(with_token.token.as_deref(), Some("ghp_example"));
+
+        // Blank tokens are not tokens.
+        let blank =
+            UpdateService::new("bruceamoser/canonwright").with_token(Some("   ".to_owned()));
+        assert!(blank.token.is_none());
+    }
+
+    #[test]
     fn checks_a_local_release_endpoint() {
         let body = release_json("v0.3.0", &[("Canonwright_0.3.0_amd64.AppImage", 10)]).to_string();
         let api_base = serve_once("200 OK", body);
@@ -1123,11 +1169,23 @@ mod tests {
 
     #[test]
     fn missing_release_is_reported_as_no_release() {
+        // The same 404 means two different things depending on whether we asked
+        // as a caller who can see private repositories.
         let api_base = serve_once("404 Not Found", String::new());
-        let service = UpdateService::new(DEFAULT_REPO)
+        let anonymous = UpdateService::new(DEFAULT_REPO)
             .with_api_base(api_base)
             .with_target(linux_x64());
-        let status = service.check("0.2.0").expect("check");
+        assert!(matches!(
+            anonymous.check("0.2.0"),
+            Err(UpdateError::NeedsAuth)
+        ));
+
+        let api_base = serve_once("404 Not Found", String::new());
+        let authenticated = UpdateService::new(DEFAULT_REPO)
+            .with_api_base(api_base)
+            .with_token(Some("ghp_example".to_owned()))
+            .with_target(linux_x64());
+        let status = authenticated.check("0.2.0").expect("check");
         assert!(matches!(status, UpdateStatus::NoRelease { .. }));
     }
 

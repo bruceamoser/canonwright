@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.2.1
+
+The release that makes the previous one visible.
+
+### The updater could not see 0.2.0
+
+`GET /repos/{repo}/releases/latest` was called without a token. On a private
+repository GitHub answers `404` to anonymous callers — the same status it uses
+for "no release" — and the updater read that as *up to date*. So 0.2.0 shipped,
+was marked latest, and stayed invisible.
+
+The check now sends the token from the keychain, and an anonymous `404` is
+reported as **needing a token** instead of claiming the app is current. An
+authenticated `404` still means "no release", which is now the only thing it can
+mean.
+
+Consequence worth stating: **checking for updates requires being signed in.**
+That is unavoidable while the repository is private — an anonymous request
+cannot see the release list at all. If the repository is ever made public, the
+anonymous path starts working again with no code change.
+
+### Also
+
+- One test now covers both meanings of `404`; the previous one asserted the
+  behaviour that caused this.
+
 ## 0.2.0
 
 The first release where Canonwright behaves like a product rather than a harness

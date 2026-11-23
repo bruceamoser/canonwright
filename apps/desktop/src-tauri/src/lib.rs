@@ -5340,8 +5340,13 @@ fn update_service() -> canonwright_update::UpdateService {
         .ok()
         .filter(|repo| !repo.trim().is_empty())
         .unwrap_or_else(|| canonwright_update::DEFAULT_REPO.to_owned());
+    // The releases are in a private repository, so an anonymous query gets a
+    // 404 that looks exactly like "no release". The stored token is what makes
+    // the check mean anything; without it the updater says so instead of
+    // claiming the app is current.
     let mut service = canonwright_update::UpdateService::new(repo)
-        .with_self_installable(canonwright_update::running_app_image().is_some());
+        .with_self_installable(canonwright_update::running_app_image().is_some())
+        .with_token(github_api::stored_token());
     if let Ok(api_base) = std::env::var("CANONWRIGHT_UPDATE_API") {
         if !api_base.trim().is_empty() {
             service = service.with_api_base(api_base);
