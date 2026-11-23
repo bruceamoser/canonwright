@@ -26,6 +26,35 @@ about the book, and the rest about the work.
 | [`07-workspace---rulebook.png`](screens/07-workspace---rulebook.png) | Book tree, entity fields, cross-references. Light theme. |
 | [`08-source-control.png`](screens/08-source-control.png) | Changes, staged, commit, branches, tags, merge conflict. |
 
+## Running the prototype
+
+`canonwright-ux.figcraft` is a **clickable prototype**, not a set of pictures.
+Every screen is a frame, and the buttons are wired to each other:
+
+```
+00 First run ──skip / open browser──▶ 01 Welcome
+01 Welcome ──new story──▶ 02 What       ──open a project──▶ 06 Workspace
+02 What ──novel──▶ 03 New manuscript    ──rulebook──▶ 07 Workspace
+        ──import a draft──▶ 04 Existing manuscript
+03 New manuscript ──create──▶ 05 First session
+04 Existing ──import / answer later──▶ 05 First session
+05 First session ──accept the proposals──▶ 06 Workspace
+06 / 07 ──source──▶ 08 Source control    08 ──manuscript tab──▶ 06
+```
+
+Fifteen links, checked: every destination resolves to a frame.
+
+To run it: open `canonwright-ux.figcraft` in FigCraft and press the play
+button (or `view.prototype`, Alt+9, to see the wiring). Click through from the
+first screen. The two entry points worth trying:
+
+- **New book** — Welcome → New story → Novel → pick a seed → Create → the
+  collaborator opens with proposals.
+- **Existing draft** — Welcome → New story → *Import a draft* → what was read
+  from the file → Import and continue.
+
+`python3 verify_prototype.py` re-checks every link after an edit.
+
 ## The palette
 
 Taken from the logo, so the product and the mark agree:

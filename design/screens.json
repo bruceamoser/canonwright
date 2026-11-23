@@ -2,545 +2,22 @@
  {
   "command": "page.add",
   "params": {
-   "name": "01 Welcome"
-  }
- },
- {
-  "command": "page.setBackground",
-  "params": {
-   "color": "#F7F3FF"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 900,
-   "name": "01 Welcome / background",
-   "props": {
-    "fill": "#F7F3FF"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 44,
-   "name": "titlebar",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 0
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 0,
-   "y": 43,
-   "width": 1440,
-   "height": 1,
-   "name": "titlebar rule",
-   "props": {
-    "fill": "#E2DAF0",
-    "cornerRadius": 0
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 16,
-   "y": 12,
-   "width": 20,
-   "height": 20,
-   "name": "mark",
-   "props": {
-    "fill": "#C5A7FF",
-    "cornerRadius": 6
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Canonwright",
-   "x": 44,
-   "y": 15,
-   "props": {
-    "fontSize": 12,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A",
-    "fontStyle": "Bold"
-   },
-   "name": "Canonwright"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 120,
-   "y": 13,
-   "width": 1,
-   "height": 18,
-   "name": "rect",
-   "props": {
-    "fill": "#E2DAF0",
-    "cornerRadius": 0
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "no project open",
-   "x": 134,
-   "y": 15,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "no project open"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1336,
-   "y": 12,
-   "width": 44,
-   "height": 20,
-   "name": "rect",
-   "props": {
-    "fill": "#F1ECFB",
-    "cornerRadius": 10,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1336,
-   "y": 12,
-   "width": 22,
-   "height": 20,
-   "name": "theme knob",
-   "props": {
-    "fill": "#C5A7FF",
-    "cornerRadius": 10
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Settings",
-   "x": 1392,
-   "y": 15,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "Settings"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Write the book.",
-   "x": 120,
-   "y": 170,
-   "props": {
-    "fontSize": 44,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A",
-    "fontStyle": "Bold"
-   },
-   "name": "Write the book."
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Keep the canon.",
-   "x": 120,
-   "y": 226,
-   "props": {
-    "fontSize": 44,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#8058C5",
-    "fontStyle": "Bold"
-   },
-   "name": "Keep the canon."
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Scenes, viewpoints, facts, rules and threads \u2014 held as state,",
-   "x": 120,
-   "y": 296,
-   "props": {
-    "fontSize": 13,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "Scenes, viewpoints, fact"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "so continuity is checked instead of remembered.",
-   "x": 120,
-   "y": 316,
-   "props": {
-    "fontSize": 13,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "so continuity is checked"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 120,
-   "y": 380,
-   "width": 440,
-   "height": 190,
-   "name": "rect",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 14,
-    "stroke": "#8058C5",
-    "strokeWeight": 1
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Start a new story",
-   "x": 148,
-   "y": 406,
-   "props": {
-    "fontSize": 17,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A",
-    "fontStyle": "Bold"
-   },
-   "name": "Start a new story"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "A novel or a rulebook. Answer a short interview,",
-   "x": 148,
-   "y": 434,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "A novel or a rulebook. A"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "or import a draft you already have.",
-   "x": 148,
-   "y": 452,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "or import a draft you al"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 148,
-   "y": 486,
-   "width": 150,
-   "height": 34,
-   "name": "rect",
-   "props": {
-    "fill": "#8058C5",
-    "cornerRadius": 8
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "New story",
-   "x": 172,
-   "y": 496,
-   "props": {
-    "fontSize": 12,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#FFFFFF",
-    "fontStyle": "Bold"
-   },
-   "name": "New story"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "or press \u2318N",
-   "x": 316,
-   "y": 496,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "or press \u2318N"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 592,
-   "y": 380,
-   "width": 440,
-   "height": 190,
-   "name": "rect",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 14,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Open a project",
-   "x": 620,
-   "y": 406,
-   "props": {
-    "fontSize": 17,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A",
-    "fontStyle": "Bold"
-   },
-   "name": "Open a project"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "A folder, or a GitHub repository you already",
-   "x": 620,
-   "y": 434,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "A folder, or a GitHub re"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "keep your manuscript in.",
-   "x": 620,
-   "y": 452,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "keep your manuscript in."
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 620,
-   "y": 486,
-   "width": 150,
-   "height": 34,
-   "name": "rect",
-   "props": {
-    "fill": "#F1ECFB",
-    "cornerRadius": 8,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Open folder",
-   "x": 644,
-   "y": 496,
-   "props": {
-    "fontSize": 12,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A",
-    "fontStyle": "Bold"
-   },
-   "name": "Open folder"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "RECENT",
-   "x": 120,
-   "y": 610,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "RECENT"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 120,
-   "y": 630,
-   "width": 912,
-   "height": 1,
-   "name": "rect",
-   "props": {
-    "fill": "#E2DAF0",
-    "cornerRadius": 0
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "No projects yet. Everything you open appears here, most recent first.",
-   "x": 120,
-   "y": 650,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "No projects yet. Everyth"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 120,
-   "y": 706,
-   "width": 912,
-   "height": 1,
-   "name": "rect",
-   "props": {
-    "fill": "#E2DAF0",
-    "cornerRadius": 0
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Light and dark follow the system until you choose one.",
-   "x": 120,
-   "y": 724,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "Light and dark follow th"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1148,
-   "y": 716,
-   "width": 44,
-   "height": 20,
-   "name": "rect",
-   "props": {
-    "fill": "#F1ECFB",
-    "cornerRadius": 10,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1148,
-   "y": 716,
-   "width": 22,
-   "height": 20,
-   "name": "rect",
-   "props": {
-    "fill": "#C5A7FF",
-    "cornerRadius": 10
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Theme",
-   "x": 1204,
-   "y": 720,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "Theme"
-  }
- },
- {
-  "command": "page.add",
-  "params": {
    "name": "00 First run \u2014 GitHub"
   }
  },
  {
-  "command": "page.setBackground",
-  "params": {
-   "color": "#14161C"
-  }
- },
- {
-  "command": "shape.rectangle",
+  "command": "frame.create",
   "params": {
    "x": 0,
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "00 First run \u2014 GitHub / background",
+   "name": "00 First run \u2014 GitHub",
    "props": {
     "fill": "#14161C"
    }
-  }
+  },
+  "as": "screen:00 First run \u2014 GitHub"
  },
  {
   "command": "shape.rectangle",
@@ -553,6 +30,9 @@
    "props": {
     "fill": "#1B1F27",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -567,6 +47,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -581,6 +64,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -596,7 +82,10 @@
     "fill": "#F2EFF9",
     "fontStyle": "Bold"
    },
-   "name": "Canonwright"
+   "name": "Canonwright",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -610,6 +99,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -624,7 +116,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Welcome to Canonwright"
+   "name": "Welcome to Canonwright",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -640,6 +135,9 @@
     "cornerRadius": 10,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -654,6 +152,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 10
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -668,7 +169,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Settings"
+   "name": "Settings",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -683,7 +187,10 @@
     "fill": "#F2EFF9",
     "fontStyle": "Bold"
    },
-   "name": "Your manuscript should l"
+   "name": "Your manuscript should l",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -697,7 +204,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#CFC9DE"
    },
-   "name": "Not because you are a pr"
+   "name": "Not because you are a pr",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -711,7 +221,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#CFC9DE"
    },
-   "name": "show someone is a draft "
+   "name": "show someone is a draft ",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -727,6 +240,9 @@
     "cornerRadius": 12,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -741,7 +257,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "WHY THIS IS ASKED FIRST"
+   "name": "WHY THIS IS ASKED FIRST",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -756,7 +275,10 @@
     "fill": "#F2EFF9"
    },
    "name": "An existing manuscript i",
-   "width": 580
+   "width": 580,
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -771,7 +293,10 @@
     "fill": "#F2EFF9"
    },
    "name": "Connecting now means pro",
-   "width": 580
+   "width": 580,
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -786,7 +311,10 @@
     "fill": "#F2EFF9"
    },
    "name": "alongside \u201copen a file\u201d.",
-   "width": 580
+   "width": 580,
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -802,6 +330,9 @@
     "cornerRadius": 12,
     "stroke": "#C5A7FF",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -816,7 +347,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#C5A7FF"
    },
-   "name": "SIGNING IN"
+   "name": "SIGNING IN",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -830,7 +364,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "Enter this code on GitHu"
+   "name": "Enter this code on GitHu",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -846,6 +383,9 @@
     "cornerRadius": 8,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -861,7 +401,10 @@
     "fill": "#C5A7FF",
     "fontStyle": "Bold"
    },
-   "name": "ABCD-1234"
+   "name": "ABCD-1234",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -875,7 +418,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "github.com/login/device "
+   "name": "github.com/login/device ",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -889,6 +435,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -904,7 +453,10 @@
     "fill": "#FFFFFF",
     "fontStyle": "Bold"
    },
-   "name": "Open the browser"
+   "name": "Open the browser",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -920,6 +472,9 @@
     "cornerRadius": 8,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -934,7 +489,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Skip for now"
+   "name": "Skip for now",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -948,7 +506,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Skipping is fine. Settin"
+   "name": "Skipping is fine. Settin",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -962,7 +523,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "simply stays unavailable"
+   "name": "simply stays unavailable",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -978,6 +542,9 @@
     "cornerRadius": 12,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -992,7 +559,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "ALREADY CHECKED"
+   "name": "ALREADY CHECKED",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -1006,7 +576,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "git installed"
+   "name": "git installed",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -1020,7 +593,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#7BD88F"
    },
-   "name": "2.43"
+   "name": "2.43",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -1034,7 +610,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "GitHub CLI"
+   "name": "GitHub CLI",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -1048,7 +627,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#7BD88F"
    },
-   "name": "2.97"
+   "name": "2.97",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -1062,7 +644,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "signed in"
+   "name": "signed in",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -1076,7 +661,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2C879"
    },
-   "name": "not yet"
+   "name": "not yet",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -1090,7 +678,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "a local model key"
+   "name": "a local model key",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -1104,7 +695,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#7BD88F"
    },
-   "name": "configured"
+   "name": "configured",
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -1118,6 +712,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
    }
   }
  },
@@ -1133,7 +730,10 @@
     "fill": "#9A93AD"
    },
    "name": "None of this is required",
-   "width": 300
+   "width": 300,
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -1148,7 +748,10 @@
     "fill": "#9A93AD"
    },
    "name": "It is required to keep t",
-   "width": 300
+   "width": 300,
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
   }
  },
  {
@@ -1158,23 +761,18 @@
   }
  },
  {
-  "command": "page.setBackground",
-  "params": {
-   "color": "#F7F3FF"
-  }
- },
- {
-  "command": "shape.rectangle",
+  "command": "frame.create",
   "params": {
    "x": 0,
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "01 Welcome / background",
+   "name": "01 Welcome",
    "props": {
     "fill": "#F7F3FF"
    }
-  }
+  },
+  "as": "screen:01 Welcome"
  },
  {
   "command": "shape.rectangle",
@@ -1187,6 +785,9 @@
    "props": {
     "fill": "#FFFFFF",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1201,6 +802,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1215,6 +819,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1230,7 +837,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Canonwright"
+   "name": "Canonwright",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1244,6 +854,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1258,7 +871,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "no project open"
+   "name": "no project open",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1274,6 +890,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1288,6 +907,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 10
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1302,7 +924,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Settings"
+   "name": "Settings",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1317,7 +942,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Write the book."
+   "name": "Write the book.",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1332,7 +960,10 @@
     "fill": "#8058C5",
     "fontStyle": "Bold"
    },
-   "name": "Keep the canon."
+   "name": "Keep the canon.",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1346,7 +977,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Scenes, viewpoints, fact"
+   "name": "Scenes, viewpoints, fact",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1360,7 +994,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "so continuity is checked"
+   "name": "so continuity is checked",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1376,6 +1013,9 @@
     "cornerRadius": 14,
     "stroke": "#8058C5",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1391,7 +1031,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Start a new story"
+   "name": "Start a new story",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1405,7 +1048,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "A novel or a rulebook. A"
+   "name": "A novel or a rulebook. A",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1419,7 +1065,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "or import a draft you al"
+   "name": "or import a draft you al",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1433,6 +1082,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1448,7 +1100,10 @@
     "fill": "#FFFFFF",
     "fontStyle": "Bold"
    },
-   "name": "New story"
+   "name": "New story",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1462,7 +1117,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "or press \u2318N"
+   "name": "or press \u2318N",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1478,6 +1136,9 @@
     "cornerRadius": 14,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1493,7 +1154,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Open a project"
+   "name": "Open a project",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1507,7 +1171,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "A folder, or a GitHub re"
+   "name": "A folder, or a GitHub re",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1521,7 +1188,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "keep your manuscript in."
+   "name": "keep your manuscript in.",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1537,6 +1207,9 @@
     "cornerRadius": 8,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1552,7 +1225,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Open folder"
+   "name": "Open folder",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1566,7 +1242,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "RECENT"
+   "name": "RECENT",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1580,6 +1259,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1594,7 +1276,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "No projects yet. Everyth"
+   "name": "No projects yet. Everyth",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1608,6 +1293,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1622,7 +1310,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Light and dark follow th"
+   "name": "Light and dark follow th",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1638,6 +1329,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1652,6 +1346,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 10
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
    }
   }
  },
@@ -1666,7 +1363,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Theme"
+   "name": "Theme",
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
   }
  },
  {
@@ -1676,23 +1376,18 @@
   }
  },
  {
-  "command": "page.setBackground",
-  "params": {
-   "color": "#F7F3FF"
-  }
- },
- {
-  "command": "shape.rectangle",
+  "command": "frame.create",
   "params": {
    "x": 0,
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "02 New story \u2014 what / background",
+   "name": "02 New story \u2014 what",
    "props": {
     "fill": "#F7F3FF"
    }
-  }
+  },
+  "as": "screen:02 New story \u2014 what"
  },
  {
   "command": "shape.rectangle",
@@ -1705,6 +1400,9 @@
    "props": {
     "fill": "#FFFFFF",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -1719,6 +1417,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -1733,6 +1434,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -1748,7 +1452,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Canonwright"
+   "name": "Canonwright",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -1762,6 +1469,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -1776,7 +1486,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "New story"
+   "name": "New story",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -1792,6 +1505,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -1806,6 +1522,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 10
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -1820,7 +1539,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Settings"
+   "name": "Settings",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -1834,6 +1556,9 @@
    "props": {
     "fill": "#FFFFFF",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -1848,6 +1573,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -1862,7 +1590,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "NEW STORY"
+   "name": "NEW STORY",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -1876,6 +1607,9 @@
    "props": {
     "fill": "#F1ECFB",
     "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -1890,6 +1624,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 2
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -1905,7 +1642,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "1   What you are writing"
+   "name": "1   What you are writing",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -1919,7 +1659,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "2   Where it starts"
+   "name": "2   Where it starts",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -1933,7 +1676,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "3   The interview"
+   "name": "3   The interview",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -1948,7 +1694,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "What are you writing?"
+   "name": "What are you writing?",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -1962,7 +1711,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "This decides the questio"
+   "name": "This decides the questio",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -1976,7 +1728,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "the workspace. You can c"
+   "name": "the workspace. You can c",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -1992,6 +1747,9 @@
     "cornerRadius": 14,
     "stroke": "#8058C5",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2006,6 +1764,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 2
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2021,7 +1782,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "A novel"
+   "name": "A novel",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2035,7 +1799,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Scenes with a viewpoint,"
+   "name": "Scenes with a viewpoint,",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2049,7 +1816,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "threads that get planted"
+   "name": "threads that get planted",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2063,6 +1833,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 3
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2077,7 +1850,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Continuity: value shifts"
+   "name": "Continuity: value shifts",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2091,6 +1867,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 3
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2105,7 +1884,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Knowledge leaks: who cou"
+   "name": "Knowledge leaks: who cou",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2119,6 +1901,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 3
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2133,7 +1918,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Voice: per-character con"
+   "name": "Voice: per-character con",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2149,6 +1937,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2164,7 +1955,10 @@
     "fill": "#8058C5"
    },
    "name": "default",
-   "width": 58
+   "width": 58,
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2180,6 +1974,9 @@
     "cornerRadius": 14,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2195,7 +1992,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "A rulebook"
+   "name": "A rulebook",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2209,7 +2009,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Chapters, procedures, cl"
+   "name": "Chapters, procedures, cl",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2223,7 +2026,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "with cross-references th"
+   "name": "with cross-references th",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2237,6 +2043,9 @@
    "props": {
     "fill": "#6F6885",
     "cornerRadius": 3
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2251,7 +2060,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Referential integrity: e"
+   "name": "Referential integrity: e",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2265,6 +2077,9 @@
    "props": {
     "fill": "#6F6885",
     "cornerRadius": 3
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2279,7 +2094,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Completeness: a class wi"
+   "name": "Completeness: a class wi",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2293,6 +2111,9 @@
    "props": {
     "fill": "#6F6885",
     "cornerRadius": 3
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2307,7 +2128,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Balance: the cap you dec"
+   "name": "Balance: the cap you dec",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2321,6 +2145,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2335,7 +2162,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Hybrid books \u2014 a setting"
+   "name": "Hybrid books \u2014 a setting",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2349,7 +2179,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "choose either and turn o"
+   "name": "choose either and turn o",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2363,6 +2196,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
    }
   }
  },
@@ -2378,7 +2214,10 @@
     "fill": "#FFFFFF",
     "fontStyle": "Bold"
    },
-   "name": "Continue"
+   "name": "Continue",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2392,7 +2231,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Cancel"
+   "name": "Cancel",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
   }
  },
  {
@@ -2402,23 +2244,18 @@
   }
  },
  {
-  "command": "page.setBackground",
-  "params": {
-   "color": "#F7F3FF"
-  }
- },
- {
-  "command": "shape.rectangle",
+  "command": "frame.create",
   "params": {
    "x": 0,
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "03 New manuscript \u2014 start / background",
+   "name": "03 New manuscript \u2014 start",
    "props": {
     "fill": "#F7F3FF"
    }
-  }
+  },
+  "as": "screen:03 New manuscript \u2014 start"
  },
  {
   "command": "shape.rectangle",
@@ -2431,6 +2268,9 @@
    "props": {
     "fill": "#FFFFFF",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2445,6 +2285,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2459,6 +2302,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2474,7 +2320,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Canonwright"
+   "name": "Canonwright",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2488,6 +2337,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2502,7 +2354,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "New manuscript"
+   "name": "New manuscript",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2518,6 +2373,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2532,6 +2390,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 10
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2546,7 +2407,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Settings"
+   "name": "Settings",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2561,7 +2425,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Where does it start?"
+   "name": "Where does it start?",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2575,7 +2442,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "A new book needs a way i"
+   "name": "A new book needs a way i",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2589,7 +2459,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "have \u2014 the collaborator "
+   "name": "have \u2014 the collaborator ",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2605,6 +2478,9 @@
     "cornerRadius": 12,
     "stroke": "#8058C5",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2620,7 +2496,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "A character"
+   "name": "A character",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2634,7 +2513,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Someone with a want that"
+   "name": "Someone with a want that",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2650,6 +2532,9 @@
     "cornerRadius": 8,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2665,7 +2550,10 @@
     "fill": "#25243A"
    },
    "name": "A caravan master who has",
-   "width": 800
+   "width": 800,
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2681,6 +2569,9 @@
     "cornerRadius": 12,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2696,7 +2587,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "A situation"
+   "name": "A situation",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2710,7 +2604,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "A place and a pressure, "
+   "name": "A place and a pressure, ",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2724,7 +2621,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "click to write yours"
+   "name": "click to write yours",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2740,6 +2640,9 @@
     "cornerRadius": 12,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2755,7 +2658,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "A question"
+   "name": "A question",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2769,7 +2675,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "The thing the book is tr"
+   "name": "The thing the book is tr",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2783,7 +2692,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "click to write yours"
+   "name": "click to write yours",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2797,7 +2709,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "TITLE"
+   "name": "TITLE",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2813,6 +2728,9 @@
     "cornerRadius": 8,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2827,7 +2745,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "The Salt Road"
+   "name": "The Salt Road",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2843,6 +2764,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2858,7 +2782,10 @@
     "fill": "#8058C5"
    },
    "name": "Novel \u00b7 fantasy",
-   "width": 118
+   "width": 118,
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2874,6 +2801,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2888,7 +2818,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A6B12"
    },
-   "name": "THE REST IS NOT A FORM"
+   "name": "THE REST IS NOT A FORM",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2903,7 +2836,10 @@
     "fill": "#25243A"
    },
    "name": "No cast, no world rules,",
-   "width": 860
+   "width": 860,
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2918,7 +2854,10 @@
     "fill": "#25243A"
    },
    "name": "you push back, and nothi",
-   "width": 860
+   "width": 860,
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2932,6 +2871,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
    }
   }
  },
@@ -2947,7 +2889,10 @@
     "fill": "#FFFFFF",
     "fontStyle": "Bold"
    },
-   "name": "Create project"
+   "name": "Create project",
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
   }
  },
  {
@@ -2957,23 +2902,18 @@
   }
  },
  {
-  "command": "page.setBackground",
-  "params": {
-   "color": "#F7F3FF"
-  }
- },
- {
-  "command": "shape.rectangle",
+  "command": "frame.create",
   "params": {
    "x": 0,
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "04 Existing manuscript \u2014 what I read / background",
+   "name": "04 Existing manuscript \u2014 what I read",
    "props": {
     "fill": "#F7F3FF"
    }
-  }
+  },
+  "as": "screen:04 Existing manuscript \u2014 what I read"
  },
  {
   "command": "shape.rectangle",
@@ -2986,6 +2926,9 @@
    "props": {
     "fill": "#FFFFFF",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3000,6 +2943,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3014,6 +2960,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3029,7 +2978,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Canonwright"
+   "name": "Canonwright",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3043,6 +2995,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3057,7 +3012,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Import \u00b7 draft.md"
+   "name": "Import \u00b7 draft.md",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3073,6 +3031,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3087,6 +3048,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 10
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3101,7 +3065,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Settings"
+   "name": "Settings",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3116,7 +3083,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "I read the draft. Here i"
+   "name": "I read the draft. Here i",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3130,7 +3100,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "These questions came fro"
+   "name": "These questions came fro",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3144,7 +3117,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "anything you skip stays "
+   "name": "anything you skip stays ",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3160,6 +3136,9 @@
     "cornerRadius": 12,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3174,7 +3153,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "THE SALT ROAD.DOCX \u00b7 REA"
+   "name": "THE SALT ROAD.DOCX \u00b7 REA",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3189,7 +3171,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "41,200 words"
+   "name": "41,200 words",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3203,7 +3188,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "24 scenes"
+   "name": "24 scenes",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3218,7 +3206,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "3 viewpoints"
+   "name": "3 viewpoints",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3232,7 +3223,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "past tense"
+   "name": "past tense",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3247,7 +3241,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "1 unresolved thread"
+   "name": "1 unresolved thread",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3261,7 +3258,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "2 name mismatches"
+   "name": "2 name mismatches",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3275,7 +3275,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Third limited, past tens"
+   "name": "Third limited, past tens",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3289,7 +3292,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "QUESTIONS FROM THE DRAFT"
+   "name": "QUESTIONS FROM THE DRAFT",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3305,6 +3311,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3320,7 +3329,10 @@
     "fill": "#25243A"
    },
    "name": "I count three viewpoints",
-   "width": 860
+   "width": 860,
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3334,7 +3346,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#8058C5"
    },
-   "name": "choice: protagonist \u00b7 ob"
+   "name": "choice: protagonist \u00b7 ob",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3350,6 +3365,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3365,7 +3383,10 @@
     "fill": "#25243A"
    },
    "name": "'the Factor's Office' an",
-   "width": 860
+   "width": 860,
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3379,7 +3400,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#8058C5"
    },
-   "name": "choice: the Factor's Off"
+   "name": "choice: the Factor's Off",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3395,6 +3419,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3410,7 +3437,10 @@
     "fill": "#25243A"
    },
    "name": "Scene 14 has no causal l",
-   "width": 860
+   "width": 860,
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3424,7 +3454,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#8058C5"
    },
-   "name": "choice: flashback \u00b7 gap "
+   "name": "choice: flashback \u00b7 gap ",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3440,6 +3473,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3455,7 +3491,10 @@
     "fill": "#25243A"
    },
    "name": "The forged-seal thread i",
-   "width": 860
+   "width": 860,
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3469,7 +3508,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#8058C5"
    },
-   "name": "choice: intentional \u00b7 ho"
+   "name": "choice: intentional \u00b7 ho",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3485,6 +3527,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3499,7 +3544,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "WHAT HAPPENS NEXT"
+   "name": "WHAT HAPPENS NEXT",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3514,7 +3562,10 @@
     "fill": "#25243A"
    },
    "name": "The manuscript becomes 2",
-   "width": 860
+   "width": 860,
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3529,7 +3580,10 @@
     "fill": "#25243A"
    },
    "name": "The collaborator then wo",
-   "width": 860
+   "width": 860,
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3545,6 +3599,9 @@
     "cornerRadius": 8,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3559,7 +3616,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Answer later"
+   "name": "Answer later",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3573,6 +3633,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
    }
   }
  },
@@ -3588,7 +3651,10 @@
     "fill": "#FFFFFF",
     "fontStyle": "Bold"
    },
-   "name": "Import and continue"
+   "name": "Import and continue",
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
   }
  },
  {
@@ -3598,23 +3664,18 @@
   }
  },
  {
-  "command": "page.setBackground",
-  "params": {
-   "color": "#14161C"
-  }
- },
- {
-  "command": "shape.rectangle",
+  "command": "frame.create",
   "params": {
    "x": 0,
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "05 First session \u2014 collaborator / background",
+   "name": "05 First session \u2014 collaborator",
    "props": {
     "fill": "#14161C"
    }
-  }
+  },
+  "as": "screen:05 First session \u2014 collaborator"
  },
  {
   "command": "shape.rectangle",
@@ -3627,6 +3688,9 @@
    "props": {
     "fill": "#1B1F27",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -3641,6 +3705,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -3655,6 +3722,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -3670,7 +3740,10 @@
     "fill": "#F2EFF9",
     "fontStyle": "Bold"
    },
-   "name": "Canonwright"
+   "name": "Canonwright",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3684,6 +3757,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -3698,7 +3774,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "The Salt Road"
+   "name": "The Salt Road",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3714,6 +3793,9 @@
     "cornerRadius": 10,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -3728,6 +3810,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 10
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -3742,7 +3827,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Settings"
+   "name": "Settings",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3756,6 +3844,9 @@
    "props": {
     "fill": "#1B1F27",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -3770,6 +3861,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -3784,7 +3878,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "THE SALT ROAD"
+   "name": "THE SALT ROAD",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3798,7 +3895,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Novel \u00b7 third limited \u00b7 "
+   "name": "Novel \u00b7 third limited \u00b7 ",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3812,7 +3912,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "CANON"
+   "name": "CANON",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3826,7 +3929,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "0 characters"
+   "name": "0 characters",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3840,7 +3946,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "0 facts"
+   "name": "0 facts",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3854,7 +3963,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "0 threads"
+   "name": "0 threads",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3868,7 +3980,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "MANUSCRIPT"
+   "name": "MANUSCRIPT",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3882,7 +3997,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "0 scenes"
+   "name": "0 scenes",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3896,7 +4014,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "PROPOSED"
+   "name": "PROPOSED",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3910,7 +4031,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#C5A7FF"
    },
-   "name": "3 characters"
+   "name": "3 characters",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3924,7 +4048,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#C5A7FF"
    },
-   "name": "1 rule"
+   "name": "1 rule",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3938,7 +4065,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "WRITERS' ROOM"
+   "name": "WRITERS' ROOM",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3954,6 +4084,9 @@
     "cornerRadius": 12,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -3969,7 +4102,10 @@
     "fill": "#C5A7FF",
     "fontStyle": "Bold"
    },
-   "name": "Collaborator"
+   "name": "Collaborator",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3984,7 +4120,10 @@
     "fill": "#F2EFF9"
    },
    "name": "The project is set up, s",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -3999,7 +4138,10 @@
     "fill": "#F2EFF9"
    },
    "name": "Here is the shape I woul",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4014,7 +4156,10 @@
     "fill": "#F2EFF9"
    },
    "name": "closed road:",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4029,7 +4174,10 @@
     "fill": "#CFC9DE"
    },
    "name": "\u00b7 Mara Vale, a caravan m",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4044,7 +4192,10 @@
     "fill": "#CFC9DE"
    },
    "name": "  needs to admit she lef",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4059,7 +4210,10 @@
     "fill": "#CFC9DE"
    },
    "name": "\u00b7 Harek, the ford warden",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4074,7 +4228,10 @@
     "fill": "#CFC9DE"
    },
    "name": "\u00b7 Ilse, the duke's facto",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4089,7 +4246,10 @@
     "fill": "#CFC9DE"
    },
    "name": "A hard rule: no salt cro",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4104,7 +4264,10 @@
     "fill": "#9A93AD"
    },
    "name": "Say what to change, or a",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4120,6 +4283,9 @@
     "cornerRadius": 11,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -4134,7 +4300,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#C5A7FF"
    },
-   "name": "Accept all three"
+   "name": "Accept all three",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4150,6 +4319,9 @@
     "cornerRadius": 11,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -4164,7 +4336,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Edit one"
+   "name": "Edit one",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4180,6 +4355,9 @@
     "cornerRadius": 11,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -4194,7 +4372,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Start over"
+   "name": "Start over",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4210,6 +4391,9 @@
     "cornerRadius": 12,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -4225,7 +4409,10 @@
     "fill": "#F2EFF9"
    },
    "name": "Mara is good. Make Harek",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4241,6 +4428,9 @@
     "cornerRadius": 12,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -4256,7 +4446,10 @@
     "fill": "#C5A7FF",
     "fontStyle": "Bold"
    },
-   "name": "Collaborator"
+   "name": "Collaborator",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4271,7 +4464,10 @@
     "fill": "#F2EFF9"
    },
    "name": "Brother changes the firs",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4286,7 +4482,10 @@
     "fill": "#F2EFF9"
    },
    "name": "a political one. I have ",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4301,7 +4500,10 @@
     "fill": "#F2EFF9"
    },
    "name": "money he cannot repay \u2014 ",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4316,7 +4518,10 @@
     "fill": "#9A93AD"
    },
    "name": "Two ways to open: the fo",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4331,7 +4536,10 @@
     "fill": "#9A93AD"
    },
    "name": "I would take the second ",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4347,6 +4555,9 @@
     "cornerRadius": 12,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -4362,7 +4573,10 @@
     "fill": "#9A93AD"
    },
    "name": "Tell me who burned the f",
-   "width": 720
+   "width": 720,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4378,6 +4592,9 @@
     "cornerRadius": 10,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -4392,7 +4609,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Reply, or press \u2318K for a"
+   "name": "Reply, or press \u2318K for a",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4406,6 +4626,9 @@
    "props": {
     "fill": "#1B1F27",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -4420,6 +4643,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -4434,7 +4660,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "PROPOSED CANON"
+   "name": "PROPOSED CANON",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4448,7 +4677,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2EFF9"
    },
-   "name": "Mara Vale"
+   "name": "Mara Vale",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4462,7 +4694,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#C5A7FF"
    },
-   "name": "proposed"
+   "name": "proposed",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4476,7 +4711,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2EFF9"
    },
-   "name": "Harek"
+   "name": "Harek",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4490,7 +4728,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#C5A7FF"
    },
-   "name": "proposed"
+   "name": "proposed",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4504,7 +4745,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2EFF9"
    },
-   "name": "Ilse"
+   "name": "Ilse",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4518,7 +4762,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#C5A7FF"
    },
-   "name": "proposed"
+   "name": "proposed",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4532,7 +4779,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2EFF9"
    },
-   "name": "no-salt-unsealed"
+   "name": "no-salt-unsealed",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4546,7 +4796,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#C5A7FF"
    },
-   "name": "proposed"
+   "name": "proposed",
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4560,6 +4813,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
    }
   }
  },
@@ -4575,7 +4831,10 @@
     "fill": "#9A93AD"
    },
    "name": "Nothing is canon until y",
-   "width": 240
+   "width": 240,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4590,7 +4849,10 @@
     "fill": "#9A93AD"
    },
    "name": "Accepted proposals becom",
-   "width": 240
+   "width": 240,
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
   }
  },
  {
@@ -4600,23 +4862,18 @@
   }
  },
  {
-  "command": "page.setBackground",
-  "params": {
-   "color": "#14161C"
-  }
- },
- {
-  "command": "shape.rectangle",
+  "command": "frame.create",
   "params": {
    "x": 0,
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "06 Workspace \u2014 novel / background",
+   "name": "06 Workspace \u2014 novel",
    "props": {
     "fill": "#14161C"
    }
-  }
+  },
+  "as": "screen:06 Workspace \u2014 novel"
  },
  {
   "command": "shape.rectangle",
@@ -4629,6 +4886,9 @@
    "props": {
     "fill": "#1B1F27",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -4643,6 +4903,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -4657,6 +4920,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -4672,7 +4938,10 @@
     "fill": "#F2EFF9",
     "fontStyle": "Bold"
    },
-   "name": "Canonwright"
+   "name": "Canonwright",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4686,6 +4955,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -4700,7 +4972,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "The Salt Road \u00b7 Novel"
+   "name": "The Salt Road \u00b7 Novel",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4716,6 +4991,9 @@
     "cornerRadius": 10,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -4730,6 +5008,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 10
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -4744,7 +5025,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Settings"
+   "name": "Settings",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4758,6 +5042,9 @@
    "props": {
     "fill": "#1B1F27",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -4772,6 +5059,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -4786,7 +5076,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "SCENES"
+   "name": "SCENES",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4802,6 +5095,9 @@
     "cornerRadius": 6,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -4816,7 +5112,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "+ Scene"
+   "name": "+ Scene",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4830,7 +5129,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#9A93AD"
    },
-   "name": "1"
+   "name": "1",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4844,7 +5146,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "The ford"
+   "name": "The ford",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4858,7 +5163,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#7BD88F"
    },
-   "name": "canon"
+   "name": "canon",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4872,7 +5180,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#9A93AD"
    },
-   "name": "2"
+   "name": "2",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4886,7 +5197,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "The tally"
+   "name": "The tally",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4900,7 +5214,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#7BD88F"
    },
-   "name": "canon"
+   "name": "canon",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4914,6 +5231,9 @@
    "props": {
     "fill": "#232833",
     "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -4928,6 +5248,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 2
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -4942,7 +5265,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#9A93AD"
    },
-   "name": "3"
+   "name": "3",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4957,7 +5283,10 @@
     "fill": "#F2EFF9",
     "fontStyle": "Bold"
    },
-   "name": "Ash on the water"
+   "name": "Ash on the water",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4971,7 +5300,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#C5A7FF"
    },
-   "name": "drafted"
+   "name": "drafted",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4985,7 +5317,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#9A93AD"
    },
-   "name": "4"
+   "name": "4",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -4999,7 +5334,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "The seal"
+   "name": "The seal",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5013,7 +5351,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "planned"
+   "name": "planned",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5027,6 +5368,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5041,7 +5385,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "CONTINUITY"
+   "name": "CONTINUITY",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5055,7 +5402,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2C879"
    },
-   "name": "2 scenes need a recheck"
+   "name": "2 scenes need a recheck",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5069,7 +5419,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "1 thread owed to the rea"
+   "name": "1 thread owed to the rea",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5083,7 +5436,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Scene 3"
+   "name": "Scene 3",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5098,7 +5454,10 @@
     "fill": "#F2EFF9",
     "fontStyle": "Bold"
    },
-   "name": "Ash on the water"
+   "name": "Ash on the water",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5114,6 +5473,9 @@
     "cornerRadius": 10,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5129,7 +5491,10 @@
     "fill": "#C5A7FF"
    },
    "name": "drafted",
-   "width": 54
+   "width": 54,
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5145,6 +5510,9 @@
     "cornerRadius": 10,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5160,7 +5528,10 @@
     "fill": "#9A93AD"
    },
    "name": "pov: Mara",
-   "width": 64
+   "width": 64,
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5176,6 +5547,9 @@
     "cornerRadius": 10,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5191,7 +5565,10 @@
     "fill": "#9A93AD"
    },
    "name": "suspicion \u2192 certainty",
-   "width": 148
+   "width": 148,
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5206,6 +5583,9 @@
     "fill": "#232833",
     "cornerRadius": 4,
     "opacity": 0.9
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5221,6 +5601,9 @@
     "fill": "#232833",
     "cornerRadius": 4,
     "opacity": 0.9
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5236,6 +5619,9 @@
     "fill": "#232833",
     "cornerRadius": 4,
     "opacity": 0.9
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5251,6 +5637,9 @@
     "fill": "#232833",
     "cornerRadius": 4,
     "opacity": 0.9
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5266,6 +5655,9 @@
     "fill": "#232833",
     "cornerRadius": 4,
     "opacity": 0.9
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5281,6 +5673,9 @@
     "fill": "#232833",
     "cornerRadius": 4,
     "opacity": 0.9
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5296,6 +5691,9 @@
     "fill": "#232833",
     "cornerRadius": 4,
     "opacity": 0.9
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5311,6 +5709,9 @@
     "fill": "#232833",
     "cornerRadius": 4,
     "opacity": 0.9
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5326,6 +5727,9 @@
     "fill": "#232833",
     "cornerRadius": 4,
     "opacity": 0.9
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5342,6 +5746,9 @@
     "cornerRadius": 10,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5356,7 +5763,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "BRIEF FOR THIS SCENE"
+   "name": "BRIEF FOR THIS SCENE",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5371,7 +5781,10 @@
     "fill": "#F2EFF9"
    },
    "name": "Mara knows the truce bro",
-   "width": 390
+   "width": 390,
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5386,7 +5799,10 @@
     "fill": "#F2EFF9"
    },
    "name": "burned the ford \u2014 she le",
-   "width": 390
+   "width": 390,
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5400,7 +5816,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#C5A7FF"
    },
-   "name": "Withheld: 1 later scene "
+   "name": "Withheld: 1 later scene ",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5414,6 +5833,9 @@
    "props": {
     "fill": "#1B1F27",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5428,6 +5850,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5442,7 +5867,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "CONTINUITY"
+   "name": "CONTINUITY",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5458,6 +5886,9 @@
     "cornerRadius": 8,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5472,7 +5903,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#FF8A8A"
    },
-   "name": "[CAUSALITY_BREAK]"
+   "name": "[CAUSALITY_BREAK]",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5487,7 +5921,10 @@
     "fill": "#F2EFF9"
    },
    "name": "Scene 4 has no link to a",
-   "width": 224
+   "width": 224,
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5501,7 +5938,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "advisory \u00b7 dismiss or fi"
+   "name": "advisory \u00b7 dismiss or fi",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5517,6 +5957,9 @@
     "cornerRadius": 8,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5531,7 +5974,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2C879"
    },
-   "name": "[DANGLING_SETUP]"
+   "name": "[DANGLING_SETUP]",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5546,7 +5992,10 @@
     "fill": "#F2EFF9"
    },
    "name": "The forged seal was plan",
-   "width": 224
+   "width": 224,
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5560,7 +6009,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "confirmed against the ti"
+   "name": "confirmed against the ti",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5574,7 +6026,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "AUDIT"
+   "name": "AUDIT",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5588,7 +6043,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Knowledge leaks"
+   "name": "Knowledge leaks",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5602,7 +6060,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "0"
+   "name": "0",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5616,7 +6077,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Voice drift"
+   "name": "Voice drift",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5630,7 +6094,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "1"
+   "name": "1",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5644,7 +6111,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Dirty scenes"
+   "name": "Dirty scenes",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5658,7 +6128,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "2"
+   "name": "2",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5672,6 +6145,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
    }
   }
  },
@@ -5686,7 +6162,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "SOURCES"
+   "name": "SOURCES",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5700,7 +6179,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#9A93AD"
    },
-   "name": "story.json \u00b7 4 scenes"
+   "name": "story.json \u00b7 4 scenes",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5714,7 +6196,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#9A93AD"
    },
-   "name": "main \u00b7 2 ahead of origin"
+   "name": "main \u00b7 2 ahead of origin",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
   }
  },
  {
@@ -5724,23 +6209,18 @@
   }
  },
  {
-  "command": "page.setBackground",
-  "params": {
-   "color": "#F7F3FF"
-  }
- },
- {
-  "command": "shape.rectangle",
+  "command": "frame.create",
   "params": {
    "x": 0,
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "07 Workspace \u2014 rulebook / background",
+   "name": "07 Workspace \u2014 rulebook",
    "props": {
     "fill": "#F7F3FF"
    }
-  }
+  },
+  "as": "screen:07 Workspace \u2014 rulebook"
  },
  {
   "command": "shape.rectangle",
@@ -5753,6 +6233,9 @@
    "props": {
     "fill": "#FFFFFF",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -5767,6 +6250,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -5781,6 +6267,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -5796,7 +6285,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Canonwright"
+   "name": "Canonwright",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -5810,6 +6302,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -5824,7 +6319,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Deeds of Legend \u00b7 Rulebo"
+   "name": "Deeds of Legend \u00b7 Rulebo",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -5840,6 +6338,9 @@
     "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -5854,6 +6355,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 10
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -5868,7 +6372,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Settings"
+   "name": "Settings",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -5882,6 +6389,9 @@
    "props": {
     "fill": "#FFFFFF",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -5896,6 +6406,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -5910,7 +6423,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "BOOK"
+   "name": "BOOK",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -5924,7 +6440,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Front matter"
+   "name": "Front matter",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -5938,7 +6457,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "1 \u00b7 The core mechanic"
+   "name": "1 \u00b7 The core mechanic",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -5952,7 +6474,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "2 \u00b7 Characters"
+   "name": "2 \u00b7 Characters",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -5966,6 +6491,9 @@
    "props": {
     "fill": "#F1ECFB",
     "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -5981,7 +6509,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "    Classes"
+   "name": "    Classes",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -5995,7 +6526,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "    Species"
+   "name": "    Species",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6009,7 +6543,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "3 \u00b7 Adversaries"
+   "name": "3 \u00b7 Adversaries",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6023,7 +6560,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "4 \u00b7 Equipment"
+   "name": "4 \u00b7 Equipment",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6037,7 +6577,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Appendix"
+   "name": "Appendix",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6051,7 +6594,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "ENTITIES"
+   "name": "ENTITIES",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6065,7 +6611,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Fighter (class)"
+   "name": "Fighter (class)",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6079,7 +6628,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Duelist (class)"
+   "name": "Duelist (class)",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6093,7 +6645,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Marsh-wight (monster)"
+   "name": "Marsh-wight (monster)",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6107,7 +6662,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A6B12"
    },
-   "name": "Grapple (procedure)"
+   "name": "Grapple (procedure)",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6121,7 +6679,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "CLASS \u00b7 24 of 118"
+   "name": "CLASS \u00b7 24 of 118",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6136,7 +6697,10 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Fighter"
+   "name": "Fighter",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6150,7 +6714,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "A trained combatant who "
+   "name": "A trained combatant who ",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6164,7 +6731,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "FIELDS"
+   "name": "FIELDS",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6178,6 +6748,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -6192,7 +6765,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Traits"
+   "name": "Traits",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6208,6 +6784,9 @@
     "cornerRadius": 6,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -6222,7 +6801,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Might, Edge"
+   "name": "Might, Edge",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6236,7 +6818,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Hit points"
+   "name": "Hit points",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6252,6 +6837,9 @@
     "cornerRadius": 6,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -6266,7 +6854,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "8 + Might at 1st level"
+   "name": "8 + Might at 1st level",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6280,7 +6871,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Starting gear"
+   "name": "Starting gear",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6296,6 +6890,9 @@
     "cornerRadius": 6,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -6310,7 +6907,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "One martial weapon, a sh"
+   "name": "One martial weapon, a sh",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6324,7 +6924,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Advancement"
+   "name": "Advancement",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6340,6 +6943,9 @@
     "cornerRadius": 6,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -6354,7 +6960,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Gain a talent every odd "
+   "name": "Gain a talent every odd ",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6368,7 +6977,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "CROSS-REFERENCES"
+   "name": "CROSS-REFERENCES",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6382,7 +6994,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#25243A"
    },
-   "name": "core-resolution"
+   "name": "core-resolution",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6396,7 +7011,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#3F8F55"
    },
-   "name": "resolves"
+   "name": "resolves",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6410,7 +7028,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#25243A"
    },
-   "name": "dice"
+   "name": "dice",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6424,7 +7045,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#3F8F55"
    },
-   "name": "resolves"
+   "name": "resolves",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6438,7 +7062,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#25243A"
    },
-   "name": "grapple"
+   "name": "grapple",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6452,7 +7079,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#B4443C"
    },
-   "name": "dangling \u2014 nothing defin"
+   "name": "dangling \u2014 nothing defin",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6466,6 +7096,9 @@
    "props": {
     "fill": "#FFFFFF",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -6480,6 +7113,9 @@
    "props": {
     "fill": "#E2DAF0",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -6494,7 +7130,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "CHECKS"
+   "name": "CHECKS",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6510,6 +7149,9 @@
     "cornerRadius": 8,
     "stroke": "#B4443C",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -6524,7 +7166,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#B4443C"
    },
-   "name": "[BROKEN_REFERENCE]"
+   "name": "[BROKEN_REFERENCE]",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6539,7 +7184,10 @@
     "fill": "#25243A"
    },
    "name": "`grapple` is referenced ",
-   "width": 224
+   "width": 224,
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6553,7 +7201,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "error \u2014 the book cannot "
+   "name": "error \u2014 the book cannot ",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6569,6 +7220,9 @@
     "cornerRadius": 8,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
    }
   }
  },
@@ -6583,7 +7237,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#9A6B12"
    },
-   "name": "[INCOMPLETE_ENTITY]"
+   "name": "[INCOMPLETE_ENTITY]",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6598,7 +7255,10 @@
     "fill": "#25243A"
    },
    "name": "Duelist has no fields an",
-   "width": 224
+   "width": 224,
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6612,7 +7272,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "advisory"
+   "name": "advisory",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6626,7 +7289,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "BALANCE"
+   "name": "BALANCE",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6640,7 +7306,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Trait cap: 5 at creation"
+   "name": "Trait cap: 5 at creation",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6654,7 +7323,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#3F8F55"
    },
-   "name": "Highest in book: 5"
+   "name": "Highest in book: 5",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6668,7 +7340,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "No chapter exceeds the c"
+   "name": "No chapter exceeds the c",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
   }
  },
  {
@@ -6678,23 +7353,18 @@
   }
  },
  {
-  "command": "page.setBackground",
-  "params": {
-   "color": "#14161C"
-  }
- },
- {
-  "command": "shape.rectangle",
+  "command": "frame.create",
   "params": {
    "x": 0,
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "08 Source control / background",
+   "name": "08 Source control",
    "props": {
     "fill": "#14161C"
    }
-  }
+  },
+  "as": "screen:08 Source control"
  },
  {
   "command": "shape.rectangle",
@@ -6707,6 +7377,9 @@
    "props": {
     "fill": "#1B1F27",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -6721,6 +7394,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -6735,6 +7411,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -6750,7 +7429,10 @@
     "fill": "#F2EFF9",
     "fontStyle": "Bold"
    },
-   "name": "Canonwright"
+   "name": "Canonwright",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -6764,6 +7446,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -6778,7 +7463,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "The Salt Road \u00b7 Source"
+   "name": "The Salt Road \u00b7 Source",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -6794,6 +7482,9 @@
     "cornerRadius": 10,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -6808,6 +7499,9 @@
    "props": {
     "fill": "#8058C5",
     "cornerRadius": 10
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -6822,7 +7516,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Settings"
+   "name": "Settings",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -6836,6 +7533,9 @@
    "props": {
     "fill": "#1B1F27",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -6850,6 +7550,9 @@
    "props": {
     "fill": "#2E3542",
     "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -6864,7 +7567,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Manuscript"
+   "name": "Manuscript",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -6878,7 +7584,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Canon"
+   "name": "Canon",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -6892,6 +7601,9 @@
    "props": {
     "fill": "#232833",
     "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -6907,7 +7619,10 @@
     "fill": "#F2EFF9",
     "fontStyle": "Bold"
    },
-   "name": "Source"
+   "name": "Source",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -6923,6 +7638,9 @@
     "cornerRadius": 12,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -6938,7 +7656,10 @@
     "fill": "#F2EFF9",
     "fontStyle": "Bold"
    },
-   "name": "main"
+   "name": "main",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -6952,7 +7673,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "\u21912  \u21930   origin/main"
+   "name": "\u21912  \u21930   origin/main",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -6966,7 +7690,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "CHANGES \u00b7 3"
+   "name": "CHANGES \u00b7 3",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -6980,7 +7707,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2C879"
    },
-   "name": "M"
+   "name": "M",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -6994,7 +7724,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2EFF9"
    },
-   "name": "manuscript/scene-03.md"
+   "name": "manuscript/scene-03.md",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7010,6 +7743,9 @@
     "cornerRadius": 6,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7024,7 +7760,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "stage"
+   "name": "stage",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7038,7 +7777,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2C879"
    },
-   "name": "M"
+   "name": "M",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7052,7 +7794,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2EFF9"
    },
-   "name": "story.json"
+   "name": "story.json",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7068,6 +7813,9 @@
     "cornerRadius": 6,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7082,7 +7830,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "stage"
+   "name": "stage",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7096,7 +7847,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#7BD88F"
    },
-   "name": "U"
+   "name": "U",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7110,7 +7864,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2EFF9"
    },
-   "name": "manuscript/scene-04.md"
+   "name": "manuscript/scene-04.md",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7126,6 +7883,9 @@
     "cornerRadius": 6,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7140,7 +7900,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "stage"
+   "name": "stage",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7154,7 +7917,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "STAGED \u00b7 1"
+   "name": "STAGED \u00b7 1",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7168,7 +7934,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#7BD88F"
    },
-   "name": "M"
+   "name": "M",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7182,7 +7951,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2EFF9"
    },
-   "name": "story.json"
+   "name": "story.json",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7198,6 +7970,9 @@
     "cornerRadius": 8,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7212,7 +7987,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Scene 3: Mara works out "
+   "name": "Scene 3: Mara works out ",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7226,6 +8004,9 @@
    "props": {
     "fill": "#C5A7FF",
     "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7241,7 +8022,10 @@
     "fill": "#FFFFFF",
     "fontStyle": "Bold"
    },
-   "name": "Commit"
+   "name": "Commit",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7255,7 +8039,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "1 staged"
+   "name": "1 staged",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7269,7 +8056,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "BRANCHES"
+   "name": "BRANCHES",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7283,7 +8073,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#C5A7FF"
    },
-   "name": "\u25cf"
+   "name": "\u25cf",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7297,7 +8090,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#F2EFF9"
    },
-   "name": "main"
+   "name": "main",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7311,7 +8107,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "\u25cb"
+   "name": "\u25cb",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7325,7 +8124,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#9A93AD"
    },
-   "name": "draft/act-two"
+   "name": "draft/act-two",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7339,7 +8141,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "TAG A DRAFT"
+   "name": "TAG A DRAFT",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7355,6 +8160,9 @@
     "cornerRadius": 6,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7369,7 +8177,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "draft-2"
+   "name": "draft-2",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7385,6 +8196,9 @@
     "cornerRadius": 6,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7399,7 +8213,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "Tag & push"
+   "name": "Tag & push",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7413,7 +8230,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "RECENT"
+   "name": "RECENT",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7427,7 +8247,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#9A93AD"
    },
-   "name": "a3f21c9"
+   "name": "a3f21c9",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7441,7 +8264,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "Scene 3: Mara works out "
+   "name": "Scene 3: Mara works out ",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7455,7 +8281,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#9A93AD"
    },
-   "name": "7be04d1"
+   "name": "7be04d1",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7469,7 +8298,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "Scene 2: the tally-house"
+   "name": "Scene 2: the tally-house",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7483,7 +8315,10 @@
     "fontFamily": "DejaVu Sans Mono",
     "fill": "#9A93AD"
    },
-   "name": "12c9aa4"
+   "name": "12c9aa4",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7497,7 +8332,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "Import the draft and set"
+   "name": "Import the draft and set",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7513,6 +8351,9 @@
     "cornerRadius": 12,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7528,7 +8369,10 @@
     "fill": "#F2EFF9",
     "fontStyle": "Bold"
    },
-   "name": "This is the manuscript's"
+   "name": "This is the manuscript's",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7543,7 +8387,10 @@
     "fill": "#9A93AD"
    },
    "name": "Every commit is a draft ",
-   "width": 420
+   "width": 420,
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7558,7 +8405,10 @@
     "fill": "#9A93AD"
    },
    "name": "Every tag is a version y",
-   "width": 420
+   "width": 420,
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7573,7 +8423,10 @@
     "fill": "#9A93AD"
    },
    "name": "The assistant can stage,",
-   "width": 420
+   "width": 420,
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7588,7 +8441,10 @@
     "fill": "#9A93AD"
    },
    "name": "it asks before anything ",
-   "width": 420
+   "width": 420,
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7602,7 +8458,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "REMOTE"
+   "name": "REMOTE",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7617,7 +8476,10 @@
     "fill": "#F2EFF9"
    },
    "name": "github.com/bruceamoser/t",
-   "width": 420
+   "width": 420,
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7631,7 +8493,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "FETCH / PULL / PUSH"
+   "name": "FETCH / PULL / PUSH",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7647,6 +8512,9 @@
     "cornerRadius": 6,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7661,7 +8529,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "Fetch"
+   "name": "Fetch",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7677,6 +8548,9 @@
     "cornerRadius": 6,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7691,7 +8565,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "Pull"
+   "name": "Pull",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7707,6 +8584,9 @@
     "cornerRadius": 6,
     "stroke": "#2E3542",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7721,7 +8601,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "Push"
+   "name": "Push",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7735,7 +8618,10 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "NEEDS A HUMAN"
+   "name": "NEEDS A HUMAN",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7751,6 +8637,9 @@
     "cornerRadius": 8,
     "stroke": "#F2C879",
     "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
    }
   }
  },
@@ -7766,7 +8655,10 @@
     "fill": "#F2EFF9"
    },
    "name": "Merge conflict in manusc",
-   "width": 380
+   "width": 380,
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
   }
  },
  {
@@ -7780,7 +8672,598 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "Resolve in the editor, t"
+   "name": "Resolve in the editor, t",
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 200,
+   "y": 566,
+   "width": 240,
+   "height": 40,
+   "name": "sso-open",
+   "props": {
+    "fill": "#C5A7FF",
+    "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
+  },
+  "as": "hot:sso-open"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:sso-open"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:01 Welcome"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 452,
+   "y": 566,
+   "width": 180,
+   "height": 40,
+   "name": "sso-skip",
+   "props": {
+    "fill": "#1B1F27",
+    "cornerRadius": 8,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:00 First run \u2014 GitHub"
+   }
+  },
+  "as": "hot:sso-skip"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:sso-skip"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:01 Welcome"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 148,
+   "y": 486,
+   "width": 150,
+   "height": 34,
+   "name": "new-story",
+   "props": {
+    "fill": "#8058C5",
+    "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
+  },
+  "as": "hot:new-story"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:new-story"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:02 New story \u2014 what"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 620,
+   "y": 486,
+   "width": 150,
+   "height": 34,
+   "name": "open-folder",
+   "props": {
+    "fill": "#F1ECFB",
+    "cornerRadius": 8,
+    "stroke": "#E2DAF0",
+    "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:01 Welcome"
+   }
+  },
+  "as": "hot:open-folder"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:open-folder"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:06 Workspace \u2014 novel"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 320,
+   "y": 226,
+   "width": 470,
+   "height": 300,
+   "name": "kind-novel",
+   "props": {
+    "fill": "#FFFFFF",
+    "cornerRadius": 14
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
+  },
+  "as": "hot:kind-novel"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:kind-novel"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:03 New manuscript \u2014 start"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 820,
+   "y": 226,
+   "width": 470,
+   "height": 300,
+   "name": "kind-rules",
+   "props": {
+    "fill": "#FFFFFF",
+    "cornerRadius": 14
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
+  },
+  "as": "hot:kind-rules"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:kind-rules"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:07 Workspace \u2014 rulebook"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1116,
+   "y": 806,
+   "width": 174,
+   "height": 38,
+   "name": "continue",
+   "props": {
+    "fill": "#8058C5",
+    "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
+  },
+  "as": "hot:continue"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:continue"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:03 New manuscript \u2014 start"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1120,
+   "y": 556,
+   "width": 170,
+   "height": 34,
+   "name": "Import a draft \u2192",
+   "props": {
+    "fill": "#F1ECFB",
+    "cornerRadius": 8,
+    "stroke": "#E2DAF0",
+    "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
+  },
+  "as": "nav:import-link"
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Import a draft \u2192",
+   "x": 1130,
+   "y": 567.0,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "Import a draft \u2192",
+   "parent": {
+    "$ref": "screen:02 New story \u2014 what"
+   }
+  }
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "nav:import-link"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:04 Existing manuscript \u2014 what I read"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 900,
+   "y": 828,
+   "width": 200,
+   "height": 38,
+   "name": "create",
+   "props": {
+    "fill": "#8058C5",
+    "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:03 New manuscript \u2014 start"
+   }
+  },
+  "as": "hot:create"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:create"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:05 First session \u2014 collaborator"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 880,
+   "y": 828,
+   "width": 220,
+   "height": 38,
+   "name": "import-continue",
+   "props": {
+    "fill": "#8058C5",
+    "cornerRadius": 8
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
+  },
+  "as": "hot:import-continue"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:import-continue"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:05 First session \u2014 collaborator"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 200,
+   "y": 828,
+   "width": 220,
+   "height": 38,
+   "name": "import-later",
+   "props": {
+    "fill": "#FFFFFF",
+    "cornerRadius": 8,
+    "stroke": "#E2DAF0",
+    "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:04 Existing manuscript \u2014 what I read"
+   }
+  },
+  "as": "hot:import-later"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:import-later"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:05 First session \u2014 collaborator"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 700,
+   "y": 296,
+   "width": 108,
+   "height": 22,
+   "name": "accept-proposals",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 11
+   },
+   "parent": {
+    "$ref": "screen:05 First session \u2014 collaborator"
+   }
+  },
+  "as": "hot:accept-proposals"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:accept-proposals"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:06 Workspace \u2014 novel"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1240,
+   "y": 60,
+   "width": 96,
+   "height": 26,
+   "name": "Source",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 8,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
+  },
+  "as": "nav:to-source"
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Source",
+   "x": 1250,
+   "y": 67.0,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Source",
+   "parent": {
+    "$ref": "screen:06 Workspace \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "nav:to-source"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:08 Source control"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1240,
+   "y": 60,
+   "width": 96,
+   "height": 26,
+   "name": "Source",
+   "props": {
+    "fill": "#F1ECFB",
+    "cornerRadius": 8,
+    "stroke": "#E2DAF0",
+    "strokeWeight": 1
+   },
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
+  },
+  "as": "nav:to-source-rules"
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Source",
+   "x": 1250,
+   "y": 67.0,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "Source",
+   "parent": {
+    "$ref": "screen:07 Workspace \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "nav:to-source-rules"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:08 Source control"
+    }
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 14,
+   "y": 54,
+   "width": 96,
+   "height": 28,
+   "name": "tab-manuscript",
+   "props": {
+    "fill": "#1B1F27",
+    "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:08 Source control"
+   }
+  },
+  "as": "hot:tab-manuscript"
+ },
+ {
+  "command": "proto.interaction.add",
+  "params": {
+   "id": {
+    "$ref": "hot:tab-manuscript"
+   },
+   "trigger": {
+    "type": "onClick"
+   },
+   "action": {
+    "type": "navigate",
+    "dest": {
+     "$ref": "screen:06 Workspace \u2014 novel"
+    }
+   }
   }
  },
  {

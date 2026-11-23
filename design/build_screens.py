@@ -28,31 +28,54 @@ LIGHT = dict(
 
 commands = []
 
+# The frame every layer on the current screen is added to.
+CURRENT = {"ref": None}
 
-def cmd(command, **params):
-    commands.append({"command": command, "params": params})
+
+def cmd(command, as_=None, **params):
+    step = {"command": command, "params": params}
+    if as_ is not None:
+        step["as"] = as_
+    commands.append(step)
 
 
-def page(name, palette):
-    # page.add makes the new page current, so the layers below land on it.
+def screen(name, palette):
+    """One page, one frame. The frame is what a prototype interaction navigates to."""
     cmd("page.add", name=name)
-    cmd("page.setBackground", color=palette["bg"])
-    cmd("shape.rectangle", x=0, y=0, width=1440, height=900,
-        name=f"{name} / background", props={"fill": palette["bg"]})
+    ref = f"screen:{name}"
+    cmd("frame.create", as_=ref, x=0, y=0, width=1440, height=900, name=name,
+        props={"fill": palette["bg"]})
+    CURRENT["ref"] = ref
 
 
-def rect(x, y, w, h, fill, radius=0, stroke=None, name=None, o=1):
+def link(element_as, target_name, trigger="onClick"):
+    """Click `element_as` and the prototype goes to the frame named `target_name`."""
+    commands.append(
+        {
+            "command": "proto.interaction.add",
+            "params": {
+                "id": {"$ref": element_as},
+                "trigger": {"type": trigger},
+                "action": {"type": "navigate", "dest": {"$ref": f"screen:{target_name}"}},
+            },
+        }
+    )
+
+
+def rect(x, y, w, h, fill, radius=0, stroke=None, name=None, o=1, as_=None):
     props = {"fill": fill, "cornerRadius": radius}
     if stroke:
         props["stroke"] = stroke
         props["strokeWeight"] = 1
     if o != 1:
         props["opacity"] = o
-    cmd("shape.rectangle", x=x, y=y, width=w, height=h,
-        name=name or "rect", props=props)
+    params = {"x": x, "y": y, "width": w, "height": h, "name": name or "rect", "props": props}
+    if CURRENT["ref"]:
+        params["parent"] = {"$ref": CURRENT["ref"]}
+    cmd("shape.rectangle", as_=as_, **params)
 
 
-def text(x, y, s, size, color, width=None, bold=False, mono=False, height=None, name=None):
+def text(x, y, s, size, color, width=None, bold=False, mono=False, height=None, name=None, as_=None):
     props = {"fontSize": size, "fontFamily": MONO if mono else FONT, "fill": color}
     if bold:
         props["fontStyle"] = "Bold"
@@ -61,7 +84,9 @@ def text(x, y, s, size, color, width=None, bold=False, mono=False, height=None, 
     params = {"text": s, "x": x, "y": y, "props": props, "name": name or s[:24]}
     if width:
         params["width"] = width
-    cmd("text.create", **params)
+    if CURRENT["ref"]:
+        params["parent"] = {"$ref": CURRENT["ref"]}
+    cmd("text.create", as_=as_, **params)
 
 
 def chip(x, y, label, palette, tone="muted", w=None):
@@ -97,7 +122,7 @@ def window_chrome(p, title):
 def first_run_github():
     """Before anything else, the one integration the product genuinely needs."""
     p = DARK
-    page("00 First run — GitHub", p)
+    screen("00 First run — GitHub", p)
     window_chrome(p, "Welcome to Canonwright")
 
     text(200, 150, "Your manuscript should live in git.", 30, p["text"], bold=True)
@@ -148,7 +173,7 @@ def first_run_github():
 def new_manuscript_setup():
     """A blank book needs a seed, not an inventory."""
     p = LIGHT
-    page("03 New manuscript — start", p)
+    screen("03 New manuscript — start", p)
     window_chrome(p, "New manuscript")
 
     text(200, 120, "Where does it start?", 26, p["text"], bold=True)
@@ -188,7 +213,7 @@ def new_manuscript_setup():
 # ---------------------------------------------------------------- 1. welcome
 def welcome():
     p = LIGHT
-    page("01 Welcome", p)
+    screen("01 Welcome", p)
     window_chrome(p, "no project open")
 
     text(120, 170, "Write the book.", 44, p["text"], bold=True)
@@ -225,7 +250,7 @@ def welcome():
 # ------------------------------------------------------- 2. what are you writing
 def step_one():
     p = LIGHT
-    page("02 New story — what", p)
+    screen("02 New story — what", p)
     window_chrome(p, "New story")
 
     rect(0, 44, 260, 856, p["surface"], name="rail")
@@ -285,7 +310,7 @@ def step_one():
 def existing_manuscript_setup():
     """The file is read first. The questions are about what was found in it."""
     p = LIGHT
-    page("04 Existing manuscript — what I read", p)
+    screen("04 Existing manuscript — what I read", p)
     window_chrome(p, "Import · draft.md")
 
     text(200, 92, "I read the draft. Here is what I found.", 24, p["text"], bold=True)
@@ -335,7 +360,7 @@ def existing_manuscript_setup():
 def collaborating():
     """The product's real first move: proposals and questions, in prose, in chat."""
     p = DARK
-    page("05 First session — collaborator", p)
+    screen("05 First session — collaborator", p)
     window_chrome(p, "The Salt Road")
 
     rect(0, 44, 300, 856, p["surface"], name="rail")
@@ -413,7 +438,7 @@ def collaborating():
 # --------------------------------------------------------- 4. novel workspace
 def novel_workspace():
     p = DARK
-    page("06 Workspace — novel", p)
+    screen("06 Workspace — novel", p)
     window_chrome(p, "The Salt Road · Novel")
 
     # left rail: scenes
@@ -489,7 +514,7 @@ def novel_workspace():
 # ------------------------------------------------------- 5. rulebook workspace
 def rulebook_workspace():
     p = LIGHT
-    page("07 Workspace — rulebook", p)
+    screen("07 Workspace — rulebook", p)
     window_chrome(p, "Deeds of Legend · Rulebook")
 
     rect(0, 44, 296, 856, p["surface"], name="chapters")
@@ -563,7 +588,7 @@ def rulebook_workspace():
 # ------------------------------------------------------------ 6. source control
 def source_control():
     p = DARK
-    page("08 Source control", p)
+    screen("08 Source control", p)
     window_chrome(p, "The Salt Road · Source")
 
     rect(0, 44, 1440, 40, p["surface"], name="tabs")
@@ -649,7 +674,6 @@ def source_control():
     text(988, 478, "Resolve in the editor, then continue the merge.", 10, p["muted"])
 
 
-welcome()
 first_run_github()
 welcome()
 step_one()
@@ -660,6 +684,63 @@ novel_workspace()
 rulebook_workspace()
 source_control()
 
+
+# --------------------------------------------------------------- the prototype
+# Hotspots sit on top of the drawn buttons, in the same colour and corner radius,
+# so the clickable thing and the visible thing are the same rectangle. Each one
+# navigates to a frame, which is what makes the file runnable rather than a set
+# of pictures.
+
+
+def hotspot(screen_name, x, y, w, h, target, name, fill, palette, radius=8, stroke=None):
+    CURRENT["ref"] = f"screen:{screen_name}"
+    as_ = f"hot:{name}"
+    rect(x, y, w, h, fill, radius=radius, stroke=stroke, name=name, as_=as_)
+    link(as_, target)
+
+
+def nav_button(screen_name, x, y, w, h, label, target, name, palette, fill=None,
+               text_color=None, radius=8, stroke=None, size=10):
+    CURRENT["ref"] = f"screen:{screen_name}"
+    as_ = f"nav:{name}"
+    rect(x, y, w, h, fill or palette["raised"], radius=radius,
+         stroke=stroke or palette["line"], name=label, as_=as_)
+    text(x + 10, y + (h - size) / 2 - 1, label, size, text_color or palette["muted"])
+    link(as_, target)
+
+
+# 00 first run → welcome (both "open the browser" and "skip")
+hotspot("00 First run — GitHub", 200, 566, 240, 40, "01 Welcome", "sso-open", DARK["accent"], DARK)
+hotspot("00 First run — GitHub", 452, 566, 180, 40, "01 Welcome", "sso-skip", DARK["surface"], DARK, stroke=DARK["line"])
+
+# 01 welcome → new story, or straight into a project
+hotspot("01 Welcome", 148, 486, 150, 34, "02 New story — what", "new-story", LIGHT["accent"], LIGHT)
+hotspot("01 Welcome", 620, 486, 150, 34, "06 Workspace — novel", "open-folder", LIGHT["raised"], LIGHT, stroke=LIGHT["line"])
+
+# 02 what → novel setup, rulebook workspace, or import
+hotspot("02 New story — what", 320, 226, 470, 300, "03 New manuscript — start", "kind-novel", LIGHT["surface"], LIGHT, radius=14)
+hotspot("02 New story — what", 820, 226, 470, 300, "07 Workspace — rulebook", "kind-rules", LIGHT["surface"], LIGHT, radius=14)
+hotspot("02 New story — what", 1116, 806, 174, 38, "03 New manuscript — start", "continue", LIGHT["accent"], LIGHT)
+nav_button("02 New story — what", 1120, 556, 170, 34, "Import a draft →", "04 Existing manuscript — what I read", "import-link", LIGHT)
+
+# 03 new manuscript → collaborator
+hotspot("03 New manuscript — start", 900, 828, 200, 38, "05 First session — collaborator", "create", LIGHT["accent"], LIGHT)
+
+# 04 existing manuscript → collaborator (either answer route)
+hotspot("04 Existing manuscript — what I read", 880, 828, 220, 38, "05 First session — collaborator", "import-continue", LIGHT["accent"], LIGHT)
+hotspot("04 Existing manuscript — what I read", 200, 828, 220, 38, "05 First session — collaborator", "import-later", LIGHT["surface"], LIGHT, stroke=LIGHT["line"])
+
+# 05 collaborator → the novel workspace, once the proposals are accepted
+hotspot("05 First session — collaborator", 700, 296, 108, 22, "06 Workspace — novel", "accept-proposals", DARK["raised"], DARK, radius=11)
+
+# 06 / 07 → source control
+nav_button("06 Workspace — novel", 1240, 60, 96, 26, "Source", "08 Source control", "to-source", DARK, size=10)
+nav_button("07 Workspace — rulebook", 1240, 60, 96, 26, "Source", "08 Source control", "to-source-rules", LIGHT, size=10)
+
+# 08 source → back to the manuscript
+hotspot("08 Source control", 14, 54, 96, 28, "06 Workspace — novel", "tab-manuscript", DARK["surface"], DARK, radius=6)
+
+# Drop the empty page the document starts with, so page index == screen index.
 cmd("page.delete", id=1)
 
 out = Path(__file__).with_name("screens.json")
