@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Canonwright — UX screens</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0; padding: 32px;
+        background: #14161c; color: #f2eff9;
+        font: 14px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
+      p.lede { color: #9a93ad; margin: 0 0 24px; max-width: 70ch; }
+      .grid { display: grid; gap: 28px; }
+      figure { margin: 0; }
+      a { color: #c5a7ff; text-decoration: none; }
+      img {
+        width: 100%; height: auto; display: block;
+        border: 1px solid #2e3542; border-radius: 10px; background: #1b1f27;
+      }
+      figcaption { margin-top: 8px; color: #9a93ad; font-size: 12px; }
+      figcaption strong { color: #f2eff9; font-weight: 600; }
+      code { font-family: ui-monospace, "DejaVu Sans Mono", monospace; color: #c5a7ff; }
+    </style>
+  </head>
+  <body>
+    <h1>Canonwright — UX screens</h1>
+    <p class="lede">
+      First draft, built in FigCraft through its MCP server. Source of truth is
+      <code>canonwright-ux.figcraft</code>; these PNGs are exports. Regenerate with
+      <code>python3 build_screens.py &amp;&amp; python3 build_document.py</code>.
+      Click any screen to open it full size.
+    </p>
+    <div class="grid">
+      <figure>
+        <a href="screens/01-welcome.png"><img src="screens/01-welcome.png" alt="Welcome" /></a>
+        <figcaption><strong>01 · Welcome</strong> — no project open. Two doors, nothing preselected, recent list empty.</figcaption>
+      </figure>
+      <figure>
+        <a href="screens/02-new-story---what.png"><img src="screens/02-new-story---what.png" alt="What are you writing" /></a>
+        <figcaption><strong>02 · New story — what</strong> — novel or rulebook, decided before anything else, because it changes the questions and the checks.</figcaption>
+      </figure>
+      <figure>
+        <a href="screens/03-new-story---interview.png"><img src="screens/03-new-story---interview.png" alt="The interview" /></a>
+        <figcaption><strong>03 · New story — interview</strong> — a form, not a chat. Labelled fields, “from draft” badges on what the import inferred, and a live summary of what will be created.</figcaption>
+      </figure>
+      <figure>
+        <a href="screens/04-workspace---novel.png"><img src="screens/04-workspace---novel.png" alt="Novel workspace" /></a>
+        <figcaption><strong>04 · Workspace — novel</strong> — scenes, the scene itself, and continuity side by side. Dark theme.</figcaption>
+      </figure>
+      <figure>
+        <a href="screens/05-workspace---rulebook.png"><img src="screens/05-workspace---rulebook.png" alt="Rulebook workspace" /></a>
+        <figcaption><strong>05 · Workspace — rulebook</strong> — book tree, entity fields, cross-references with a dangling one called out. Light theme.</figcaption>
+      </figure>
+      <figure>
+        <a href="screens/06-source-control.png"><img src="screens/06-source-control.png" alt="Source control" /></a>
+        <figcaption><strong>06 · Source control</strong> — changes, staged, commit, branches, tags, and the one case that needs a human: a merge conflict.</figcaption>
+      </figure>
+    </div>
+  </body>
+</html>
