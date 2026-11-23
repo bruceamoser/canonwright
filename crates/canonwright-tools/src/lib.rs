@@ -1656,6 +1656,7 @@ impl ToolRegistry {
         registry.register(TestPluginTool);
         registry.register(WritePluginTool);
         registry.register(InstallBuiltinPluginTool);
+        registry.register(story_project::StoryIntakeTool);
         registry.register(story_project::StoryStartTool);
         registry.register(story_tools::StoryReadTool);
         registry.register(story_tools::StoryBriefTool);
@@ -2607,8 +2608,8 @@ fn tool_domain(name: &str) -> &'static str {
         "team_task_create" | "team_task_list" | "team_task_update" | "team_task_get" => {
             "orchestration"
         }
-        "story_apply" | "story_brief" | "story_commit" | "story_lint" | "story_read"
-        | "story_review" | "story_start" | "story_substantiate" => "story",
+        "story_apply" | "story_brief" | "story_commit" | "story_intake" | "story_lint"
+        | "story_read" | "story_review" | "story_start" | "story_substantiate" => "story",
         _ => "general",
     }
 }
@@ -22729,5 +22730,129 @@ invariants:
             .await
             .expect_err("unknown mode");
         assert!(error.to_string().contains("sideways"), "{error}");
+    }
+
+    #[tokio::test]
+    async fn intake_for_a_new_manuscript_asks_the_same_questions_every_time() {
+        let jail = tempdir().expect("tempdir");
+        let context = context(jail.path());
+
+        let first = story_project::StoryIntakeTool
+            .execute(json!({"mode": "new"}), &context)
+            .await
+            .expect("intake runs");
+        let second = story_project::StoryIntakeTool
+            .execute(json!({"mode": "new"}), &context)
+            .await
+            .expect("intake runs");
+
+        assert!(!first.is_error, "{}", first.content);
+        assert_eq!(first.metadata["questions"], second.metadata["questions"]);
+        assert_eq!(first.metadata["mode"], "new");
+
+        let questions = first.metadata["questions"].as_array().expect("questions");
+        assert_eq!(questions.len(), 11);
+        let required: Vec<&str> = questions
+            .iter()
+            .filter(|question| question["required"] == true)
+            .map(|question| question["id"].as_str().unwrap_or_default())
+            .collect();
+        assert_eq!(required, vec!["title"]);
+    }
+
+    #[tokio::test]
+    async fn intake_for_a_draft_answers_what_the_document_can() {
+        let jail = tempdir().expect("tempdir");
+        let prose = "I was tired. I had walked for hours and I said nothing. \
+                     I went to the ford and I could not cross it. I waited. \
+                     I was alone, and my hands were cold."
+            .repeat(4);
+        fs::write(
+            jail.path().join("draft.md"),
+            format!("# Chapter One\n\n{prose}\n"),
+        )
+        .expect("draft");
+        let context = context(jail.path());
+
+        let result = story_project::StoryIntakeTool
+            .execute(
+                json!({"mode": "existing", "path": "draft.md", "title": "The Salt Road"}),
+                &context,
+            )
+            .await
+            .expect("intake runs");
+        assert!(!result.is_error, "{}", result.content);
+
+        let answers = result.metadata["answers"].as_object().expect("answers");
+        assert_eq!(answers["title"]["value"], "The Salt Road");
+        assert_eq!(answers["pov_voice"]["value"], "first person");
+        assert_eq!(answers["tense"]["value"], "past");
+        assert_eq!(answers["pov_voice"]["source"], "document");
+        assert_eq!(result.metadata["mode"], "imported");
+
+        let derived = result.metadata["derived"].as_array().expect("derived");
+        assert!(
+            derived
+                .iter()
+                .any(|fact| fact["label"] == "scenes detected"),
+            "{derived:?}"
+        );
+    }
+
+    #[tokio::test]
+    async fn answers_given_at_intake_land_in_the_new_story() {
+        let jail = tempdir().expect("tempdir");
+        let mut context = context(jail.path());
+        context.allow_writes = true;
+
+        let result = story_project::StoryStartTool
+            .execute(
+                json!({
+                    "mode": "new",
+                    "title": "The Salt Road",
+                    "answers": {
+                        "genre": "fantasy",
+                        "pov_voice": "third limited",
+                        "tense": "past",
+                        "protagonist": "Mara Vale",
+                        "want": "Get the carts through the ford",
+                        "central_question": "Who burned the ford?",
+                        "hard_rule": "No salt crosses without the duke's seal."
+                    }
+                }),
+                &context,
+            )
+            .await
+            .expect("start runs");
+        assert!(!result.is_error, "{}", result.content);
+
+        let story = canonwright_story::Story::load(&jail.path().join(".canonwright/story.json"))
+            .expect("story written");
+        assert_eq!(story.meta.title, "The Salt Road");
+        assert_eq!(story.meta.genre.as_deref(), Some("fantasy"));
+        assert_eq!(story.meta.tense.as_deref(), Some("past"));
+        assert_eq!(story.meta.premise.as_deref(), Some("Who burned the ford?"));
+        assert!(
+            story
+                .characters
+                .contains_key(&canonwright_story::CharacterId::new("mara-vale").unwrap())
+        );
+        assert_eq!(story.rules.len(), 1);
+        assert!(story.check().is_empty(), "{:?}", story.check());
+    }
+
+    #[tokio::test]
+    async fn an_unknown_intake_answer_is_rejected_by_name() {
+        let jail = tempdir().expect("tempdir");
+        let mut context = context(jail.path());
+        context.allow_writes = true;
+        let error = story_project::StoryStartTool
+            .execute(
+                json!({"mode": "new", "answers": {"favourite_colour": "blue"}}),
+                &context,
+            )
+            .await
+            .expect_err("unknown question");
+        assert!(error.to_string().contains("favourite_colour"), "{error}");
     }
 }

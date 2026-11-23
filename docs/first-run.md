@@ -62,25 +62,36 @@ The narrative tools are reachable through the agent, so this is a conversation.
 
 3. Ask the agent:
 
-   > Start a story from `draft.md` using `story_start` with mode existing.
+   > Run `story_intake` with mode existing on `draft.md`.
+
+   It reads the draft first and answers what a document can: the title, the point
+   of view (from pronouns), the tense (from verbs), the word count, the scene
+   count. Everything else — genre, logline, who the protagonist is, what they
+   want, the rule of the world — is still asked, and every question but the title
+   can be skipped.
+
+4. Start the story with those answers:
+
+   > Start a story from `draft.md` with `story_start` mode existing, using the
+   > intake answers.
 
    It should report 2 scenes, format markdown, and a placeholder narrator.
 
-4. Then:
+5. Then:
 
    > Read the story with `story_read`, then run `story_lint`.
 
    Lint will report `NO_VALUE_SHIFT` for each scene. That is correct, not a bug:
    the import knows the prose and not the state.
 
-5. And:
+6. And:
 
    > Show me the story brief for scene 2.
 
    The brief lists the cast, the causal lead-in, and what the point of view
    knows at the top of the scene — with the later scenes withheld.
 
-6. Inspect the result on disk: `.canonwright/story.json`. It is plain JSON and
+7. Inspect the result on disk: `.canonwright/story.json`. It is plain JSON and
    hand-editable; a worked example with real state lives at
    `crates/canonwright-story/tests/fixtures/the-salt-road.json`.
 
@@ -96,8 +107,9 @@ Not working yet:
   learned, no threads planted. The agent can infer them from the prose, but
   nothing writes them back automatically. `story_brief` stays thin until you
   fill the graph in.
-- **The new/existing prompt.** `story_start` supports both modes, but the UI
-  does not offer the choice at project creation yet — you ask the agent.
+- **The new/existing prompt.** `story_intake` and `story_start` implement both
+  branches and the question script is deterministic, but the UI does not render
+  it yet — you ask the agent.
 - **The rest of the UI.** It is still the coding harness with new copy: the
   sidebar is repositories, sessions, and retrieval. None of it is a manuscript
   view.

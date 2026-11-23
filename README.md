@@ -75,9 +75,10 @@ chapter is a harness that gets uninstalled.
 | Spoiler-free scene brief renderer | Implemented |
 | Manuscript import: `.md`, `.txt`, `.docx`, `.epub`, `.pdf` → drafted scenes | Implemented, 13 tests |
 | Project start: blank, or imported from a draft (`story_start`) | Implemented |
+| Deterministic intake: 11 questions for a new book, most of them inferred on import | Implemented, 9 tests |
 | Scene writes with whole-document validation; rejected writes change nothing | Implemented |
 | Canon commit and review tracking (`reviewed_against` premise digests) | Implemented |
-| Agent tools: `story_start`, `story_read`, `story_brief`, `story_lint`, `story_substantiate`, `story_apply`, `story_commit`, `story_review` | Wired into the `story` tool domain |
+| Agent tools: `story_intake`, `story_start`, `story_read`, `story_brief`, `story_lint`, `story_substantiate`, `story_apply`, `story_commit`, `story_review` | Wired into the `story` tool domain |
 | Reviewer and editor agents | Not started |
 | Story persistence in SQLite | JSON on disk for now |
 | Desktop UI | Inherited from OpenBaD; not yet repurposed |

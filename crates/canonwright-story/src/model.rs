@@ -55,6 +55,16 @@ pub struct StoryMeta {
     /// Where the prose came from, when it was imported rather than written here.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source: Option<String>,
+    /// Narrative voice agreed at intake: first person, third limited, and so on.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pov_voice: Option<String>,
+    /// Past or present.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tense: Option<String>,
+    /// The question the book asks. Kept here as well as on the thread, because a
+    /// new manuscript has no scene to plant the thread in yet.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub premise: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]

@@ -58,6 +58,7 @@ pub mod delta;
 pub mod edit;
 pub mod error;
 pub mod ids;
+pub mod intake;
 pub mod lint;
 pub mod model;
 pub mod state;
@@ -70,6 +71,7 @@ pub use delta::{Change, Harm, SceneChange, SceneDelta};
 pub use edit::WriteOutcome;
 pub use error::StoryError;
 pub use ids::{CharacterId, FactId, FactionId, RuleId, SceneId, TargetRef, ThreadId, TicketId};
+pub use intake::{Answer, AnswerKind, AnswerSource, Derived, Intake, Mode, Question, Section};
 pub use lint::COLD_THREAD_GAP;
 pub use model::{
     AXIS_MAX, AXIS_MIN, Axis, CausalKind, CausalLink, Character, Fact, Faction, Posture,

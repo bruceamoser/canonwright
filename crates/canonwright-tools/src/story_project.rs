@@ -7,6 +7,7 @@
 use async_trait::async_trait;
 use canonwright_governance::RiskLevel;
 use canonwright_manuscript::{Scaffold, read, scaffold, segment};
+use canonwright_story::intake::Intake;
 use canonwright_story::prelude::*;
 use serde_json::{Value, json};
 
@@ -55,6 +56,11 @@ impl Tool for StoryStartTool {
                 "overwrite": {
                     "type": "boolean",
                     "description": "Replace an existing story file. Defaults to false: an import never silently clobbers a story."
+                },
+                "answers": {
+                    "type": "object",
+                    "description": "Intake answers keyed by question id (title, genre, logline, pov_voice, tense, protagonist, want, need, central_question, hard_rule). Every one is optional.",
+                    "additionalProperties": { "type": "string" }
                 }
             },
             "required": ["mode"],
@@ -109,14 +115,32 @@ impl Tool for StoryStartTool {
             .transpose()
             .map_err(|error| ToolError::InvalidArgument(error.to_string()))?;
 
+        let answers = read_answers(&arguments)?;
+
         match mode {
-            "new" => start_blank(&arguments, context, &out, title, pov),
-            "existing" => start_from_document(&arguments, context, &out, title, pov),
+            "new" => start_blank(&arguments, context, &out, title, pov, answers),
+            "existing" => start_from_document(&arguments, context, &out, title, pov, answers),
             other => Err(ToolError::InvalidArgument(format!(
                 "mode must be \"new\" or \"existing\", not {other:?}"
             ))),
         }
     }
+}
+
+fn read_answers(arguments: &Value) -> Result<Vec<(String, String)>, ToolError> {
+    let Some(map) = arguments.get("answers").and_then(Value::as_object) else {
+        return Ok(Vec::new());
+    };
+    let mut answers = Vec::new();
+    for (id, value) in map {
+        let Some(value) = value.as_str() else {
+            return Err(ToolError::InvalidArgument(format!(
+                "answer {id:?} must be a string"
+            )));
+        };
+        answers.push((id.clone(), value.to_owned()));
+    }
+    Ok(answers)
 }
 
 fn start_blank(
@@ -125,9 +149,18 @@ fn start_blank(
     out: &std::path::Path,
     title: Option<String>,
     pov: Option<CharacterId>,
+    answers: Vec<(String, String)>,
 ) -> Result<ToolResult, ToolError> {
     let mut story = Story::default();
     story.meta.title = title.unwrap_or_else(|| "Untitled".to_owned());
+
+    let mut intake = Intake::new_manuscript();
+    for (id, value) in &answers {
+        intake
+            .answer(id, value.clone())
+            .map_err(|error| ToolError::InvalidArgument(error.to_string()))?;
+    }
+    intake.apply(&mut story);
     let mut cast_note = String::new();
     if let Some(pov) = pov {
         story.characters.insert(
@@ -168,6 +201,7 @@ fn start_from_document(
     out: &std::path::Path,
     title: Option<String>,
     pov: Option<CharacterId>,
+    answers: Vec<(String, String)>,
 ) -> Result<ToolResult, ToolError> {
     let raw = arguments
         .get("path")
@@ -222,6 +256,16 @@ fn start_from_document(
     }
 
     let Scaffold { scenes, narrator } = scaffold(&mut story, &segments);
+
+    // The document already answered what it can; these are the answers the
+    // writer supplied on top, and the inference pass fills the rest.
+    let mut intake = Intake::from_document(&document_text(&document), None);
+    for (id, value) in &answers {
+        intake
+            .answer(id, value.clone())
+            .map_err(|error| ToolError::InvalidArgument(error.to_string()))?;
+    }
+    intake.apply(&mut story);
     let errors = story.check();
     if !errors.is_empty() {
         let details: Vec<String> = errors.iter().map(|error| error.to_string()).collect();
@@ -277,6 +321,16 @@ fn start_from_document(
     })))
 }
 
+/// The whole document as one string, for inference and word counting.
+fn document_text(document: &canonwright_manuscript::Document) -> String {
+    document
+        .blocks
+        .iter()
+        .map(|block| block.text.as_str())
+        .collect::<Vec<_>>()
+        .join("\n\n")
+}
+
 fn resolve(context: &ToolContext, raw: &str) -> Result<std::path::PathBuf, ToolError> {
     context
         .workspace
@@ -287,4 +341,129 @@ fn resolve(context: &ToolContext, raw: &str) -> Result<std::path::PathBuf, ToolE
             }
             other => ToolError::Failed(other.to_string()),
         })
+}
+
+/// The deterministic intake script, pre-filled from a draft where possible.
+///
+/// This exists so the first conversation is a fixed one. The same mode always
+/// produces the same questions in the same order, which means the UI can render
+/// it, a test can assert it, and a resumed interview is a lookup rather than a
+/// re-prompt.
+pub struct StoryIntakeTool;
+
+#[async_trait]
+impl Tool for StoryIntakeTool {
+    fn definition(&self) -> ToolDefinition {
+        ToolDefinition::new(
+            "story_intake",
+            "Return the project intake questions before a story is created. mode=\"new\" \
+             returns the full interview (eleven questions, only the title is required). \
+             mode=\"existing\" reads the draft first and pre-fills what a document can \
+             answer — title, point of view, tense, word count — so the writer confirms \
+             rather than retypes. Pass the answers to story_start when done.",
+            RiskLevel::Read,
+        )
+        .with_schema(json!({
+            "type": "object",
+            "properties": {
+                "mode": {
+                    "type": "string",
+                    "enum": ["new", "existing"],
+                    "description": "new: a blank manuscript. existing: a draft to infer from."
+                },
+                "path": {
+                    "type": "string",
+                    "description": "Draft to read when mode is existing."
+                },
+                "title": {
+                    "type": "string",
+                    "description": "Title to use instead of the document's own."
+                }
+            },
+            "required": ["mode"],
+            "additionalProperties": false
+        }))
+    }
+
+    async fn execute(
+        &self,
+        arguments: Value,
+        context: &ToolContext,
+    ) -> Result<ToolResult, ToolError> {
+        let mode = arguments
+            .get("mode")
+            .and_then(Value::as_str)
+            .unwrap_or("new");
+        let title = arguments.get("title").and_then(Value::as_str);
+
+        let intake = match mode {
+            "new" => Intake::new_manuscript(),
+            "existing" => {
+                let raw = arguments
+                    .get("path")
+                    .and_then(Value::as_str)
+                    .ok_or_else(|| {
+                        ToolError::InvalidArgument(
+                            "mode is \"existing\", so path must name the draft".to_owned(),
+                        )
+                    })?;
+                let manuscript = resolve(context, raw)?;
+                let document =
+                    read(&manuscript).map_err(|error| ToolError::Failed(error.to_string()))?;
+                let mut intake = Intake::from_document(&document_text(&document), title);
+                intake.derived.push(canonwright_story::intake::Derived {
+                    label: "scenes detected".to_owned(),
+                    value: segment(&document).len().to_string(),
+                });
+                intake
+            }
+            other => {
+                return Err(ToolError::InvalidArgument(format!(
+                    "mode must be \"new\" or \"existing\", not {other:?}"
+                )));
+            }
+        };
+
+        let mut out = format!(
+            "# Intake — {} manuscript\n\n{} questions, {} skippable.\n\n",
+            intake.mode.name(),
+            intake.questions.len(),
+            intake.skippable_count()
+        );
+        if !intake.derived.is_empty() {
+            out.push_str("## Read from the draft\n\n");
+            for fact in &intake.derived {
+                out.push_str(&format!("- {}: {}\n", fact.label, fact.value));
+            }
+            out.push('\n');
+        }
+        out.push_str("## Questions\n\n");
+        for question in &intake.questions {
+            let mark = if question.required { "*" } else { "" };
+            match intake.answers.get(&question.id) {
+                Some(answer) => out.push_str(&format!(
+                    "- `{}`{} {} → **{}**{} (confirm)\n",
+                    question.id,
+                    mark,
+                    question.prompt,
+                    answer.value,
+                    if question.inferred {
+                        " — inferred"
+                    } else {
+                        ""
+                    }
+                )),
+                None => out.push_str(&format!(
+                    "- `{}`{} {} (optional)\n",
+                    question.id, mark, question.prompt
+                )),
+            }
+        }
+        out.push_str(
+            "\nAnswers marked inferred came from the document. Pass everything to \
+             `story_start` as `answers`; skipping is allowed for every question but the title.\n",
+        );
+
+        Ok(ToolResult::ok(out).with_metadata(serde_json::to_value(&intake).unwrap_or(Value::Null)))
+    }
 }
