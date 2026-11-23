@@ -56,6 +56,8 @@ import {
   cancelChat,
   chat as sendChat,
   checkpointDiff as fetchCheckpointDiff,
+  pickManuscript,
+  storyIntake,
   clearApiKey as clearStoredApiKey,
   forgetMemory as forgetStoredMemory,
   loadWorkspaceApprovals as fetchWorkspaceApprovals,
@@ -98,6 +100,7 @@ import {
 } from "./backend";
 import AppMenuBar from "./AppMenuBar";
 import type { AppMenu } from "./AppMenuBar";
+import type { IntakeScript } from "./types";
 import ChatComposer from "./ChatComposer";
 import type { ChatComposerHandle } from "./ChatComposer";
 import MarkdownMessage from "./MarkdownMessage";
@@ -533,6 +536,11 @@ export default function App() {
   const [commandOpen, setCommandOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
+  const [projectMode, setProjectMode] = useState<"new" | "existing">("new");
+  const [projectScript, setProjectScript] = useState<IntakeScript | null>(null);
+  const [projectAnswers, setProjectAnswers] = useState<Record<string, string>>({});
+  const [projectManuscript, setProjectManuscript] = useState<string | null>(null);
+  const [projectBusy, setProjectBusy] = useState(false);
   const [workspacesDir, setWorkspacesDir] = useState("");
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [sessionTitleDraft, setSessionTitleDraft] = useState("");
@@ -2264,24 +2272,93 @@ export default function App() {
     }
   }, [activeProject, projects, selectProject]);
 
+  const closeProjectDialog = useCallback(() => {
+    setProjectDialogOpen(false);
+    setNewProjectName("");
+    setProjectMode("new");
+    setProjectScript(null);
+    setProjectAnswers({});
+    setProjectManuscript(null);
+    setProjectBusy(false);
+  }, []);
+
+  const chooseManuscript = useCallback(async () => {
+    try {
+      const selected = await pickManuscript();
+      if (selected) {
+        setProjectManuscript(selected);
+      }
+    } catch (cause) {
+      setError(describeError(cause));
+    }
+  }, []);
+
+  // The question set is deterministic, so it is fetched rather than restated
+  // here: one source of truth, in Rust, rendered twice.
+  useEffect(() => {
+    if (!projectDialogOpen) {
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const script = await storyIntake(
+          projectMode,
+          projectMode === "existing" ? projectManuscript ?? undefined : undefined,
+        );
+        if (cancelled) {
+          return;
+        }
+        setProjectScript(script);
+        setProjectAnswers(
+          Object.fromEntries(
+            Object.entries(script.answers).map(([id, answer]) => [id, answer.value]),
+          ),
+        );
+      } catch (cause) {
+        if (!cancelled) {
+          setError(describeError(cause));
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectDialogOpen, projectMode, projectManuscript]);
+
   const createProject = useCallback(async () => {
     const name = newProjectName.trim();
     if (name.length === 0) {
       return;
     }
+    setProjectBusy(true);
     try {
-      const project = await createStoredProject(name);
+      const project = await createStoredProject(name, {
+        mode: projectMode,
+        manuscript:
+          projectMode === "existing" ? projectManuscript ?? undefined : undefined,
+        answers: projectAnswers,
+      });
       await loadProjects();
       setProjects((items) =>
         items.some((item) => item.id === project.id) ? items : [project, ...items],
       );
       selectProject(project);
-      setProjectDialogOpen(false);
-      setNewProjectName("");
+      closeProjectDialog();
     } catch (cause) {
       setError(describeError(cause));
+    } finally {
+      setProjectBusy(false);
     }
-  }, [loadProjects, newProjectName, selectProject]);
+  }, [
+    closeProjectDialog,
+    loadProjects,
+    newProjectName,
+    projectAnswers,
+    projectManuscript,
+    projectMode,
+    selectProject,
+  ]);
 
   const openSettings = useCallback(
     (tab: SettingsTab) => {
@@ -3287,69 +3364,199 @@ export default function App() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="New project"
+          aria-label="New story"
           className="fixed inset-0 z-50 flex items-center justify-center bg-obd-scrim p-6 backdrop-blur-sm"
         >
-          <div className="w-full max-w-md rounded-xl border border-obd-line bg-obd-surface p-5 shadow-2xl">
-            <div className="flex items-center justify-between">
+          <div className="flex max-h-[82vh] w-full max-w-lg flex-col rounded-xl border border-obd-line bg-obd-surface p-5 shadow-2xl">
+            <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-[14px] font-medium">New project</h2>
+                <h2 className="text-[14px] font-medium">New story</h2>
                 <p className="mt-0.5 text-[11px] text-obd-subtle">
-                  A project owns one workspace. Name it and Canonwright creates the
-                  folder for you.
+                  A project owns one workspace and one story. Name it, then say
+                  whether you are starting fresh or bringing a draft.
                 </p>
               </div>
               <button
                 type="button"
                 aria-label="Close"
-                onClick={() => setProjectDialogOpen(false)}
+                onClick={closeProjectDialog}
                 className="rounded-md p-1 text-obd-subtle hover:bg-obd-raised hover:text-obd-body"
               >
                 <X size={15} />
               </button>
             </div>
-            <label className="mt-4 block text-[10px] uppercase tracking-wider text-obd-subtle">
-              Project name
-            </label>
-            <input
-              autoFocus
-              value={newProjectName}
-              onChange={(event) => setNewProjectName(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  void createProject();
-                }
-              }}
-              aria-label="Project name"
-              placeholder="My project"
-              className="mt-1 w-full rounded-md border border-obd-line bg-obd-inset px-2.5 py-2 text-[12px] text-obd-text outline-none focus:border-obd-accent/40"
-            />
-            <div className="mt-3 rounded-md border border-obd-line bg-obd-inset px-2.5 py-2">
-              <p className="text-[9px] uppercase tracking-wider text-obd-subtle">
-                Workspace location
-              </p>
-              <p className="mt-1 break-all font-mono text-[10px] leading-4 text-obd-subtle">
+
+            <div className="mt-4">
+              <label className="block text-[10px] uppercase tracking-wider text-obd-subtle">
+                Project name
+              </label>
+              <input
+                autoFocus
+                value={newProjectName}
+                onChange={(event) => setNewProjectName(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    void createProject();
+                  }
+                }}
+                aria-label="Project name"
+                placeholder="The Salt Road"
+                className="mt-1 w-full rounded-md border border-obd-line bg-obd-inset px-2.5 py-2 text-[12px] text-obd-text outline-none focus:border-obd-accent/40"
+              />
+              <p className="mt-1 break-all font-mono text-[10px] text-obd-subtle">
                 {workspacesDir.length > 0
                   ? `${workspacesDir}/${projectSlugPreview(newProjectName)}`
                   : "Resolving the default workspaces directory…"}
               </p>
             </div>
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setProjectDialogOpen(false)}
-                className="rounded-md px-3 py-1.5 text-[11px] text-obd-muted hover:bg-obd-raised"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => void createProject()}
-                disabled={newProjectName.trim().length === 0}
-                className="rounded-md bg-obd-accent px-3 py-1.5 text-[11px] font-medium text-obd-on-accent hover:bg-obd-accent disabled:opacity-30"
-              >
-                Create project
-              </button>
+
+            <div className="mt-4">
+              <p className="text-[10px] uppercase tracking-wider text-obd-subtle">
+                Starting point
+              </p>
+              <div className="mt-1 grid grid-cols-2 gap-2">
+                {(
+                  [
+                    ["new", "New manuscript", "Blank page and an interview."],
+                    ["existing", "Import a draft", "Read the prose, infer what we can."],
+                  ] as const
+                ).map(([value, label, hint]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => {
+                      setProjectMode(value);
+                      setProjectManuscript(null);
+                      setProjectScript(null);
+                      setProjectAnswers({});
+                    }}
+                    className={`rounded-md border px-2.5 py-2 text-left text-[11px] ${
+                      projectMode === value
+                        ? "border-obd-accent/50 bg-obd-accent/10 text-obd-text"
+                        : "border-obd-line bg-obd-inset text-obd-muted hover:bg-obd-raised"
+                    }`}
+                  >
+                    <span className="block font-medium">{label}</span>
+                    <span className="mt-0.5 block text-[10px] text-obd-subtle">{hint}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {projectMode === "existing" && (
+              <div className="mt-3 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void chooseManuscript()}
+                  className="rounded-md border border-obd-line bg-obd-inset px-2.5 py-1.5 text-[11px] text-obd-body hover:bg-obd-raised"
+                >
+                  Choose draft…
+                </button>
+                <span className="truncate font-mono text-[10px] text-obd-subtle">
+                  {projectManuscript ?? "md, markdown, txt, docx, epub, pdf"}
+                </span>
+              </div>
+            )}
+
+            {projectScript && projectScript.derived.length > 0 && (
+              <div className="mt-3 rounded-md border border-obd-line bg-obd-inset px-2.5 py-2">
+                <p className="text-[9px] uppercase tracking-wider text-obd-subtle">
+                  Read from the draft
+                </p>
+                {projectScript.derived.map((fact) => (
+                  <p key={fact.label} className="mt-0.5 text-[11px] text-obd-muted">
+                    {fact.label}: <span className="text-obd-text">{fact.value}</span>
+                  </p>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1">
+              <p className="text-[10px] uppercase tracking-wider text-obd-subtle">
+                {projectScript
+                  ? `${projectScript.questions.length} questions · only the title is required`
+                  : "Loading questions…"}
+              </p>
+              <div className="mt-2 space-y-3">
+                {(projectScript?.questions ?? []).map((question) => {
+                  const inferred = projectScript?.answers[question.id];
+                  return (
+                    <div key={question.id}>
+                      <label className="block text-[11px] text-obd-body">
+                        {question.prompt}
+                        {!question.required && (
+                          <span className="text-obd-subtle"> (optional)</span>
+                        )}
+                        {inferred && (
+                          <span className="ml-1 rounded bg-obd-accent/15 px-1 text-[9px] text-obd-accent">
+                            from draft
+                          </span>
+                        )}
+                      </label>
+                      <p className="mt-0.5 text-[10px] leading-4 text-obd-subtle">
+                        {question.help}
+                      </p>
+                      {question.kind.kind === "choice" ? (
+                        <select
+                          value={projectAnswers[question.id] ?? ""}
+                          onChange={(event) =>
+                            setProjectAnswers((previous) => ({
+                              ...previous,
+                              [question.id]: event.target.value,
+                            }))
+                          }
+                          className="mt-1 w-full rounded-md border border-obd-line bg-obd-inset px-2 py-1.5 text-[11px] text-obd-text outline-none focus:border-obd-accent/40"
+                        >
+                          <option value="">Not set</option>
+                          {question.kind.options.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          value={projectAnswers[question.id] ?? ""}
+                          onChange={(event) =>
+                            setProjectAnswers((previous) => ({
+                              ...previous,
+                              [question.id]: event.target.value,
+                            }))
+                          }
+                          className="mt-1 w-full rounded-md border border-obd-line bg-obd-inset px-2 py-1.5 text-[11px] text-obd-text outline-none focus:border-obd-accent/40"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center justify-between gap-2 border-t border-obd-line pt-3">
+              <p className="text-[10px] text-obd-subtle">
+                Every question but the title can be skipped.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={closeProjectDialog}
+                  className="rounded-md px-3 py-1.5 text-[11px] text-obd-muted hover:bg-obd-raised"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void createProject()}
+                  disabled={
+                    projectBusy ||
+                    newProjectName.trim().length === 0 ||
+                    (projectMode === "existing" && projectManuscript === null)
+                  }
+                  className="rounded-md bg-obd-accent px-3 py-1.5 text-[11px] font-medium text-obd-on-accent hover:bg-obd-accent disabled:opacity-30"
+                >
+                  {projectBusy ? "Creating…" : "Create project"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -33,6 +33,8 @@ canonwright-pipeline = { path = "../../../crates/canonwright-pipeline" }
 canonwright-agent = { path = "../../../crates/canonwright-agent" }
 canonwright-harness = { path = "../../../crates/canonwright-harness" }
 canonwright-llm = { path = "../../../crates/canonwright-llm" }
+canonwright-manuscript = { path = "../../../crates/canonwright-manuscript" }
+canonwright-story = { path = "../../../crates/canonwright-story" }
 canonwright-tools = { path = "../../../crates/canonwright-tools" }
 canonwright-lsp = { path = "../../../crates/canonwright-lsp" }
 canonwright-mcp = { path = "../../../crates/canonwright-mcp" }

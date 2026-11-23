@@ -792,3 +792,35 @@ export type PipelineGuards = {
   protected: boolean;
   missing: string[];
 };
+
+export type IntakeQuestionKind =
+  | { kind: "text" }
+  | { kind: "choice"; options: string[] };
+
+export type IntakeQuestion = {
+  id: string;
+  section: "identity" | "voice" | "cast" | "stakes";
+  prompt: string;
+  help: string;
+  kind: IntakeQuestionKind;
+  required: boolean;
+  inferred: boolean;
+};
+
+export type IntakeAnswer = {
+  value: string;
+  source: "author" | "document";
+};
+
+export type IntakeScript = {
+  mode: "new" | "imported";
+  questions: IntakeQuestion[];
+  answers: Record<string, IntakeAnswer>;
+  derived: { label: string; value: string }[];
+};
+
+export type StoryStartRequest = {
+  mode: "new" | "existing";
+  manuscript?: string;
+  answers: Record<string, string>;
+};

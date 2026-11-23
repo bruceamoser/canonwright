@@ -5,6 +5,8 @@ import { open, save } from "@tauri-apps/plugin-dialog";
 
 import type {
   AccessMode,
+  IntakeScript,
+  StoryStartRequest,
   ChatMode,
   AgentEvent,
   ChatReply,
@@ -344,9 +346,12 @@ export async function workspacesDirectory(): Promise<string> {
     : mockWorkspacesDirectory;
 }
 
-export async function createProject(name: string): Promise<WorkspaceSummary> {
+export async function createProject(
+  name: string,
+  story?: StoryStartRequest,
+): Promise<WorkspaceSummary> {
   if (isTauri) {
-    return invoke<WorkspaceSummary>("create_project", { name });
+    return invoke<WorkspaceSummary>("create_project", { name, story });
   }
   const slug =
     name
@@ -491,6 +496,46 @@ export async function pickDirectory(title: string): Promise<string | null> {
     return typeof selected === "string" ? selected : null;
   }
   return "/mnt/disk4/repos/reference-library";
+}
+
+export async function pickManuscript(): Promise<string | null> {
+  if (isTauri) {
+    const selected = await open({
+      directory: false,
+      multiple: false,
+      title: "Choose a manuscript",
+      filters: [
+        { name: "Manuscript", extensions: ["md", "markdown", "txt", "docx", "epub", "pdf"] },
+      ],
+    });
+    return typeof selected === "string" ? selected : null;
+  }
+  return `${mockWorkspacesDirectory}/draft.md`;
+}
+
+export async function storyIntake(
+  mode: "new" | "existing",
+  manuscript?: string,
+): Promise<IntakeScript> {
+  if (isTauri) {
+    return invoke<IntakeScript>("story_intake", { mode, manuscript });
+  }
+  return {
+    mode: mode === "existing" ? "imported" : "new",
+    questions: [
+      {
+        id: "title",
+        section: "identity",
+        prompt: "What is this story called?",
+        help: "You can rename it later.",
+        kind: { kind: "text" },
+        required: true,
+        inferred: false,
+      },
+    ],
+    answers: {},
+    derived: [],
+  };
 }
 
 export async function pickFiles(title: string): Promise<string[]> {

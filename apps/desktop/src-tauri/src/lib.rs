@@ -4486,6 +4486,7 @@ fn workspaces_directory() -> Result<String, String> {
 fn create_project(
     state: State<'_, AppState>,
     name: String,
+    story: Option<StoryStartRequest>,
 ) -> Result<canonwright_store::types::WorkspaceSummary, String> {
     let name = name.trim();
     if name.is_empty() {
@@ -4496,6 +4497,9 @@ fn create_project(
     }
     let root = default_workspaces_directory()?;
     let path = create_workspace_directory(&root, name)?;
+    if let Some(request) = story {
+        start_story_in(&path, name, request)?;
+    }
     let store = state
         .store
         .lock()
@@ -4507,6 +4511,116 @@ fn create_project(
         .workspace_summary(workspace)
         .map_err(|error| error.to_string())?
         .ok_or_else(|| "project disappeared after creation".to_owned())
+}
+
+/// The deterministic intake script, so the UI renders one source of truth
+/// rather than a second copy of the questions in TypeScript.
+#[tauri::command]
+fn story_intake(mode: String, manuscript: Option<String>) -> Result<serde_json::Value, String> {
+    let intake = build_intake(&mode, manuscript.as_deref(), None)?;
+    serde_json::to_value(&intake).map_err(|error| error.to_string())
+}
+
+fn build_intake(
+    mode: &str,
+    manuscript: Option<&str>,
+    title: Option<&str>,
+) -> Result<canonwright_story::intake::Intake, String> {
+    match mode {
+        "existing" => {
+            let path = manuscript
+                .ok_or_else(|| "a manuscript path is required for an existing draft".to_owned())?;
+            let document = canonwright_manuscript::read(std::path::Path::new(path))
+                .map_err(|error| error.to_string())?;
+            let text = document
+                .blocks
+                .iter()
+                .map(|block| block.text.as_str())
+                .collect::<Vec<_>>()
+                .join("\n\n");
+            let mut intake = canonwright_story::intake::Intake::from_document(
+                &text,
+                title.or(document.title.as_deref()),
+            );
+            intake.derived.push(canonwright_story::intake::Derived {
+                label: "scenes detected".to_owned(),
+                value: canonwright_manuscript::segment(&document).len().to_string(),
+            });
+            Ok(intake)
+        }
+        "new" => Ok(canonwright_story::intake::Intake::new_manuscript()),
+        other => Err(format!("mode must be \"new\" or \"existing\", not {other:?}")),
+    }
+}
+
+/// One story, created inside a fresh project directory.
+fn start_story_in(
+    root: &Path,
+    project_name: &str,
+    request: StoryStartRequest,
+) -> Result<(), String> {
+    let document = match request.mode.as_str() {
+        "existing" => {
+            let path = request.manuscript.clone().ok_or_else(|| {
+                "a manuscript path is required for an existing draft".to_owned()
+            })?;
+            Some(
+                canonwright_manuscript::read(Path::new(&path))
+                    .map_err(|error| error.to_string())?,
+            )
+        }
+        "new" => None,
+        other => return Err(format!("mode must be \"new\" or \"existing\", not {other:?}")),
+    };
+
+    let mut intake = match &document {
+        Some(document) => {
+            let text = document
+                .blocks
+                .iter()
+                .map(|block| block.text.as_str())
+                .collect::<Vec<_>>()
+                .join("\n\n");
+            canonwright_story::intake::Intake::from_document(&text, document.title.as_deref())
+        }
+        None => canonwright_story::intake::Intake::new_manuscript(),
+    };
+    for (id, value) in &request.answers {
+        intake
+            .answer(id, value.clone())
+            .map_err(|error| error.to_string())?;
+    }
+
+    let mut story = canonwright_story::Story::default();
+    if let Some(document) = &document {
+        let segments = canonwright_manuscript::segment(document);
+        canonwright_manuscript::scaffold(&mut story, &segments);
+    }
+    intake.apply(&mut story);
+    if story.meta.title.trim().is_empty() {
+        story.meta.title = project_name.to_owned();
+    }
+
+    let errors = story.check();
+    if !errors.is_empty() {
+        return Err(errors
+            .iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>()
+            .join("; "));
+    }
+    story
+        .save(&root.join(".canonwright").join("story.json"))
+        .map_err(|error| error.to_string())
+}
+
+#[derive(Debug, Default, serde::Deserialize)]
+struct StoryStartRequest {
+    mode: String,
+    #[serde(default)]
+    manuscript: Option<String>,
+    #[serde(default)]
+    answers: std::collections::BTreeMap<String, String>,
 }
 
 #[tauri::command]
@@ -6128,6 +6242,7 @@ pub fn run() {
             list_projects,
             add_project,
             create_project,
+            story_intake,
             export_project,
             import_project,
             import_project_into,
