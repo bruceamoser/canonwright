@@ -93,6 +93,98 @@ def window_chrome(p, title):
     text(1392, 15, "Settings", 10, p["muted"])
 
 
+# ------------------------------------------------------------- 0. first run
+def first_run_github():
+    """Before anything else, the one integration the product genuinely needs."""
+    p = DARK
+    page("00 First run — GitHub", p)
+    window_chrome(p, "Welcome to Canonwright")
+
+    text(200, 150, "Your manuscript should live in git.", 30, p["text"], bold=True)
+    text(200, 200, "Not because you are a programmer — because a draft you can return to, diff and", 13, p["body"])
+    text(200, 220, "show someone is a draft you will finish.", 13, p["body"])
+
+    rect(200, 268, 620, 96, p["surface"], radius=12, stroke=p["line"])
+    text(224, 284, "WHY THIS IS ASKED FIRST", 9, p["muted"])
+    text(224, 306, "An existing manuscript is often already a repository, not a file on a disk.", 11, p["text"], width=580)
+    text(224, 326, "Connecting now means project creation can offer “read it from GitHub”", 11, p["text"], width=580)
+    text(224, 344, "alongside “open a file”.", 11, p["text"], width=580)
+
+    # state: device code already issued
+    rect(200, 396, 620, 150, p["surface"], radius=12, stroke=p["accent"])
+    text(224, 412, "SIGNING IN", 9, p["accent"])
+    text(224, 436, "Enter this code on GitHub, then approve access:", 12, p["text"])
+    rect(224, 460, 200, 44, p["raised"], radius=8, stroke=p["line"])
+    text(248, 470, "ABCD-1234", 22, p["accent"], bold=True, mono=True)
+    text(224, 516, "github.com/login/device     ·     this window updates by itself", 10, p["muted"])
+
+    rect(200, 566, 240, 40, p["accent"], radius=8)
+    text(228, 578, "Open the browser", 13, "#FFFFFF", bold=True)
+    rect(452, 566, 180, 40, p["surface"], radius=8, stroke=p["line"])
+    text(478, 578, "Skip for now", 12, p["muted"])
+
+    text(200, 640, "Skipping is fine. Settings → GitHub connects later, and reading from a repository", 10, p["muted"])
+    text(200, 658, "simply stays unavailable until you do.", 10, p["muted"])
+
+    # right rail: what is not being asked
+    rect(880, 150, 360, 470, p["surface"], radius=12, stroke=p["line"])
+    text(904, 170, "ALREADY CHECKED", 9, p["muted"])
+    for i, (label, state, tone) in enumerate([
+        ("git installed", "2.43", "good"),
+        ("GitHub CLI", "2.97", "good"),
+        ("signed in", "not yet", "warn"),
+        ("a local model key", "configured", "good"),
+    ]):
+        y = 200 + i * 44
+        text(904, y, label, 11, p["text"])
+        text(904, y + 16, state, 10, p[tone])
+
+    rect(904, 400, 312, 1, p["line"])
+    text(904, 416, "None of this is required to write.", 10, p["muted"], width=300)
+    text(904, 440, "It is required to keep the manuscript somewhere other than one disk.", 10, p["muted"], width=300)
+
+
+# ------------------------------------------------- 3. new manuscript — starting
+def new_manuscript_setup():
+    """A blank book needs a seed, not an inventory."""
+    p = LIGHT
+    page("03 New manuscript — start", p)
+    window_chrome(p, "New manuscript")
+
+    text(200, 120, "Where does it start?", 26, p["text"], bold=True)
+    text(200, 158, "A new book needs a way in, not a cast list. Pick whichever of these you already", 12, p["muted"])
+    text(200, 176, "have — the collaborator will build the rest with you in the first conversation.", 12, p["muted"])
+
+    for i, (title, hint, seed) in enumerate([
+        ("A character", "Someone with a want that costs them.", "A caravan master who has to get a load of salt through a closed ford."),
+        ("A situation", "A place and a pressure, no people yet.", "A border town whose only income has just been made illegal."),
+        ("A question", "The thing the book is trying to answer.", "Who do you become when the law is the thing that is wrong?"),
+    ]):
+        y = 228 + i * 132
+        selected = i == 0
+        rect(200, y, 900, 112, p["surface"], radius=12, stroke=p["accent"] if selected else p["line"])
+        text(224, y + 16, title, 15, p["text"], bold=True)
+        text(224, y + 40, hint, 11, p["muted"])
+        if selected:
+            rect(224, y + 62, 840, 34, p["raised"], radius=8, stroke=p["line"])
+            text(236, y + 71, seed, 12, p["text"], width=800)
+        else:
+            text(224, y + 66, "click to write yours", 11, p["muted"])
+
+    text(200, 630, "TITLE", 9, p["muted"])
+    rect(200, 650, 420, 34, p["surface"], radius=8, stroke=p["line"])
+    text(212, 660, "The Salt Road", 12, p["text"])
+    chip(640, 656, "Novel · fantasy", p, "accent", w=130)
+
+    rect(200, 716, 900, 92, p["raised"], radius=10, stroke=p["line"])
+    text(224, 730, "THE REST IS NOT A FORM", 9, p["warn"])
+    text(224, 752, "No cast, no world rules, no theme, no chapter list. The collaborator proposes them,", 11, p["text"], width=860)
+    text(224, 770, "you push back, and nothing becomes canon until you accept it.", 11, p["text"], width=860)
+
+    rect(900, 828, 200, 38, p["accent"], radius=8)
+    text(936, 841, "Create project", 13, "#FFFFFF", bold=True)
+
+
 # ---------------------------------------------------------------- 1. welcome
 def welcome():
     p = LIGHT
@@ -189,54 +281,61 @@ def step_one():
     text(960, 819, "Cancel", 12, p["muted"])
 
 
-# ---------------------------------------------------------- 3. project setup
-def project_setup():
-    """Setup only. Everything here configures the project; none of it is content."""
+# ------------------------------------- 4. existing manuscript — read, then ask
+def existing_manuscript_setup():
+    """The file is read first. The questions are about what was found in it."""
     p = LIGHT
-    page("03 Project setup", p)
-    window_chrome(p, "New project · setup")
+    page("04 Existing manuscript — what I read", p)
+    window_chrome(p, "Import · draft.md")
 
-    text(320, 104, "Set up the project", 26, p["text"], bold=True)
-    text(320, 142, "Five things, all of them about the project rather than the book. Once this is", 12, p["muted"])
-    text(320, 160, "done the collaborator opens the manuscript and starts asking about the story.", 12, p["muted"])
+    text(200, 92, "I read the draft. Here is what I found.", 24, p["text"], bold=True)
+    text(200, 128, "These questions came from the file, not from a template. Answer what you like;", 12, p["muted"])
+    text(200, 146, "anything you skip stays as I read it, and you can change it later in the canon panel.", 12, p["muted"])
 
-    text(320, 208, "PROJECT", 9, p["muted"])
-    field(320, 230, 330, "Title *", "The Salt Road", p)
-    field(676, 230, 330, "Author", "Bruce Amoser", p)
-    field(1032, 230, 300, "Workspace", "~/Canonwright/the-salt-road", p)
+    # what was read
+    rect(200, 190, 900, 104, p["surface"], radius=12, stroke=p["line"])
+    text(224, 206, "THE SALT ROAD.DOCX · READ IN 1.2s", 9, p["muted"])
+    for i, (label, value) in enumerate([
+        ("41,200 words", "24 scenes"), ("3 viewpoints", "past tense"), ("1 unresolved thread", "2 name mismatches"),
+    ]):
+        text(224 + i * 296, 232, label, 14, p["text"], bold=True)
+        text(224 + i * 296, 254, value, 11, p["muted"])
+    text(224, 276, "Third limited, past tense, chapters split on headings and scene breaks.", 10, p["muted"])
 
-    text(320, 306, "SHAPE", 9, p["muted"])
-    # kind is already chosen on the previous screen; show it as a settled chip
-    chip(320, 328, "Novel", p, "accent", w=86)
-    chip(416, 328, "third limited · past", p, "muted", w=136)
-    field(320, 360, 330, "Genre", "Fantasy", p)
-    field(676, 360, 330, "Roughly how long?", "80,000 words", p)
+    # questions produced from the file
+    text(200, 320, "QUESTIONS FROM THE DRAFT", 9, p["muted"])
+    questions = [
+        ("I count three viewpoints: Mara, Harek, Ilse. Is Harek a protagonist or an obstacle?",
+         "choice: protagonist · obstacle · both"),
+        ("'the Factor's Office' and 'the Office' appear 11 and 3 times. Which is the name?",
+         "choice: the Factor's Office · the Office"),
+        ("Scene 14 has no causal link to scene 13. A flashback, or a gap to fill?",
+         "choice: flashback · gap to fill"),
+        ("The forged-seal thread is never paid off. Intentional, or should I hold it open?",
+         "choice: intentional · hold it open"),
+    ]
+    for i, (question, answer) in enumerate(questions):
+        y = 344 + i * 76
+        rect(200, y, 900, 64, p["surface"], radius=10, stroke=p["line"])
+        text(220, y + 12, question, 11, p["text"], width=860)
+        text(220, y + 40, answer, 10, p["accent"], mono=True)
 
-    text(320, 436, "WHERE IT STARTS", 9, p["muted"])
-    rect(320, 458, 320, 62, p["surface"], radius=10, stroke=p["accent"])
-    text(340, 470, "Blank manuscript", 12, p["text"], bold=True)
-    text(340, 490, "The collaborator proposes the cast with you.", 10, p["muted"])
-    rect(668, 458, 320, 62, p["surface"], radius=10, stroke=p["line"])
-    text(688, 470, "Import a draft", 12, p["text"])
-    text(688, 490, ".md, .docx, .epub, .pdf — or a GitHub repo", 10, p["muted"])
+    rect(200, 664, 900, 84, p["raised"], radius=10, stroke=p["line"])
+    text(224, 678, "WHAT HAPPENS NEXT", 9, p["muted"])
+    text(224, 700, "The manuscript becomes 24 drafted scenes with the prose kept and the state empty.", 11, p["text"], width=860)
+    text(224, 718, "The collaborator then works through these answers and fills the graph — you are not starting over.", 11, p["text"], width=860)
 
-    rect(320, 556, 970, 96, p["raised"], radius=10, stroke=p["line"])
-    text(340, 570, "NOT ASKED HERE", 9, p["warn"])
-    text(340, 590, "Who the protagonist is. What they want. The rules of the world. The classes,", 11, p["text"], width=920)
-    text(340, 608, "ancestries, items or monsters. The book's theme. That is the work — the collaborator", 11, p["text"], width=920)
-    text(340, 626, "will propose it with you, in the manuscript, one conversation at a time.", 11, p["text"], width=920)
-
-    rect(320, 806, 200, 38, p["surface"], radius=8, stroke=p["line"])
-    text(356, 819, "Cancel", 12, p["muted"])
-    rect(1030, 806, 260, 38, p["accent"], radius=8)
-    text(1078, 819, "Create the project", 13, "#FFFFFF", bold=True)
+    rect(200, 828, 220, 38, p["surface"], radius=8, stroke=p["line"])
+    text(228, 841, "Answer later", 12, p["muted"])
+    rect(880, 828, 220, 38, p["accent"], radius=8)
+    text(910, 841, "Import and continue", 13, "#FFFFFF", bold=True)
 
 
 # ------------------------------------------- 3b. first session — collaborator opens
 def collaborating():
     """The product's real first move: proposals and questions, in prose, in chat."""
     p = DARK
-    page("04 First session — collaborator", p)
+    page("05 First session — collaborator", p)
     window_chrome(p, "The Salt Road")
 
     rect(0, 44, 300, 856, p["surface"], name="rail")
@@ -314,7 +413,7 @@ def collaborating():
 # --------------------------------------------------------- 4. novel workspace
 def novel_workspace():
     p = DARK
-    page("05 Workspace — novel", p)
+    page("06 Workspace — novel", p)
     window_chrome(p, "The Salt Road · Novel")
 
     # left rail: scenes
@@ -390,7 +489,7 @@ def novel_workspace():
 # ------------------------------------------------------- 5. rulebook workspace
 def rulebook_workspace():
     p = LIGHT
-    page("06 Workspace — rulebook", p)
+    page("07 Workspace — rulebook", p)
     window_chrome(p, "Deeds of Legend · Rulebook")
 
     rect(0, 44, 296, 856, p["surface"], name="chapters")
@@ -464,7 +563,7 @@ def rulebook_workspace():
 # ------------------------------------------------------------ 6. source control
 def source_control():
     p = DARK
-    page("07 Source control", p)
+    page("08 Source control", p)
     window_chrome(p, "The Salt Road · Source")
 
     rect(0, 44, 1440, 40, p["surface"], name="tabs")
@@ -551,8 +650,11 @@ def source_control():
 
 
 welcome()
+first_run_github()
+welcome()
 step_one()
-project_setup()
+new_manuscript_setup()
+existing_manuscript_setup()
 collaborating()
 novel_workspace()
 rulebook_workspace()
