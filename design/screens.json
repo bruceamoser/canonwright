@@ -182,32 +182,6 @@
   }
  },
  {
-  "command": "page.add",
-  "params": {
-   "name": "07 Source control"
-  }
- },
- {
-  "command": "page.select",
-  "params": {
-   "index": 8
-  }
- },
- {
-  "command": "frame.create",
-  "as": "screen:07 Source control",
-  "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 900,
-   "name": "07 Source control",
-   "props": {
-    "fill": "#14161C"
-   }
-  }
- },
- {
   "command": "shape.rectangle",
   "params": {
    "x": 0,
@@ -3728,11 +3702,11 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 1136,
+   "x": 1120,
    "y": 40,
-   "width": 304,
+   "width": 320,
    "height": 860,
-   "name": "canon",
+   "name": "canon panel",
    "props": {
     "fill": "#1B1F27",
     "cornerRadius": 0
@@ -3745,7 +3719,7 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 1136,
+   "x": 1120,
    "y": 40,
    "width": 1,
    "height": 860,
@@ -3760,17 +3734,137 @@
   }
  },
  {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 56,
+   "width": 92,
+   "height": 24,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
   "command": "text.create",
   "params": {
-   "text": "CANON",
-   "x": 1160,
-   "y": 64,
+   "text": "Canon",
+   "x": 1150,
+   "y": 62,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9",
+    "fontStyle": "Bold"
+   },
+   "name": "Canon",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Issues 2",
+   "x": 1244,
+   "y": 62,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Issues 2",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 86,
+   "width": 288,
+   "height": 1,
+   "name": "rect",
+   "props": {
+    "fill": "#2E3542",
+    "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 100,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "CHARACTERS",
+   "x": 1146,
+   "y": 103,
    "props": {
     "fontSize": 9,
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "CANON",
+   "name": "CHARACTERS",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "3",
+   "x": 1378,
+   "y": 103,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "3",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 102,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
    "parent": {
     "$ref": "screen:04 Project"
    }
@@ -3780,50 +3874,15 @@
   "command": "text.create",
   "params": {
    "text": "Mara Vale",
-   "x": 1160,
-   "y": 92,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#F2EFF9"
-   },
-   "name": "Mara Vale",
-   "parent": {
-    "$ref": "screen:04 Project"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "character",
-   "x": 1160,
-   "y": 108,
+   "x": 1150,
+   "y": 122,
    "props": {
     "fontSize": 9,
     "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
+    "fill": "#F2EFF9"
    },
-   "name": "character",
-   "parent": {
-    "$ref": "screen:04 Project"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1330,
-   "y": 92,
-   "width": 84,
-   "height": 20,
-   "name": "rect",
-   "props": {
-    "fill": "#232833",
-    "cornerRadius": 10,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
+   "name": "Mara Vale",
+   "width": 210,
    "parent": {
     "$ref": "screen:04 Project"
    }
@@ -3832,16 +3891,16 @@
  {
   "command": "text.create",
   "params": {
-   "text": "accepted",
-   "x": 1339,
-   "y": 97,
+   "text": "POV",
+   "x": 1348,
+   "y": 123,
    "props": {
-    "fontSize": 10,
+    "fontSize": 8,
     "fontFamily": "DejaVu Sans",
-    "fill": "#7BD88F"
+    "fill": "#6F6885"
    },
-   "name": "accepted",
-   "width": 72,
+   "name": "POV",
+   "width": 76,
    "parent": {
     "$ref": "screen:04 Project"
    }
@@ -3851,14 +3910,15 @@
   "command": "text.create",
   "params": {
    "text": "Harek Vale",
-   "x": 1160,
-   "y": 140,
+   "x": 1150,
+   "y": 139,
    "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans Mono",
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
    "name": "Harek Vale",
+   "width": 210,
    "parent": {
     "$ref": "screen:04 Project"
    }
@@ -3867,15 +3927,16 @@
  {
   "command": "text.create",
   "params": {
-   "text": "character",
-   "x": 1160,
-   "y": 156,
+   "text": "POV",
+   "x": 1348,
+   "y": 140,
    "props": {
-    "fontSize": 9,
+    "fontSize": 8,
     "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
+    "fill": "#6F6885"
    },
-   "name": "character",
+   "name": "POV",
+   "width": 76,
    "parent": {
     "$ref": "screen:04 Project"
    }
@@ -3884,16 +3945,14 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 1330,
-   "y": 140,
-   "width": 84,
-   "height": 20,
+   "x": 1136,
+   "y": 166,
+   "width": 288,
+   "height": 18,
    "name": "rect",
    "props": {
     "fill": "#232833",
-    "cornerRadius": 10,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
+    "cornerRadius": 4
    },
    "parent": {
     "$ref": "screen:04 Project"
@@ -3903,16 +3962,15 @@
  {
   "command": "text.create",
   "params": {
-   "text": "accepted",
-   "x": 1339,
-   "y": 145,
+   "text": "PLOT",
+   "x": 1146,
+   "y": 169,
    "props": {
-    "fontSize": 10,
+    "fontSize": 9,
     "fontFamily": "DejaVu Sans",
-    "fill": "#7BD88F"
+    "fill": "#9A93AD"
    },
-   "name": "accepted",
-   "width": 72,
+   "name": "PLOT",
    "parent": {
     "$ref": "screen:04 Project"
    }
@@ -3921,15 +3979,50 @@
  {
   "command": "text.create",
   "params": {
-   "text": "no-salt-unsealed",
-   "x": 1160,
+   "text": "2",
+   "x": 1378,
+   "y": 169,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "2",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 168,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Act one",
+   "x": 1150,
    "y": 188,
    "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans Mono",
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "no-salt-unsealed",
+   "name": "Act one",
+   "width": 210,
    "parent": {
     "$ref": "screen:04 Project"
    }
@@ -3938,15 +4031,52 @@
  {
   "command": "text.create",
   "params": {
-   "text": "hard rule",
-   "x": 1160,
-   "y": 204,
+   "text": "4 scenes",
+   "x": 1348,
+   "y": 189,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "4 scenes",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Act two",
+   "x": 1150,
+   "y": 205,
    "props": {
     "fontSize": 9,
     "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
+    "fill": "#F2EFF9"
    },
-   "name": "hard rule",
+   "name": "Act two",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "6 scenes",
+   "x": 1348,
+   "y": 206,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "6 scenes",
+   "width": 76,
    "parent": {
     "$ref": "screen:04 Project"
    }
@@ -3955,16 +4085,14 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 1330,
-   "y": 188,
-   "width": 84,
-   "height": 20,
+   "x": 1136,
+   "y": 232,
+   "width": 288,
+   "height": 18,
    "name": "rect",
    "props": {
     "fill": "#232833",
-    "cornerRadius": 10,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
+    "cornerRadius": 4
    },
    "parent": {
     "$ref": "screen:04 Project"
@@ -3974,16 +4102,659 @@
  {
   "command": "text.create",
   "params": {
-   "text": "review",
-   "x": 1339,
-   "y": 193,
+   "text": "ARCS",
+   "x": 1146,
+   "y": 235,
    "props": {
-    "fontSize": 10,
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "ARCS",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "2",
+   "x": 1378,
+   "y": 235,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "2",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 234,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Mara: fear \u2192 command",
+   "x": 1150,
+   "y": 254,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Mara: fear \u2192 command",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "open",
+   "x": 1348,
+   "y": 255,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "open",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Harek: debt \u2192 ruin",
+   "x": 1150,
+   "y": 271,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Harek: debt \u2192 ruin",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "open",
+   "x": 1348,
+   "y": 272,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "open",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 298,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "MOTIVATIONS",
+   "x": 1146,
+   "y": 301,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "MOTIVATIONS",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "2",
+   "x": 1378,
+   "y": 301,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "2",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 300,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Mara wants the ford",
+   "x": 1150,
+   "y": 320,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Mara wants the ford",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Harek needs money",
+   "x": 1150,
+   "y": 337,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Harek needs money",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 364,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "GOALS",
+   "x": 1146,
+   "y": 367,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "GOALS",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "1",
+   "x": 1378,
+   "y": 367,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "1",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 366,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Reach the duke by spring",
+   "x": 1150,
+   "y": 386,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Reach the duke by spring",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 413,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "THREADS",
+   "x": 1146,
+   "y": 416,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "THREADS",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "1",
+   "x": 1378,
+   "y": 416,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "1",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 415,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "The forged seal",
+   "x": 1150,
+   "y": 435,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "The forged seal",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "planted",
+   "x": 1348,
+   "y": 436,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "planted",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 462,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "WORLD RULES",
+   "x": 1146,
+   "y": 465,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "WORLD RULES",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "1",
+   "x": 1378,
+   "y": 465,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "1",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 464,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "No salt crosses unsealed",
+   "x": 1150,
+   "y": 484,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "No salt crosses unsealed",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "hard",
+   "x": 1348,
+   "y": 485,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "hard",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 511,
+   "width": 288,
+   "height": 1,
+   "name": "rect",
+   "props": {
+    "fill": "#2E3542",
+    "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "ISSUES",
+   "x": 1136,
+   "y": 523,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "ISSUES",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "\u25cf",
+   "x": 1138,
+   "y": 543,
+   "props": {
+    "fontSize": 9,
     "fontFamily": "DejaVu Sans",
     "fill": "#F2C879"
    },
-   "name": "review",
-   "width": 72,
+   "name": "\u25cf",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Scene 4 has no cause",
+   "x": 1154,
+   "y": 542,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Scene 4 has no cause",
+   "width": 250,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "continuity \u00b7 advisory",
+   "x": 1154,
+   "y": 555,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "continuity \u00b7 advisory",
+   "width": 250,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "\u25cf",
+   "x": 1138,
+   "y": 577,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2C879"
+   },
+   "name": "\u25cf",
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Forged seal unresolved",
+   "x": 1154,
+   "y": 576,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Forged seal unresolved",
+   "width": 250,
+   "parent": {
+    "$ref": "screen:04 Project"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "thread \u00b7 advisory",
+   "x": 1154,
+   "y": 589,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "thread \u00b7 advisory",
+   "width": 250,
    "parent": {
     "$ref": "screen:04 Project"
    }
@@ -3992,33 +4763,31 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 1160,
-   "y": 700,
-   "width": 256,
+   "x": 1136,
+   "y": 790,
+   "width": 288,
    "height": 34,
    "name": "Open the manuscript",
    "props": {
-    "fill": "#232833",
-    "cornerRadius": 8,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
+    "fill": "#C5A7FF",
+    "cornerRadius": 8
    },
    "parent": {
     "$ref": "screen:04 Project"
    }
   },
-  "as": "04 Project:go:manuscript"
+  "as": "04 Project:panel:footer"
  },
  {
   "command": "text.create",
   "params": {
    "text": "Open the manuscript",
-   "x": 1174,
-   "y": 710.8,
+   "x": 1150,
+   "y": 800.8,
    "props": {
     "fontSize": 10,
     "fontFamily": "DejaVu Sans",
-    "fill": "#CFC9DE",
+    "fill": "#25243A",
     "fontStyle": "Bold"
    },
    "name": "Open the manuscript",
@@ -4031,7 +4800,7 @@
   "command": "proto.interaction.add",
   "params": {
    "id": {
-    "$ref": "04 Project:go:manuscript"
+    "$ref": "04 Project:panel:footer"
    },
    "trigger": {
     "type": "onClick"
@@ -4040,61 +4809,6 @@
     "type": "navigate",
     "dest": {
      "$ref": "screen:05 Manuscript \u2014 novel"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1160,
-   "y": 744,
-   "width": 256,
-   "height": 34,
-   "name": "Source control",
-   "props": {
-    "fill": "#1B1F27",
-    "cornerRadius": 8,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:04 Project"
-   }
-  },
-  "as": "04 Project:go:source"
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Source control",
-   "x": 1174,
-   "y": 754.8,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD",
-    "fontStyle": "Bold"
-   },
-   "name": "Source control",
-   "parent": {
-    "$ref": "screen:04 Project"
-   }
-  }
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "04 Project:go:source"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:07 Source control"
     }
    }
   }
@@ -4914,11 +5628,11 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 1112,
+   "x": 1120,
    "y": 40,
-   "width": 328,
+   "width": 320,
    "height": 860,
-   "name": "continuity",
+   "name": "canon panel",
    "props": {
     "fill": "#1B1F27",
     "cornerRadius": 0
@@ -4931,7 +5645,7 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 1112,
+   "x": 1120,
    "y": 40,
    "width": 1,
    "height": 860,
@@ -4946,17 +5660,52 @@
   }
  },
  {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 56,
+   "width": 92,
+   "height": 24,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 6
+   },
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
   "command": "text.create",
   "params": {
-   "text": "CONTINUITY",
-   "x": 1136,
-   "y": 64,
+   "text": "Canon",
+   "x": 1150,
+   "y": 62,
    "props": {
-    "fontSize": 9,
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9",
+    "fontStyle": "Bold"
+   },
+   "name": "Canon",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Issues 2",
+   "x": 1244,
+   "y": 62,
+   "props": {
+    "fontSize": 10,
     "fontFamily": "DejaVu Sans",
     "fill": "#9A93AD"
    },
-   "name": "CONTINUITY",
+   "name": "Issues 2",
    "parent": {
     "$ref": "screen:05 Manuscript \u2014 novel"
    }
@@ -4966,15 +5715,30 @@
   "command": "shape.rectangle",
   "params": {
    "x": 1136,
-   "y": 88,
-   "width": 280,
-   "height": 84,
+   "y": 86,
+   "width": 288,
+   "height": 1,
+   "name": "rect",
+   "props": {
+    "fill": "#2E3542",
+    "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 100,
+   "width": 288,
+   "height": 18,
    "name": "rect",
    "props": {
     "fill": "#232833",
-    "cornerRadius": 8,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
+    "cornerRadius": 4
    },
    "parent": {
     "$ref": "screen:05 Manuscript \u2014 novel"
@@ -4984,15 +5748,15 @@
  {
   "command": "text.create",
   "params": {
-   "text": "[CAUSALITY_BREAK]",
-   "x": 1152,
-   "y": 100,
+   "text": "CHARACTERS",
+   "x": 1146,
+   "y": 103,
    "props": {
     "fontSize": 9,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#FF8A8A"
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
    },
-   "name": "[CAUSALITY_BREAK]",
+   "name": "CHARACTERS",
    "parent": {
     "$ref": "screen:05 Manuscript \u2014 novel"
    }
@@ -5001,35 +5765,50 @@
  {
   "command": "text.create",
   "params": {
-   "text": "Scene 4 has no link to an earlier scene.",
-   "x": 1152,
-   "y": 118,
+   "text": "3",
+   "x": 1378,
+   "y": 103,
    "props": {
-    "fontSize": 10,
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "3",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 102,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Mara Vale",
+   "x": 1150,
+   "y": 122,
+   "props": {
+    "fontSize": 9,
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "Scene 4 has no link to an ",
-   "width": 250,
-   "parent": {
-    "$ref": "screen:05 Manuscript \u2014 novel"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1152,
-   "y": 142,
-   "width": 72,
-   "height": 20,
-   "name": "rect",
-   "props": {
-    "fill": "#232833",
-    "cornerRadius": 10,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
+   "name": "Mara Vale",
+   "width": 210,
    "parent": {
     "$ref": "screen:05 Manuscript \u2014 novel"
    }
@@ -5038,16 +5817,52 @@
  {
   "command": "text.create",
   "params": {
-   "text": "advisory",
-   "x": 1161,
-   "y": 147,
+   "text": "POV",
+   "x": 1348,
+   "y": 123,
    "props": {
-    "fontSize": 10,
+    "fontSize": 8,
     "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
+    "fill": "#6F6885"
    },
-   "name": "advisory",
-   "width": 60,
+   "name": "POV",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Harek Vale",
+   "x": 1150,
+   "y": 139,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Harek Vale",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "POV",
+   "x": 1348,
+   "y": 140,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "POV",
+   "width": 76,
    "parent": {
     "$ref": "screen:05 Manuscript \u2014 novel"
    }
@@ -5057,15 +5872,13 @@
   "command": "shape.rectangle",
   "params": {
    "x": 1136,
-   "y": 184,
-   "width": 280,
-   "height": 84,
+   "y": 166,
+   "width": 288,
+   "height": 18,
    "name": "rect",
    "props": {
     "fill": "#232833",
-    "cornerRadius": 8,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
+    "cornerRadius": 4
    },
    "parent": {
     "$ref": "screen:05 Manuscript \u2014 novel"
@@ -5075,15 +5888,710 @@
  {
   "command": "text.create",
   "params": {
-   "text": "[DANGLING_SETUP]",
-   "x": 1152,
-   "y": 196,
+   "text": "PLOT",
+   "x": 1146,
+   "y": 169,
    "props": {
     "fontSize": 9,
-    "fontFamily": "DejaVu Sans Mono",
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "PLOT",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "2",
+   "x": 1378,
+   "y": 169,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "2",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 168,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Act one",
+   "x": 1150,
+   "y": 188,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Act one",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "4 scenes",
+   "x": 1348,
+   "y": 189,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "4 scenes",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Act two",
+   "x": 1150,
+   "y": 205,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Act two",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "6 scenes",
+   "x": 1348,
+   "y": 206,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "6 scenes",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 232,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "ARCS",
+   "x": 1146,
+   "y": 235,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "ARCS",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "2",
+   "x": 1378,
+   "y": 235,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "2",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 234,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Mara: fear \u2192 command",
+   "x": 1150,
+   "y": 254,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Mara: fear \u2192 command",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "open",
+   "x": 1348,
+   "y": 255,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "open",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Harek: debt \u2192 ruin",
+   "x": 1150,
+   "y": 271,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Harek: debt \u2192 ruin",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "open",
+   "x": 1348,
+   "y": 272,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "open",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 298,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "MOTIVATIONS",
+   "x": 1146,
+   "y": 301,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "MOTIVATIONS",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "2",
+   "x": 1378,
+   "y": 301,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "2",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 300,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Mara wants the ford",
+   "x": 1150,
+   "y": 320,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Mara wants the ford",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Harek needs money",
+   "x": 1150,
+   "y": 337,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Harek needs money",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 364,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "GOALS",
+   "x": 1146,
+   "y": 367,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "GOALS",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "1",
+   "x": 1378,
+   "y": 367,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "1",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 366,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Reach the duke by spring",
+   "x": 1150,
+   "y": 386,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Reach the duke by spring",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 413,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "THREADS",
+   "x": 1146,
+   "y": 416,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "THREADS",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "1",
+   "x": 1378,
+   "y": 416,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "1",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 415,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "The forged seal",
+   "x": 1150,
+   "y": 435,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "The forged seal",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "planted",
+   "x": 1348,
+   "y": 436,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "planted",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 462,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "WORLD RULES",
+   "x": 1146,
+   "y": 465,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "WORLD RULES",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "1",
+   "x": 1378,
+   "y": 465,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "1",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 464,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "No salt crosses unsealed",
+   "x": 1150,
+   "y": 484,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "No salt crosses unsealed",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "hard",
+   "x": 1348,
+   "y": 485,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "hard",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 511,
+   "width": 288,
+   "height": 1,
+   "name": "rect",
+   "props": {
+    "fill": "#2E3542",
+    "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "ISSUES",
+   "x": 1136,
+   "y": 523,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "ISSUES",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "\u25cf",
+   "x": 1138,
+   "y": 543,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
     "fill": "#F2C879"
    },
-   "name": "[DANGLING_SETUP]",
+   "name": "\u25cf",
    "parent": {
     "$ref": "screen:05 Manuscript \u2014 novel"
    }
@@ -5092,15 +6600,86 @@
  {
   "command": "text.create",
   "params": {
-   "text": "The forged seal was planted 6 scenes ago.",
-   "x": 1152,
-   "y": 214,
+   "text": "Scene 4 has no cause",
+   "x": 1154,
+   "y": 542,
    "props": {
-    "fontSize": 10,
+    "fontSize": 9,
     "fontFamily": "DejaVu Sans",
     "fill": "#F2EFF9"
    },
-   "name": "The forged seal was plante",
+   "name": "Scene 4 has no cause",
+   "width": 250,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "continuity \u00b7 advisory",
+   "x": 1154,
+   "y": 555,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "continuity \u00b7 advisory",
+   "width": 250,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "\u25cf",
+   "x": 1138,
+   "y": 577,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2C879"
+   },
+   "name": "\u25cf",
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Forged seal unresolved",
+   "x": 1154,
+   "y": 576,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Forged seal unresolved",
+   "width": 250,
+   "parent": {
+    "$ref": "screen:05 Manuscript \u2014 novel"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "thread \u00b7 advisory",
+   "x": 1154,
+   "y": 589,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "thread \u00b7 advisory",
    "width": 250,
    "parent": {
     "$ref": "screen:05 Manuscript \u2014 novel"
@@ -5110,73 +6689,34 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 1152,
-   "y": 238,
-   "width": 80,
-   "height": 20,
-   "name": "rect",
-   "props": {
-    "fill": "#232833",
-    "cornerRadius": 10,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:05 Manuscript \u2014 novel"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "confirmed",
-   "x": 1161,
-   "y": 243,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#7BD88F"
-   },
-   "name": "confirmed",
-   "width": 68,
-   "parent": {
-    "$ref": "screen:05 Manuscript \u2014 novel"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
    "x": 1136,
-   "y": 700,
-   "width": 280,
+   "y": 790,
+   "width": 288,
    "height": 34,
-   "name": "Discussion",
+   "name": "Open the manuscript",
    "props": {
-    "fill": "#1B1F27",
-    "cornerRadius": 8,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
+    "fill": "#C5A7FF",
+    "cornerRadius": 8
    },
    "parent": {
     "$ref": "screen:05 Manuscript \u2014 novel"
    }
   },
-  "as": "05 Manuscript \u2014 novel:go:discussion"
+  "as": "05 Manuscript \u2014 novel:panel:footer"
  },
  {
   "command": "text.create",
   "params": {
-   "text": "Discussion",
+   "text": "Open the manuscript",
    "x": 1150,
-   "y": 710.8,
+   "y": 800.8,
    "props": {
     "fontSize": 10,
     "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD",
+    "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Discussion",
+   "name": "Open the manuscript",
    "parent": {
     "$ref": "screen:05 Manuscript \u2014 novel"
    }
@@ -5186,7 +6726,7 @@
   "command": "proto.interaction.add",
   "params": {
    "id": {
-    "$ref": "05 Manuscript \u2014 novel:go:discussion"
+    "$ref": "05 Manuscript \u2014 novel:panel:footer"
    },
    "trigger": {
     "type": "onClick"
@@ -5194,62 +6734,7 @@
    "action": {
     "type": "navigate",
     "dest": {
-     "$ref": "screen:04 Project"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1136,
-   "y": 744,
-   "width": 280,
-   "height": 34,
-   "name": "Source control",
-   "props": {
-    "fill": "#232833",
-    "cornerRadius": 8,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:05 Manuscript \u2014 novel"
-   }
-  },
-  "as": "05 Manuscript \u2014 novel:go:source"
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Source control",
-   "x": 1150,
-   "y": 754.8,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#CFC9DE",
-    "fontStyle": "Bold"
-   },
-   "name": "Source control",
-   "parent": {
-    "$ref": "screen:05 Manuscript \u2014 novel"
-   }
-  }
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "05 Manuscript \u2014 novel:go:source"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:07 Source control"
+     "$ref": "screen:05 Manuscript \u2014 novel"
     }
    }
   }
@@ -5932,11 +7417,11 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 1112,
+   "x": 1120,
    "y": 40,
-   "width": 328,
+   "width": 320,
    "height": 860,
-   "name": "checks",
+   "name": "canon panel",
    "props": {
     "fill": "#FFFFFF",
     "cornerRadius": 0
@@ -5949,7 +7434,7 @@
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 1112,
+   "x": 1120,
    "y": 40,
    "width": 1,
    "height": 860,
@@ -5964,533 +7449,19 @@
   }
  },
  {
-  "command": "text.create",
-  "params": {
-   "text": "CHECKS",
-   "x": 1136,
-   "y": 64,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "CHECKS",
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
   "command": "shape.rectangle",
   "params": {
    "x": 1136,
-   "y": 88,
-   "width": 280,
-   "height": 92,
+   "y": 56,
+   "width": 92,
+   "height": 24,
    "name": "rect",
    "props": {
     "fill": "#F1ECFB",
-    "cornerRadius": 8,
-    "stroke": "#B4443C",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "[BROKEN_REFERENCE]",
-   "x": 1152,
-   "y": 100,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#B4443C"
-   },
-   "name": "[BROKEN_REFERENCE]",
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "`grapple` is referenced but not defined.",
-   "x": 1152,
-   "y": 118,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A"
-   },
-   "name": "`grapple` is referenced bu",
-   "width": 250,
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1152,
-   "y": 142,
-   "width": 54,
-   "height": 20,
-   "name": "rect",
-   "props": {
-    "fill": "#F1ECFB",
-    "cornerRadius": 10,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "error",
-   "x": 1161,
-   "y": 147,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#B4443C"
-   },
-   "name": "error",
-   "width": 42,
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1136,
-   "y": 192,
-   "width": 280,
-   "height": 84,
-   "name": "rect",
-   "props": {
-    "fill": "#F1ECFB",
-    "cornerRadius": 8,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "[INCOMPLETE_ENTITY]",
-   "x": 1152,
-   "y": 204,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#9A6B12"
-   },
-   "name": "[INCOMPLETE_ENTITY]",
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Duelist has no fields and no summary.",
-   "x": 1152,
-   "y": 222,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A"
-   },
-   "name": "Duelist has no fields and ",
-   "width": 250,
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1152,
-   "y": 246,
-   "width": 72,
-   "height": 20,
-   "name": "rect",
-   "props": {
-    "fill": "#F1ECFB",
-    "cornerRadius": 10,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "advisory",
-   "x": 1161,
-   "y": 251,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "advisory",
-   "width": 60,
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1136,
-   "y": 700,
-   "width": 280,
-   "height": 34,
-   "name": "Discussion",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 8,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  },
-  "as": "06 Manuscript \u2014 rulebook:go:discussion"
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Discussion",
-   "x": 1150,
-   "y": 710.8,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885",
-    "fontStyle": "Bold"
-   },
-   "name": "Discussion",
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "06 Manuscript \u2014 rulebook:go:discussion"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:04 Project"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1136,
-   "y": 744,
-   "width": 280,
-   "height": 34,
-   "name": "Source control",
-   "props": {
-    "fill": "#F1ECFB",
-    "cornerRadius": 8,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  },
-  "as": "06 Manuscript \u2014 rulebook:go:source"
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Source control",
-   "x": 1150,
-   "y": 754.8,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#4A4360",
-    "fontStyle": "Bold"
-   },
-   "name": "Source control",
-   "parent": {
-    "$ref": "screen:06 Manuscript \u2014 rulebook"
-   }
-  }
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "06 Manuscript \u2014 rulebook:go:source"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:07 Source control"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 0,
-   "y": 0,
-   "width": 1440,
-   "height": 40,
-   "name": "titlebar",
-   "props": {
-    "fill": "#1B1F27",
-    "cornerRadius": 0
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 0,
-   "y": 39,
-   "width": 1440,
-   "height": 1,
-   "name": "titlebar rule",
-   "props": {
-    "fill": "#2E3542",
-    "cornerRadius": 0
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 16,
-   "y": 10,
-   "width": 20,
-   "height": 20,
-   "name": "mark",
-   "props": {
-    "fill": "#8058C5",
     "cornerRadius": 6
    },
    "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Canonwright",
-   "x": 44,
-   "y": 13,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#F2EFF9",
-    "fontStyle": "Bold"
-   },
-   "name": "Canonwright",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 118,
-   "y": 11,
-   "width": 1,
-   "height": 18,
-   "name": "rect",
-   "props": {
-    "fill": "#2E3542",
-    "cornerRadius": 0
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "The Salt Road \u00b7 Source",
-   "x": 132,
-   "y": 13,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "The Salt Road \u00b7 Source",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Settings",
-   "x": 1352,
-   "y": 13,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "Settings",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 0,
-   "y": 40,
-   "width": 300,
-   "height": 860,
-   "name": "sidebar",
-   "props": {
-    "fill": "#1B1F27",
-    "cornerRadius": 0
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 300,
-   "y": 40,
-   "width": 1,
-   "height": 860,
-   "name": "rect",
-   "props": {
-    "fill": "#2E3542",
-    "cornerRadius": 0
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "THE SALT ROAD",
-   "x": 20,
-   "y": 64,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "THE SALT ROAD",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Novel",
-   "x": 20,
-   "y": 84,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#CFC9DE"
-   },
-   "name": "Novel",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Discussion",
-   "x": 28,
-   "y": 124,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "Discussion",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Manuscript",
-   "x": 28,
-   "y": 158,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "Manuscript",
-   "parent": {
-    "$ref": "screen:07 Source control"
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
    }
   }
  },
@@ -6498,432 +7469,835 @@
   "command": "text.create",
   "params": {
    "text": "Canon",
-   "x": 28,
-   "y": 192,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "Canon",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 12,
-   "y": 218,
-   "width": 276,
-   "height": 30,
-   "name": "rect",
-   "props": {
-    "fill": "#232833",
-    "cornerRadius": 6
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Source",
-   "x": 28,
-   "y": 226,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#F2EFF9",
-    "fontStyle": "Bold"
-   },
-   "name": "Source",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 336,
-   "y": 64,
-   "width": 760,
-   "height": 700,
-   "name": "rect",
-   "props": {
-    "fill": "#1B1F27",
-    "cornerRadius": 12,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "main",
-   "x": 360,
-   "y": 86,
-   "props": {
-    "fontSize": 14,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#F2EFF9",
-    "fontStyle": "Bold"
-   },
-   "name": "main",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "\u21912  \u21930   origin/main",
-   "x": 408,
-   "y": 89,
+   "x": 1150,
+   "y": 62,
    "props": {
     "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "\u21912  \u21930   origin/main",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "CHANGES \u00b7 3",
-   "x": 360,
-   "y": 128,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "CHANGES \u00b7 3",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "M",
-   "x": 360,
-   "y": 152,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#F2C879"
-   },
-   "name": "M",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "manuscript/scene-03.md",
-   "x": 380,
-   "y": 151,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#F2EFF9"
-   },
-   "name": "manuscript/scene-03.md",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "stage",
-   "x": 1010,
-   "y": 152,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "stage",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "M",
-   "x": 360,
-   "y": 180,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#F2C879"
-   },
-   "name": "M",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "story.json",
-   "x": 380,
-   "y": 179,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#F2EFF9"
-   },
-   "name": "story.json",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "stage",
-   "x": 1010,
-   "y": 180,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "stage",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "U",
-   "x": 360,
-   "y": 208,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#7BD88F"
-   },
-   "name": "U",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "manuscript/scene-04.md",
-   "x": 380,
-   "y": 207,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#F2EFF9"
-   },
-   "name": "manuscript/scene-04.md",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "stage",
-   "x": 1010,
-   "y": 208,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "stage",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "STAGED \u00b7 1",
-   "x": 360,
-   "y": 262,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "STAGED \u00b7 1",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "M",
-   "x": 360,
-   "y": 286,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#7BD88F"
-   },
-   "name": "M",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "story.json",
-   "x": 380,
-   "y": 285,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#F2EFF9"
-   },
-   "name": "story.json",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 360,
-   "y": 320,
-   "width": 712,
-   "height": 60,
-   "name": "rect",
-   "props": {
-    "fill": "#1B1F27",
-    "cornerRadius": 8,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Scene 3: Mara works out who burned the ford.",
-   "x": 372,
-   "y": 334,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "Scene 3: Mara works out wh",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 360,
-   "y": 396,
-   "width": 120,
-   "height": 34,
-   "name": "Commit",
-   "props": {
-    "fill": "#C5A7FF",
-    "cornerRadius": 8
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  },
-  "as": "07 Source control:go:commit"
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Commit",
-   "x": 374,
-   "y": 406.18,
-   "props": {
-    "fontSize": 11,
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "Commit",
+   "name": "Canon",
    "parent": {
-    "$ref": "screen:07 Source control"
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
    }
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "1 staged",
-   "x": 492,
-   "y": 406,
+   "text": "Issues 3",
+   "x": 1244,
+   "y": 62,
    "props": {
-    "fontSize": 9,
+    "fontSize": 10,
     "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
+    "fill": "#6F6885"
    },
-   "name": "1 staged",
+   "name": "Issues 3",
    "parent": {
-    "$ref": "screen:07 Source control"
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 86,
+   "width": 288,
+   "height": 1,
+   "name": "rect",
+   "props": {
+    "fill": "#E2DAF0",
+    "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 100,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#F1ECFB",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
    }
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "BRANCHES",
-   "x": 360,
-   "y": 460,
+   "text": "CHARACTERS",
+   "x": 1146,
+   "y": 103,
    "props": {
     "fontSize": 9,
     "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
+    "fill": "#6F6885"
    },
-   "name": "BRANCHES",
+   "name": "CHARACTERS",
    "parent": {
-    "$ref": "screen:07 Source control"
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "3",
+   "x": 1378,
+   "y": 103,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "3",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 102,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Fighter",
+   "x": 1150,
+   "y": 122,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "Fighter",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "class",
+   "x": 1348,
+   "y": 123,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "class",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Duelist",
+   "x": 1150,
+   "y": 139,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "Duelist",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "class",
+   "x": 1348,
+   "y": 140,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "class",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 166,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#F1ECFB",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "SPECIES",
+   "x": 1146,
+   "y": 169,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "SPECIES",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "3",
+   "x": 1378,
+   "y": 169,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "3",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 168,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Human",
+   "x": 1150,
+   "y": 188,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "Human",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Elf",
+   "x": 1150,
+   "y": 205,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "Elf",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 232,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#F1ECFB",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "RULES",
+   "x": 1146,
+   "y": 235,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "RULES",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "2",
+   "x": 1378,
+   "y": 235,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "2",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 234,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Core resolution",
+   "x": 1150,
+   "y": 254,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "Core resolution",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "2d10",
+   "x": 1348,
+   "y": 255,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "2d10",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Advancement",
+   "x": 1150,
+   "y": 271,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "Advancement",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 298,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#F1ECFB",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "ITEMS",
+   "x": 1146,
+   "y": 301,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "ITEMS",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "2",
+   "x": 1378,
+   "y": 301,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "2",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 300,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Longsword",
+   "x": 1150,
+   "y": 320,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "Longsword",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "weapon",
+   "x": 1348,
+   "y": 321,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "weapon",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Rations",
+   "x": 1150,
+   "y": 337,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "Rations",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "gear",
+   "x": 1348,
+   "y": 338,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "gear",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 364,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#F1ECFB",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "ADVERSARIES",
+   "x": 1146,
+   "y": 367,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "ADVERSARIES",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "2",
+   "x": 1378,
+   "y": 367,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "2",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 366,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Bandit",
+   "x": 1150,
+   "y": 386,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "Bandit",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "tier 1",
+   "x": 1348,
+   "y": 387,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "tier 1",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Wyrm",
+   "x": 1150,
+   "y": 403,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "Wyrm",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "tier 4",
+   "x": 1348,
+   "y": 404,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "tier 4",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 430,
+   "width": 288,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#F1ECFB",
+    "cornerRadius": 4
+   },
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "THREADS",
+   "x": 1146,
+   "y": 433,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "THREADS",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "1",
+   "x": 1378,
+   "y": 433,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "1",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "+",
+   "x": 1410,
+   "y": 432,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "+",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "The broken oath",
+   "x": 1150,
+   "y": 452,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "The broken oath",
+   "width": 210,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "planted",
+   "x": 1348,
+   "y": 453,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "planted",
+   "width": 76,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 479,
+   "width": 288,
+   "height": 1,
+   "name": "rect",
+   "props": {
+    "fill": "#E2DAF0",
+    "cornerRadius": 0
+   },
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "ISSUES",
+   "x": 1136,
+   "y": 491,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "ISSUES",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
    }
   }
  },
@@ -6931,385 +8305,194 @@
   "command": "text.create",
   "params": {
    "text": "\u25cf",
-   "x": 360,
-   "y": 484,
+   "x": 1138,
+   "y": 511,
    "props": {
-    "fontSize": 10,
+    "fontSize": 9,
     "fontFamily": "DejaVu Sans",
-    "fill": "#C5A7FF"
+    "fill": "#B4443C"
    },
    "name": "\u25cf",
    "parent": {
-    "$ref": "screen:07 Source control"
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
    }
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "main",
-   "x": 380,
-   "y": 484,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#F2EFF9"
-   },
-   "name": "main",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "\u25cb",
-   "x": 360,
-   "y": 508,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "\u25cb",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "draft/act-two",
-   "x": 380,
-   "y": 508,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#CFC9DE"
-   },
-   "name": "draft/act-two",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "TAG A DRAFT",
-   "x": 360,
-   "y": 556,
+   "text": "grapple is undefined",
+   "x": 1154,
+   "y": 510,
    "props": {
     "fontSize": 9,
     "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
+    "fill": "#25243A"
    },
-   "name": "TAG A DRAFT",
+   "name": "grapple is undefined",
+   "width": 250,
    "parent": {
-    "$ref": "screen:07 Source control"
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
    }
   }
  },
  {
-  "command": "shape.rectangle",
+  "command": "text.create",
   "params": {
-   "x": 360,
+   "text": "reference \u00b7 error",
+   "x": 1154,
+   "y": 523,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "reference \u00b7 error",
+   "width": 250,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "\u25cf",
+   "x": 1138,
+   "y": 545,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A6B12"
+   },
+   "name": "\u25cf",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Duelist has no fields",
+   "x": 1154,
+   "y": 544,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "Duelist has no fields",
+   "width": 250,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "entry \u00b7 advisory",
+   "x": 1154,
+   "y": 557,
+   "props": {
+    "fontSize": 8,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8B84A0"
+   },
+   "name": "entry \u00b7 advisory",
+   "width": 250,
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "\u25cf",
+   "x": 1138,
+   "y": 579,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#B4443C"
+   },
+   "name": "\u25cf",
+   "parent": {
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Bandit has no attacks",
+   "x": 1154,
    "y": 578,
-   "width": 260,
-   "height": 30,
-   "name": "rect",
    "props": {
-    "fill": "#232833",
-    "cornerRadius": 6,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
    },
+   "name": "Bandit has no attacks",
+   "width": 250,
    "parent": {
-    "$ref": "screen:07 Source control"
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
    }
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "draft-2",
-   "x": 370,
-   "y": 587,
+   "text": "entry \u00b7 error",
+   "x": 1154,
+   "y": 591,
    "props": {
-    "fontSize": 10,
+    "fontSize": 8,
     "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
+    "fill": "#8B84A0"
    },
-   "name": "draft-2",
+   "name": "entry \u00b7 error",
+   "width": 250,
    "parent": {
-    "$ref": "screen:07 Source control"
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
    }
   }
  },
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 632,
-   "y": 578,
-   "width": 120,
-   "height": 30,
-   "name": "rect",
-   "props": {
-    "fill": "#232833",
-    "cornerRadius": 6,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Tag & push",
-   "x": 650,
-   "y": 587,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#CFC9DE"
-   },
-   "name": "Tag & push",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "RECENT",
-   "x": 360,
-   "y": 644,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "RECENT",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "a3f21c9",
-   "x": 360,
-   "y": 668,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#9A93AD"
-   },
-   "name": "a3f21c9",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Scene 3: Mara works out who burned the ford",
-   "x": 430,
-   "y": 668,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#CFC9DE"
-   },
-   "name": "Scene 3: Mara works out wh",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "7be04d1",
-   "x": 360,
-   "y": 692,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#9A93AD"
-   },
-   "name": "7be04d1",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Scene 2: the tally-house",
-   "x": 430,
-   "y": 692,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#CFC9DE"
-   },
-   "name": "Scene 2: the tally-house",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1120,
-   "y": 64,
-   "width": 300,
-   "height": 168,
-   "name": "rect",
-   "props": {
-    "fill": "#1B1F27",
-    "cornerRadius": 12,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "PUSH",
-   "x": 1144,
-   "y": 84,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "PUSH",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "main \u2192 origin",
-   "x": 1144,
-   "y": 108,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans Mono",
-    "fill": "#CFC9DE"
-   },
-   "name": "main \u2192 origin",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "2 commits ahead",
-   "x": 1144,
-   "y": 128,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD"
-   },
-   "name": "2 commits ahead",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1144,
-   "y": 148,
-   "width": 252,
-   "height": 32,
-   "name": "rect",
-   "props": {
-    "fill": "#232833",
-    "cornerRadius": 8,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Push to origin",
-   "x": 1158,
-   "y": 157,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#F2EFF9"
-   },
-   "name": "Push to origin",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1120,
-   "y": 700,
-   "width": 300,
+   "x": 1136,
+   "y": 790,
+   "width": 288,
    "height": 34,
-   "name": "Discussion",
+   "name": "Open the manuscript",
    "props": {
-    "fill": "#1B1F27",
-    "cornerRadius": 8,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
+    "fill": "#8058C5",
+    "cornerRadius": 8
    },
    "parent": {
-    "$ref": "screen:07 Source control"
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
    }
   },
-  "as": "07 Source control:go:discussion"
+  "as": "06 Manuscript \u2014 rulebook:panel:footer"
  },
  {
   "command": "text.create",
   "params": {
-   "text": "Discussion",
-   "x": 1134,
-   "y": 710.8,
+   "text": "Open the manuscript",
+   "x": 1150,
+   "y": 800.8,
    "props": {
     "fontSize": 10,
     "fontFamily": "DejaVu Sans",
-    "fill": "#9A93AD",
+    "fill": "#FFFFFF",
     "fontStyle": "Bold"
    },
-   "name": "Discussion",
+   "name": "Open the manuscript",
    "parent": {
-    "$ref": "screen:07 Source control"
+    "$ref": "screen:06 Manuscript \u2014 rulebook"
    }
   }
  },
@@ -7317,7 +8500,7 @@
   "command": "proto.interaction.add",
   "params": {
    "id": {
-    "$ref": "07 Source control:go:discussion"
+    "$ref": "06 Manuscript \u2014 rulebook:panel:footer"
    },
    "trigger": {
     "type": "onClick"
@@ -7325,62 +8508,7 @@
    "action": {
     "type": "navigate",
     "dest": {
-     "$ref": "screen:04 Project"
-    }
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1120,
-   "y": 744,
-   "width": 300,
-   "height": 34,
-   "name": "Manuscript",
-   "props": {
-    "fill": "#232833",
-    "cornerRadius": 8,
-    "stroke": "#2E3542",
-    "strokeWeight": 1
-   },
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  },
-  "as": "07 Source control:go:manuscript"
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Manuscript",
-   "x": 1134,
-   "y": 754.8,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#CFC9DE",
-    "fontStyle": "Bold"
-   },
-   "name": "Manuscript",
-   "parent": {
-    "$ref": "screen:07 Source control"
-   }
-  }
- },
- {
-  "command": "proto.interaction.add",
-  "params": {
-   "id": {
-    "$ref": "07 Source control:go:manuscript"
-   },
-   "trigger": {
-    "type": "onClick"
-   },
-   "action": {
-    "type": "navigate",
-    "dest": {
-     "$ref": "screen:05 Manuscript \u2014 novel"
+     "$ref": "screen:06 Manuscript \u2014 rulebook"
     }
    }
   }

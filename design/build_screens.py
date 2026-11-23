@@ -292,6 +292,51 @@ def choose_repository():
     button(700, 700, 200, 38, "Connect repository", p, "04 Project", "repo:use", "primary", 11)
 
 
+def right_panel(p, sections, issues, footer_action, footer_target):
+    """The canon inspector: labelled areas of canon, then the issue list.
+
+    The areas come from the project's framework, so this panel is the framework
+    made visible — add an area and it appears here with its count. Issues is
+    fixed: always present, never removable.
+    """
+    x, w = 1120, 320
+    rect(x, 40, w, 860, p["surface"], name="canon panel")
+    rect(x, 40, 1, 860, p["line"])
+
+    rect(x + 16, 56, 92, 24, p["raised"], radius=6)
+    text(x + 30, 62, "Canon", 10, p["text"], bold=True)
+    text(x + 124, 62, f"Issues {len(issues)}", 10, p["muted"])
+    rect(x + 16, 86, w - 32, 1, p["line"])
+
+    y = 100
+    for label, rows in sections:
+        rect(x + 16, y, w - 32, 18, p["raised"], radius=4)
+        text(x + 26, y + 3, label.upper(), 9, p["muted"])
+        text(x + w - 62, y + 3, str(len(rows)), 9, p["subtle"])
+        text(x + w - 30, y + 2, "+", 11, p["muted"])
+        y += 18
+        # Two rows per area: the panel is an index, not the table.
+        for name, meta in rows[:2]:
+            text(x + 30, y + 4, name, 9, p["text"], width=210)
+            if meta and meta != "—":
+                text(x + w - 92, y + 5, meta, 8, p["subtle"], width=76)
+            y += 17
+        y += 14
+
+    rect(x + 16, y, w - 32, 1, p["line"])
+    y += 12
+    text(x + 16, y, "ISSUES", 9, p["muted"])
+    y += 20
+    for label, where, tone in issues:
+        text(x + 18, y, "●", 9, p[tone])
+        text(x + 34, y - 1, label, 9, p["text"], width=250)
+        text(x + 34, y + 12, where, 8, p["subtle"], width=250)
+        y += 34
+
+    button(x + 16, 790, w - 32, 34, footer_action, p, footer_target,
+           "panel:footer", "primary", 10)
+
+
 def project_discussion():
     p = DARK
     screen("04 Project", p)
@@ -349,21 +394,20 @@ def project_discussion():
     rect(336, 560, 780, 40, p["raised"], radius=10, stroke=p["line"])
     text(350, 572, "Reply", 11, p["subtle"])
 
-    rect(1136, 40, 304, 860, p["surface"], name="canon")
-    rect(1136, 40, 1, 860, p["line"])
-    text(1160, 64, "CANON", 9, p["muted"])
-    for i, (name, kind, state, tone) in enumerate([
-        ("Mara Vale", "character", "accepted", "good"),
-        ("Harek Vale", "character", "accepted", "good"),
-        ("no-salt-unsealed", "hard rule", "review", "warn"),
-    ]):
-        y = 92 + i * 48
-        text(1160, y, name, 10, p["text"], mono=True)
-        text(1160, y + 16, kind, 9, p["muted"])
-        chip(1330, y, state, p, tone, w=84)
-
-    button(1160, 700, 256, 34, "Open the manuscript", p, "05 Manuscript — novel", "go:manuscript", "raise", 10)
-    button(1160, 744, 256, 34, "Source control", p, "07 Source control", "go:source", "quiet", 10)
+    sections = [
+        ("Characters", [("Mara Vale", "POV"), ("Harek Vale", "POV"), ("Ilse", "—")]),
+        ("Plot", [("Act one", "4 scenes"), ("Act two", "6 scenes")]),
+        ("Arcs", [("Mara: fear → command", "open"), ("Harek: debt → ruin", "open")]),
+        ("Motivations", [("Mara wants the ford", "—"), ("Harek needs money", "—")]),
+        ("Goals", [("Reach the duke by spring", "—")]),
+        ("Threads", [("The forged seal", "planted")]),
+        ("World rules", [("No salt crosses unsealed", "hard")]),
+    ]
+    issues = [
+        ("Scene 4 has no cause", "continuity · advisory", "warn"),
+        ("Forged seal unresolved", "thread · advisory", "warn"),
+    ]
+    right_panel(p, sections, issues, "Open the manuscript", "05 Manuscript — novel")
 
 def project_rail(p, name, subtitle, active):
     rect(0, 40, 300, 860, p["surface"], name="sidebar")
@@ -410,23 +454,21 @@ def novel_workspace():
         width = [420, 400, 412, 300, 418, 396, 250, 410][i]
         rect(668, 164 + i * 28, width, 8, p["raised"], radius=4)
 
-    rect(1112, 40, 328, 860, p["surface"], name="continuity")
-    rect(1112, 40, 1, 860, p["line"])
-    text(1136, 64, "CONTINUITY", 9, p["muted"])
-    rect(1136, 88, 280, 84, p["raised"], radius=8, stroke=p["line"])
-    text(1152, 100, "[CAUSALITY_BREAK]", 9, p["bad"], mono=True)
-    text(1152, 118, "Scene 4 has no link to an earlier scene.", 10, p["text"], width=250)
-    chip(1152, 142, "advisory", p, "muted", w=72)
-    rect(1136, 184, 280, 84, p["raised"], radius=8, stroke=p["line"])
-    text(1152, 196, "[DANGLING_SETUP]", 9, p["warn"], mono=True)
-    text(1152, 214, "The forged seal was planted 6 scenes ago.", 10, p["text"], width=250)
-    chip(1152, 238, "confirmed", p, "good", w=80)
+    sections = [
+        ("Characters", [("Mara Vale", "POV"), ("Harek Vale", "POV"), ("Ilse", "—")]),
+        ("Plot", [("Act one", "4 scenes"), ("Act two", "6 scenes")]),
+        ("Arcs", [("Mara: fear → command", "open"), ("Harek: debt → ruin", "open")]),
+        ("Motivations", [("Mara wants the ford", "—"), ("Harek needs money", "—")]),
+        ("Goals", [("Reach the duke by spring", "—")]),
+        ("Threads", [("The forged seal", "planted")]),
+        ("World rules", [("No salt crosses unsealed", "hard")]),
+    ]
+    issues = [
+        ("Scene 4 has no cause", "continuity · advisory", "warn"),
+        ("Forged seal unresolved", "thread · advisory", "warn"),
+    ]
+    right_panel(p, sections, issues, "Open the manuscript", "05 Manuscript — novel")
 
-    button(1136, 700, 280, 34, "Discussion", p, "04 Project", "go:discussion", "quiet", 10)
-    button(1136, 744, 280, 34, "Source control", p, "07 Source control", "go:source", "raise", 10)
-
-
-# --------------------------------------------------------- 06 rulebook workspace
 def rulebook_workspace():
     p = LIGHT
     screen("06 Manuscript — rulebook", p)
@@ -457,95 +499,20 @@ def rulebook_workspace():
         rect(668, y + 14, 400, 30, p["surface"], radius=6, stroke=p["line"])
         text(678, y + 23, value, 11, p["text"])
 
-    rect(1112, 40, 328, 860, p["surface"], name="checks")
-    rect(1112, 40, 1, 860, p["line"])
-    text(1136, 64, "CHECKS", 9, p["muted"])
-    rect(1136, 88, 280, 92, p["raised"], radius=8, stroke=p["bad"])
-    text(1152, 100, "[BROKEN_REFERENCE]", 9, p["bad"], mono=True)
-    text(1152, 118, "`grapple` is referenced but not defined.", 10, p["text"], width=250)
-    chip(1152, 142, "error", p, "bad", w=54)
-    rect(1136, 192, 280, 84, p["raised"], radius=8, stroke=p["line"])
-    text(1152, 204, "[INCOMPLETE_ENTITY]", 9, p["warn"], mono=True)
-    text(1152, 222, "Duelist has no fields and no summary.", 10, p["text"], width=250)
-    chip(1152, 246, "advisory", p, "muted", w=72)
-
-    button(1136, 700, 280, 34, "Discussion", p, "04 Project", "go:discussion", "quiet", 10)
-    button(1136, 744, 280, 34, "Source control", p, "07 Source control", "go:source", "raise", 10)
-
-
-# ------------------------------------------------------------- 07 source control
-def source_control():
-    p = DARK
-    screen("07 Source control", p)
-    app_frame(p, "The Salt Road · Source")
-
-    rect(0, 40, 300, 860, p["surface"], name="sidebar")
-    rect(300, 40, 1, 860, p["line"])
-    text(20, 64, "THE SALT ROAD", 9, p["muted"])
-    text(20, 84, "Novel", 10, p["body"])
-    for i, label in enumerate(["Discussion", "Manuscript", "Canon", "Source"]):
-        y = 124 + i * 34
-        if label == "Source":
-            rect(12, y - 8, 276, 30, p["raised"], radius=6)
-            text(28, y, label, 11, p["text"], bold=True)
-        else:
-            text(28, y, label, 11, p["muted"])
-
-    rect(336, 64, 760, 700, p["surface"], radius=12, stroke=p["line"])
-    text(360, 86, "main", 14, p["text"], bold=True)
-    text(408, 89, "↑2  ↓0   origin/main", 10, p["muted"])
-
-    text(360, 128, "CHANGES · 3", 9, p["muted"])
-    for i, (path, badge, tone) in enumerate([
-        ("manuscript/scene-03.md", "M", "warn"),
-        ("story.json", "M", "warn"),
-        ("manuscript/scene-04.md", "U", "good"),
-    ]):
-        y = 152 + i * 28
-        text(360, y, badge, 9, p[tone], mono=True)
-        text(380, y - 1, path, 10, p["text"], mono=True)
-        text(1010, y, "stage", 9, p["subtle"])
-
-    text(360, 262, "STAGED · 1", 9, p["muted"])
-    text(360, 286, "M", 9, p["good"], mono=True)
-    text(380, 285, "story.json", 10, p["text"], mono=True)
-
-    rect(360, 320, 712, 60, p["surface"], radius=8, stroke=p["line"])
-    text(372, 334, "Scene 3: Mara works out who burned the ford.", 11, p["muted"])
-    button(360, 396, 120, 34, "Commit", p, None, "go:commit", "primary", 11)
-    text(492, 406, "1 staged", 9, p["muted"])
-
-    text(360, 460, "BRANCHES", 9, p["muted"])
-    for i, (name, current) in enumerate([("main", True), ("draft/act-two", False)]):
-        y = 484 + i * 24
-        text(360, y, "●" if current else "○", 10, p["accent"] if current else p["muted"])
-        text(380, y, name, 10, p["text"] if current else p["body"], mono=True)
-
-    text(360, 556, "TAG A DRAFT", 9, p["muted"])
-    rect(360, 578, 260, 30, p["raised"], radius=6, stroke=p["line"])
-    text(370, 587, "draft-2", 10, p["subtle"])
-    rect(632, 578, 120, 30, p["raised"], radius=6, stroke=p["line"])
-    text(650, 587, "Tag & push", 9, p["body"])
-
-    text(360, 644, "RECENT", 9, p["muted"])
-    for i, (sha, subject) in enumerate([
-        ("a3f21c9", "Scene 3: Mara works out who burned the ford"),
-        ("7be04d1", "Scene 2: the tally-house"),
-    ]):
-        y = 668 + i * 24
-        text(360, y, sha, 9, p["muted"], mono=True)
-        text(430, y, subject, 10, p["body"])
-
-    rect(1120, 64, 300, 168, p["surface"], radius=12, stroke=p["line"])
-    text(1144, 84, "PUSH", 9, p["muted"])
-    text(1144, 108, "main → origin", 10, p["body"], mono=True)
-    text(1144, 128, "2 commits ahead", 10, p["muted"])
-    rect(1144, 148, 252, 32, p["raised"], radius=8, stroke=p["line"])
-    text(1158, 157, "Push to origin", 10, p["text"])
-
-    button(1120, 700, 300, 34, "Discussion", p, "04 Project", "go:discussion", "quiet", 10)
-    button(1120, 744, 300, 34, "Manuscript", p, "05 Manuscript — novel", "go:manuscript", "raise", 10)
-
+    sections = [
+        ("Characters", [("Fighter", "class"), ("Duelist", "class"), ("Mage", "class")]),
+        ("Species", [("Human", "—"), ("Elf", "—"), ("Dwarf", "—")]),
+        ("Rules", [("Core resolution", "2d10"), ("Advancement", "—")]),
+        ("Items", [("Longsword", "weapon"), ("Rations", "gear")]),
+        ("Adversaries", [("Bandit", "tier 1"), ("Wyrm", "tier 4")]),
+        ("Threads", [("The broken oath", "planted")]),
+    ]
+    issues = [
+        ("grapple is undefined", "reference · error", "bad"),
+        ("Duelist has no fields", "entry · advisory", "warn"),
+        ("Bandit has no attacks", "entry · error", "bad"),
+    ]
+    right_panel(p, sections, issues, "Open the manuscript", "06 Manuscript — rulebook")
 
 setup_github()
 main_screen()
@@ -554,7 +521,6 @@ choose_repository()
 project_discussion()
 novel_workspace()
 rulebook_workspace()
-source_control()
 
 # Remove the empty page the document starts with, so page index == screen index.
 cmd("page.delete", id=1)

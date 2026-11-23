@@ -43,3 +43,5 @@ projection of story state, and the repurposed desktop UI are not built.
 The documents under `architecture/` other than `12-story-state-graph.md` were
 written for the coding harness and are being rewritten. They remain accurate as
 descriptions of the runtime Canonwright inherited.
+
+| [Canon frameworks](architecture/13-canon-framework.md) | Areas of canon as repo files, presets, and the fixed Issues surface |

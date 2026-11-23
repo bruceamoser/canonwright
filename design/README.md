@@ -33,14 +33,17 @@ and the buttons are wired, so the file can be played: open it in FigCraft and
 press play (Alt+9 shows the wiring).
 
 ```
-00 Set up GitHub ──open the browser / skip──▶ 01 Main
+00 Set up GitHub ──sign in / continue without──▶ 01 Main
 01 Main ──new project──▶ 02 New project        ──new discussion──▶ 04 Project
-02 New project ──GitHub repo──▶ 03 Choose a repository
-                ──create / cancel──▶ 04 Project / 01 Main
-03 Choose a repository ──use / back──▶ 04 Project / 02 New project
-04 Project ──manuscript──▶ 05 Manuscript       ──source──▶ 07 Source control
-05 / 06 ──discussion / source──▶ 04 / 07      07 ──discussion / manuscript──▶ 04 / 05
+02 New project ──connect a repository──▶ 03 Choose a repository
+                ──start blank / open a file / open a folder──▶ 04 Project
+03 Choose a repository ──connect / back──▶ 04 Project / 02 New project
+04 Project ──open the manuscript──▶ 05 Manuscript
+05 / 06 ──discussion──▶ 04 Project
 ```
+
+There is no source-control screen. The writer sees *Issues* in the right panel
+and a **Push** action in the difference, not branches and staging areas.
 
 Nineteen links, checked. `python3 verify_prototype.py` re-checks them.
 
@@ -82,10 +85,9 @@ Nineteen links, checked. `python3 verify_prototype.py` re-checks them.
 | `01-main.png` | **New project** and **New discussion**, projects and discussions listed. |
 | `02-new-project.png` | Setup only: name, kind, and blank / file / folder / repo. |
 | `03-choose-a-repository.png` | Picking the repository that already holds the manuscript. |
-| `04-project.png` | The collaborator opens with proposals; nothing is canon until accepted. |
-| `05-manuscript---novel.png` | Scenes, the scene, continuity. |
+| `04-project.png` | The collaborator opens with proposals; the right panel is the canon inspector. |
+| `05-manuscript---novel.png` | Scenes, the scene, and the canon inspector: areas, entries, issues. |
 | `06-manuscript---rulebook.png` | Book tree, entity fields, checks. |
-| `07-source-control.png` | Changes, commits, branches, tags. |
 
 ## The palette
 
