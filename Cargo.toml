@@ -50,5 +50,10 @@ opt-level = 2
 [profile.release]
 opt-level = 3
 lto = "thin"
-codegen-units = 1
+# One codegen unit serialises each crate's LLVM work behind a single thread,
+# which is what made a three-platform release a 20-minute wait. Sixteen lets
+# rustc parallelise codegen; thin LTO still optimises across the units. The
+# cost is a few percent of runtime and a slightly larger binary, which is the
+# right trade for a writing app that must publish quickly.
+codegen-units = 16
 strip = "symbols"

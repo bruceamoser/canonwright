@@ -25,7 +25,10 @@ jobs:
   publish:
     name: Publish release
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # This job waits for the three platform builds, so its timeout has to be at
+    # least as generous as theirs. It used to be 20, which is less than a cold
+    # Windows build: a slow bundles run killed the publish rather than waiting.
+    timeout-minutes: 75
     permissions:
       contents: write
       actions: read

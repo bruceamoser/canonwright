@@ -15,11 +15,13 @@ on:
         description: Commit or branch to build
         required: false
         default: main
+  # Every push to main, not only manifest edits. A tag publishes the artifacts
+  # built for its commit, so the only way a release is quick is if those
+  # artifacts already exist when the tag lands. Restricting this to Cargo.toml
+  # meant most tags waited for a cold build; on a public repository the runner
+  # minutes are free, so the trade is the other way round.
   push:
     branches: [main]
-    paths:
-      - Cargo.toml
-      - .github/workflows/bundles.yml
 
 permissions:
   contents: read
