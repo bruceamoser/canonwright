@@ -5,6 +5,7 @@ members = [
     "crates/canonwright-core",
     "crates/canonwright-story",
     "crates/canonwright-store",
+    "crates/canonwright-manuscript",
     "crates/canonwright-harness",
     "crates/canonwright-llm",
     "crates/canonwright-tools",

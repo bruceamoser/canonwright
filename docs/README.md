@@ -7,6 +7,7 @@
 | [Plans](plans/README.md) | Implementation phases and cache benchmarks |
 | [ADRs](adr/README.md) | Accepted architecture decisions |
 | [Local Web Services](web-services.md) | SearXNG and Jina Reader provisioning, overrides, and troubleshooting |
+| [Brand](brand/logo-brief.md) | Logo brief, mark concepts, and the icon pipeline |
 
 ## Start here
 

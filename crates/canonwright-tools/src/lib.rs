@@ -1,6 +1,7 @@
 //! Tool registry, schemas, and built-in coding tools.
 #![recursion_limit = "256"]
 
+pub mod story_project;
 pub mod story_tools;
 pub mod web_services;
 
@@ -1655,6 +1656,7 @@ impl ToolRegistry {
         registry.register(TestPluginTool);
         registry.register(WritePluginTool);
         registry.register(InstallBuiltinPluginTool);
+        registry.register(story_project::StoryStartTool);
         registry.register(story_tools::StoryReadTool);
         registry.register(story_tools::StoryBriefTool);
         registry.register(story_tools::StoryLintTool);
@@ -2606,7 +2608,7 @@ fn tool_domain(name: &str) -> &'static str {
             "orchestration"
         }
         "story_apply" | "story_brief" | "story_commit" | "story_lint" | "story_read"
-        | "story_review" | "story_substantiate" => "story",
+        | "story_review" | "story_start" | "story_substantiate" => "story",
         _ => "general",
     }
 }
@@ -22622,5 +22624,110 @@ invariants:
             .await
             .expect_err("a write without permission is refused");
         assert!(error.is_recoverable(), "{error}");
+    }
+
+    #[tokio::test]
+    async fn starting_from_a_draft_imports_scenes_and_keeps_the_prose() {
+        let jail = tempdir().expect("tempdir");
+        fs::write(
+            jail.path().join("draft.md"),
+            "# Chapter One\n\nThe road was closed.\n\n***\n\nShe waited.\n\n# Chapter Two\n\nMorning.\n",
+        )
+        .expect("draft");
+        let mut context = context(jail.path());
+        context.allow_writes = true;
+
+        let result = story_project::StoryStartTool
+            .execute(
+                json!({"mode": "existing", "path": "draft.md", "title": "The Salt Road"}),
+                &context,
+            )
+            .await
+            .expect("import runs");
+        assert!(!result.is_error, "{}", result.content);
+        assert_eq!(result.metadata["scenes"], 3, "{}", result.content);
+        assert_eq!(result.metadata["format"], "markdown");
+        assert_eq!(result.metadata["placeholder_narrator"], true);
+
+        let story = canonwright_story::Story::load(&jail.path().join(".canonwright/story.json"))
+            .expect("story written");
+        assert_eq!(story.meta.title, "The Salt Road");
+        assert_eq!(story.meta.source.as_deref(), Some("draft.md"));
+        assert_eq!(story.scenes.len(), 3);
+        assert!(
+            story
+                .scenes
+                .iter()
+                .all(|scene| scene.status == canonwright_story::SceneStatus::Drafted),
+            "an import knows the prose, not the state"
+        );
+        assert!(story.check().is_empty(), "{:?}", story.check());
+    }
+
+    #[tokio::test]
+    async fn starting_blank_writes_an_empty_story() {
+        let jail = tempdir().expect("tempdir");
+        let mut context = context(jail.path());
+        context.allow_writes = true;
+
+        let result = story_project::StoryStartTool
+            .execute(
+                json!({"mode": "new", "title": "Untitled Novel", "pov": "mara"}),
+                &context,
+            )
+            .await
+            .expect("start runs");
+        assert!(!result.is_error, "{}", result.content);
+
+        let story = canonwright_story::Story::load(&jail.path().join(".canonwright/story.json"))
+            .expect("story written");
+        assert_eq!(story.meta.title, "Untitled Novel");
+        assert!(story.scenes.is_empty());
+        assert!(
+            story
+                .characters
+                .contains_key(&canonwright_story::CharacterId::new("mara").unwrap())
+        );
+    }
+
+    #[tokio::test]
+    async fn an_import_refuses_to_clobber_an_existing_story() {
+        let jail = tempdir().expect("tempdir");
+        fs::write(jail.path().join("draft.md"), "# One\n\nProse.\n").expect("draft");
+        let mut context = context(jail.path());
+        context.allow_writes = true;
+
+        story_project::StoryStartTool
+            .execute(
+                json!({"mode": "existing", "path": "draft.md", "title": "First"}),
+                &context,
+            )
+            .await
+            .expect("first import");
+
+        let error = story_project::StoryStartTool
+            .execute(
+                json!({"mode": "existing", "path": "draft.md", "title": "Second"}),
+                &context,
+            )
+            .await
+            .expect_err("a second import must not silently replace the first");
+        assert!(error.to_string().contains("overwrite"), "{error}");
+
+        let story = canonwright_story::Story::load(&jail.path().join(".canonwright/story.json"))
+            .expect("story intact");
+        assert_eq!(story.meta.title, "First");
+    }
+
+    #[tokio::test]
+    async fn an_unknown_mode_is_refused_by_name() {
+        let jail = tempdir().expect("tempdir");
+        let mut context = context(jail.path());
+        context.allow_writes = true;
+        let error = story_project::StoryStartTool
+            .execute(json!({"mode": "sideways"}), &context)
+            .await
+            .expect_err("unknown mode");
+        assert!(error.to_string().contains("sideways"), "{error}");
     }
 }

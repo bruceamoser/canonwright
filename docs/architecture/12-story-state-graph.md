@@ -121,6 +121,22 @@ knows. It reports what it withheld — later scenes, unrevealed facts, facts the
 POV has not learned, unplanted threads — so the author can see the filter working
 instead of trusting that it did.
 
+## Starting from a manuscript
+
+`canonwright-manuscript` reads a draft — Markdown, plain text, DOCX, EPUB, PDF —
+into blocks (headings, paragraphs, breaks), segments those blocks into scenes on
+headings and thematic breaks, and scaffolds one drafted scene per segment.
+
+No model is involved, and that is the point: the structure comes from the
+document, so when a later extraction pass invents the wrong relationship, you can
+still tell which mistakes were the parser's. A document with no structure at all
+is split on a 1,500-word heuristic and every such segment is labelled a guess.
+
+Imported scenes carry the prose and nothing else: empty deltas, no cast, no
+threads. They are `Drafted`, so they are never mistaken for canon, and the
+`NoValueShift` findings they produce are an honest to-do list rather than a
+false alarm.
+
 ## The write path
 
 Writing goes through `Story::write_scene`, which clones the document, applies the

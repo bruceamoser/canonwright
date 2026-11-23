@@ -52,6 +52,9 @@ pub struct StoryMeta {
     /// The default point of view, used when a scene omits one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pov: Option<CharacterId>,
+    /// Where the prose came from, when it was imported rather than written here.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]

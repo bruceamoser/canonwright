@@ -66,16 +66,18 @@ chapter is a harness that gets uninstalled.
 
 | Piece | State |
 | --- | --- |
-| Story State Graph: characters, factions, world rules, facts, threads, scenes | Implemented, 44 tests |
+| Story State Graph: characters, factions, world rules, facts, threads, scenes | Implemented, 173 tests across three crates |
 | Temporal projection (`state_before`, `state_at`, `knowledge_at`) | Implemented |
 | Delta model and fold (knowledge, relationships, resources, injuries, deaths) | Implemented |
 | Dirty-state propagation over the causal graph | Implemented |
 | Deterministic lint (value shift, dangling setups, unearned payoffs, continuity) | Implemented |
 | Evidence gate (`substantiate` a reviewer's claim) | Implemented |
 | Spoiler-free scene brief renderer | Implemented |
+| Manuscript import: `.md`, `.txt`, `.docx`, `.epub`, `.pdf` → drafted scenes | Implemented, 13 tests |
+| Project start: blank, or imported from a draft (`story_start`) | Implemented |
 | Scene writes with whole-document validation; rejected writes change nothing | Implemented |
 | Canon commit and review tracking (`reviewed_against` premise digests) | Implemented |
-| Agent tools: `story_read`, `story_brief`, `story_lint`, `story_substantiate`, `story_apply`, `story_commit`, `story_review` | Wired into the `story` tool domain |
+| Agent tools: `story_start`, `story_read`, `story_brief`, `story_lint`, `story_substantiate`, `story_apply`, `story_commit`, `story_review` | Wired into the `story` tool domain |
 | Reviewer and editor agents | Not started |
 | Story persistence in SQLite | JSON on disk for now |
 | Desktop UI | Inherited from OpenBaD; not yet repurposed |
@@ -89,6 +91,9 @@ and is asserted against by the test suite.
 
 The intended loop, mirroring `plan → edit → test → review → commit`:
 
+0. **Start** — a new manuscript, or a draft imported from `.md`, `.txt`, `.docx`,
+   `.epub` or `.pdf`. An import brings the prose and the scene boundaries; it
+   does not guess at the story state.
 1. **Brief** — assemble the scene context from the timeline: present cast, what
    the point of view knows *at that moment*, the causal lead-in, open threads.
 2. **Ideate** — optional: stress-test beats with the character and plot
@@ -109,6 +114,7 @@ the collaborators, drafting, and the mutating editors — do not.
 ```
 crates/
   canonwright-story/     the Story State Graph — the product
+  canonwright-manuscript/ reading .md/.txt/.docx/.epub/.pdf into scenes
   canonwright-agent/     turn/step loop, context, compaction
   canonwright-llm/       DeepSeek client, streaming, pricing
   canonwright-tools/     tool registry, schemas, built-ins, story_* tools
@@ -143,7 +149,10 @@ Linux) and `pnpm` for the UI.
 
 1. Split reviewers into their own crates with structured, claim-bearing output,
    and run them concurrently against a scene brief.
-2. Add line editors that accept a ticket and a line range, and nothing else.
-3. Project story state into SQLite so briefs are queries rather than file reads,
+2. Extract story state from imported prose — cast, facts, threads, per-scene
+   deltas — as a proposal a human accepts, so an existing draft gains a graph.
+3. Add line editors that accept a ticket and a line range, and nothing else.
+4. Project story state into SQLite so briefs are queries rather than file reads,
    and the dirty queue survives a machine.
-4. Repurpose the desktop UI from a repository pane to a manuscript pane.
+5. Repurpose the desktop UI: a first-run prompt that asks new-or-existing, then a
+   manuscript pane instead of a repository pane.

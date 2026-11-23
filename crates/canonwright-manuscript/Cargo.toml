@@ -1,0 +1,19 @@
+[package]
+name = "canonwright-manuscript"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+canonwright-story = { path = "../canonwright-story" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+quick-xml = "0.42"
+zip = { version = "2", default-features = false, features = ["deflate"] }
+pdf-extract = "0.12"
+
+[dev-dependencies]
+tempfile = "3"

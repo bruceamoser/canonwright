@@ -8,6 +8,7 @@ authors.workspace = true
 
 [dependencies]
 canonwright-core = { path = "../canonwright-core" }
+canonwright-manuscript = { path = "../canonwright-manuscript" }
 canonwright-story = { path = "../canonwright-story" }
 canonwright-governance = { path = "../canonwright-governance" }
 canonwright-vault = { path = "../canonwright-vault" }

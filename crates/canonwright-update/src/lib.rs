@@ -16,7 +16,7 @@ use serde_json::Value;
 use sha2::{Digest, Sha256};
 
 /// Repository that publishes Canonwright releases.
-pub const DEFAULT_REPO: &str = "bruceamoser/Canonwright";
+pub const DEFAULT_REPO: &str = "bruceamoser/canonwright";
 pub const DEFAULT_API_BASE: &str = "https://api.github.com";
 const DEFAULT_TIMEOUT: Duration = Duration::from_secs(60);
 const MAX_DOWNLOAD_BYTES: u64 = 2 * 1024 * 1024 * 1024;
@@ -853,7 +853,7 @@ mod tests {
             "tag_name": tag,
             "name": format!("Canonwright {tag}"),
             "body": "Release notes",
-            "html_url": "https://github.com/bruceamoser/Canonwright/releases/tag/v0.2.0",
+            "html_url": "https://github.com/bruceamoser/canonwright/releases/tag/v0.2.0",
             "published_at": "2026-10-01T00:00:00Z",
             "assets": assets.iter().map(|(name, size)| serde_json::json!({
                 "name": name,
@@ -1133,7 +1133,7 @@ mod tests {
 
     #[test]
     fn update_urls_must_use_tls_except_on_loopback() {
-        assert!(secure_url("https://github.com/bruceamoser/Canonwright"));
+        assert!(secure_url("https://github.com/bruceamoser/canonwright"));
         assert!(secure_url("http://127.0.0.1:8080/releases/latest"));
         assert!(secure_url("http://localhost:8080/releases/latest"));
         assert!(!secure_url("http://example.com/releases/latest"));
