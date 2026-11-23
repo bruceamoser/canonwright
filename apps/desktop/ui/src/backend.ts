@@ -115,7 +115,7 @@ let mockKnowledge: KnowledgeDocumentSummary[] = [
 const mockKnowledgeContent = new Map<string, string>([
   [
     "mock-knowledge-1",
-    "Canonwright is a desktop coding harness. Projects own one workspace plus reference folders, a knowledge library, retrieval corpus, and durable memories. Keep the chat focused and open visual artifacts beside it.",
+    "Canonwright is a narrative harness for long-form fiction. A project owns a workspace folder holding the story state graph (`.canonwright/story.json`) and the manuscript. Keep the chat focused and open visual artifacts beside it.",
   ],
 ]);
 
@@ -222,7 +222,7 @@ let mockQuestions: ProjectQuestion[] = [
 
 const mockManifest: ProjectManifest = {
   name: "Canonwright",
-  description: "Desktop coding harness with project-scoped context.",
+  description: "Narrative harness with project-scoped story state.",
   scope: {
     authoritative: ["crates/**", "apps/**", "docs/**"],
     generated: ["target/**", "apps/desktop/ui/dist/**"],

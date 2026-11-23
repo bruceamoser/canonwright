@@ -2565,7 +2565,7 @@ export default function App() {
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[13px] font-semibold tracking-tight">Canonwright</p>
-              <p className="truncate text-[10px] text-obd-subtle">coding harness</p>
+              <p className="truncate text-[10px] text-obd-subtle">narrative harness</p>
             </div>
             <button
               type="button"
@@ -2906,12 +2906,12 @@ export default function App() {
                     <Bot size={22} />
                   </div>
                   <h2 className="mt-4 text-center text-lg font-medium tracking-tight text-obd-text">
-                    {activeProject === null ? "Open a project to begin" : "What are we building?"}
+                    {activeProject === null ? "Open a project to begin" : "What are we writing?"}
                   </h2>
                   <p className="mx-auto mt-1 max-w-md text-center text-[12px] leading-5 text-obd-subtle">
                     {activeProject === null
                       ? "Choose a project directory so the agent has a workspace and a place to keep session context."
-                      : "Ask about the codebase, request a change, or run a check. Read and search tools run freely; edits and commands follow the access mode."}
+                      : "Ask about the manuscript, plan a scene, or run a continuity check. Read and search tools run freely; edits and commands follow the access mode."}
                   </p>
                   {activeProject === null ? (
                     <div className="mt-5 flex justify-center">
@@ -2926,9 +2926,9 @@ export default function App() {
                   ) : (
                     <div className="mx-auto mt-5 flex max-w-xl flex-wrap justify-center gap-2">
                       {[
-                        "Summarize this repository and its main packages.",
-                        "Find the riskiest code in this project.",
-                        "Run the tests and triage any failures.",
+                        "Start from an existing draft: import a .md, .docx, .epub or .pdf.",
+                        "Show me the story brief for the next scene.",
+                        "Run story_lint and tell me what needs attention.",
                       ].map((suggestion) => (
                         <button
                           key={suggestion}
@@ -4511,7 +4511,7 @@ function SettingsDialog({
 
           {tab === "about" && (
             <div className="max-w-md space-y-3">
-              <Section title="Canonwright Desktop" description="A DeepSeek-first coding harness.">
+              <Section title="Canonwright" description="A narrative harness for long-form fiction.">
                 <div className="space-y-1 font-mono text-[11px] text-obd-muted">
                   <p>version {foundation.kind === "ready" ? foundation.foundation.app_version : "—"}</p>
                   <p>schema {foundation.kind === "ready" ? foundation.foundation.doctor.schema_version : "—"}</p>

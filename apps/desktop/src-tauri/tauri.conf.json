@@ -5,7 +5,7 @@
   "identifier": "com.canonwright.desktop",
   "build": {
     "beforeDevCommand": "pnpm dev",
-    "devUrl": "http://localhost:5173",
+    "devUrl": "http://127.0.0.1:5173",
     "beforeBuildCommand": "pnpm build",
     "frontendDist": "../ui/dist"
   },
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Canonwright Desktop",
+        "title": "Canonwright",
         "width": 1200,
         "height": 800,
         "minWidth": 900,

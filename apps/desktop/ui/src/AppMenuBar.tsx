@@ -49,9 +49,12 @@ export default function AppMenuBar({ menus }: { menus: AppMenu[] }) {
       className="relative z-40 flex h-8 shrink-0 items-center gap-0.5 border-b border-obd-line bg-obd-bg px-2"
     >
       <div className="mr-2 flex items-center gap-1.5 px-1">
-        <div className="flex h-4 w-4 items-center justify-center rounded bg-obd-accent/15 text-[7px] font-bold text-obd-accent">
-          OB
-        </div>
+        <img
+          src="/canonwright-icon.svg"
+          alt=""
+          aria-hidden="true"
+          className="h-4 w-4 rounded-[4px]"
+        />
         <span className="text-[10px] font-medium tracking-tight text-obd-muted">
           Canonwright
         </span>

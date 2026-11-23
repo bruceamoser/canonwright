@@ -325,7 +325,7 @@ export default function ProjectPanel(props: ProjectPanelProps) {
           <button
             type="button"
             aria-label="Import project bundle"
-            title="Merge an Canonwright project bundle into this project"
+            title="Merge a Canonwright project bundle into this project"
             onClick={onImportBundle}
             className="rounded-md p-1.5 text-obd-subtle hover:bg-obd-raised hover:text-obd-accent"
           >

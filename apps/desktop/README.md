@@ -44,8 +44,8 @@ pnpm --dir ui build
 ```
 
 The Tauri CLI is installed with the UI package. Running it from `apps/desktop`
-lets it find `src-tauri/tauri.conf.json`. The `beforeDevCommand` runs
-`pnpm --dir ui dev` from the project root.
+lets it find `src-tauri/tauri.conf.json`. `beforeDevCommand` runs with its working
+directory set to `apps/desktop/ui`, so it is plain `pnpm dev`.
 
 ## Build
 
@@ -55,8 +55,9 @@ pnpm --dir ui build
 ./ui/node_modules/.bin/tauri build
 ```
 
-The current scaffold uses `icons/icon.png` from the project logo. Add platform
-icons and signing before shipping installers.
+Icons are generated from `docs/brand/icon-1024.png` with
+`./ui/node_modules/.bin/tauri icon ../../docs/brand/icon-1024.png`. Signing is still
+required before shipping installers.
 
 ## UI development without Tauri
 

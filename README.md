@@ -135,12 +135,19 @@ diverge without constraint and OpenBaD stays a general-purpose harness. The MIT
 licence and attribution are preserved in [`NOTICE`](NOTICE). See
 [ADR-010](docs/adr/010-copy-openbad-core-as-a-starting-point.md).
 
-## Build
+## Build & run
 
 ```sh
 cargo check --workspace --exclude canonwright-desktop
-cargo test -p canonwright-story
+cargo test -p canonwright-story -p canonwright-manuscript -p canonwright-tools
+
+cd apps/desktop
+pnpm --dir ui install
+./ui/node_modules/.bin/tauri dev
 ```
+
+[First run](docs/first-run.md) walks through importing a draft and talking to the
+story tools.
 
 The desktop app additionally needs Tauri v2 system dependencies (GTK/WebKit on
 Linux) and `pnpm` for the UI.
