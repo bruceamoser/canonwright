@@ -3,7 +3,7 @@
 This document describes `crates/canonwright-story`, the part of Canonwright that
 is not inherited from the harness. Source of the design intent:
 `docs/creative-writing-architecture.md` (the original plan), and
-[ADR-010](adr/010-copy-openbad-core-as-a-starting-point.md) (why it lives in a
+[ADR-010](../adr/010-copy-openbad-core-as-a-starting-point.md) (why it lives in a
 copied tree).
 
 ## Why a graph and not a wiki
