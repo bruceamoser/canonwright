@@ -7,24 +7,7 @@ towards.
 
 Open [`index.html`](index.html) to browse them with captions, or read on.
 
-![The six screens at a glance](contact-sheet.png)
-
-## The set
-
-The order matters: the first two screens are about the machine, the next two
-about the book, and the rest about the work.
-
-| Screen | What it settles |
-| --- | --- |
-| [`00-first-run---github.png`](screens/00-first-run---github.png) | First run. Git and GitHub before anything else, because an existing manuscript is often already a repository. Device code, "skip for now", and what has already been checked. |
-| [`01-welcome.png`](screens/01-welcome.png) | No project open. Two doors, nothing preselected. |
-| [`02-new-story---what.png`](screens/02-new-story---what.png) | Novel or rulebook, first, because it decides the checks and the shape of the workspace. |
-| [`03-new-manuscript---start.png`](screens/03-new-manuscript---start.png) | **New manuscript.** A way in, not an inventory: a character, a situation, or a question. Nothing else is asked. |
-| [`04-existing-manuscript---what-i-read.png`](screens/04-existing-manuscript---what-i-read.png) | **Existing manuscript.** The file is read first — 41,200 words, 24 scenes, 3 viewpoints — and the questions are produced *from what was found*: which name, which viewpoint, is that thread intentional. |
-| [`05-first-session---collaborator.png`](screens/05-first-session---collaborator.png) | The collaborator opens with proposals, not questions. The writer pushes back; it answers with the consequence. Nothing is canon until accepted. |
-| [`06-workspace---novel.png`](screens/06-workspace---novel.png) | Scenes, the scene, continuity. Dark theme. |
-| [`07-workspace---rulebook.png`](screens/07-workspace---rulebook.png) | Book tree, entity fields, cross-references. Light theme. |
-| [`08-source-control.png`](screens/08-source-control.png) | Changes, staged, commit, branches, tags, merge conflict. |
+![The seven screens at a glance](contact-sheet.png)
 
 ## Running the prototype
 
@@ -81,13 +64,13 @@ Nineteen links, checked. `python3 verify_prototype.py` re-checks them.
 
 | Screen | What it settles |
 | --- | --- |
-| `00-set-up-github.png` | First run: git and GitHub, the device code, and skipping. |
-| `01-main.png` | **New project** and **New discussion**, projects and discussions listed. |
-| `02-new-project.png` | Setup only: name, kind, and blank / file / folder / repo. |
-| `03-choose-a-repository.png` | Picking the repository that already holds the manuscript. |
-| `04-project.png` | The collaborator opens with proposals; the right panel is the canon inspector. |
-| `05-manuscript---novel.png` | Scenes, the scene, and the canon inspector: areas, entries, issues. |
-| `06-manuscript---rulebook.png` | Book tree, entity fields, checks. |
+| [`00-set-up-github.png`](screens/00-set-up-github.png) | First run: git and GitHub, the device code, and skipping. |
+| [`01-main.png`](screens/01-main.png) | **New project** and **New discussion**, projects and discussions listed. |
+| [`02-new-project.png`](screens/02-new-project.png) | Setup only: name, kind, and blank / file / folder / repo. |
+| [`03-choose-a-repository.png`](screens/03-choose-a-repository.png) | Picking the repository that already holds the manuscript. |
+| [`04-project.png`](screens/04-project.png) | The collaborator opens with proposals; the right panel is the canon inspector. |
+| [`05-manuscript---novel.png`](screens/05-manuscript---novel.png) | Scenes, the scene, and the canon inspector: areas, entries, issues. |
+| [`06-manuscript---rulebook.png`](screens/06-manuscript---rulebook.png) | Book tree, entity fields, checks. |
 
 ## The palette
 
