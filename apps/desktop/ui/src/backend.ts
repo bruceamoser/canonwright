@@ -506,11 +506,23 @@ export async function githubStatus(): Promise<GithubStatus> {
   return { installed: true, authenticated: false, account: null, detail: "mock" };
 }
 
-export async function githubSignIn(): Promise<string> {
+/**
+ * Verify a token against GitHub and keep it in the OS keychain.
+ *
+ * No CLI is involved and nothing global changes: the token is checked with one
+ * request, then stored under this app's own keychain entry.
+ */
+export async function githubSetToken(token: string): Promise<GithubStatus> {
   if (isTauri) {
-    return invoke<string>("github_sign_in");
+    return invoke<GithubStatus>("github_set_token", { token });
   }
-  return "ABCD-1234";
+  return { installed: true, authenticated: true, account: "mock", detail: "mock" };
+}
+
+export async function githubSignOut(): Promise<void> {
+  if (isTauri) {
+    await invoke<void>("github_sign_out");
+  }
 }
 
 export async function githubRepos(): Promise<string[]> {

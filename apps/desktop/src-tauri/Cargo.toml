@@ -52,7 +52,7 @@ calamine = "0.35.0"
 zip = { version = "7.3.0", default-features = false, features = ["deflate"] }
 pdf-extract = "0.12.1"
 quick-xml = "0.39"
-reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "blocking", "json"] }
 
 # In-process clipboard access for the native image paste fallback. The default
 # `image-data` feature provides `get_image`; `wayland-data-control` reads the

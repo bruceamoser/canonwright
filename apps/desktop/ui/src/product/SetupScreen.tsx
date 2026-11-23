@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
-import { githubSignIn, githubStatus } from "../backend";
+import { githubSetToken, githubStatus } from "../backend";
 import type { GithubStatus } from "../types";
 
 type Props = {
@@ -12,12 +12,12 @@ type Props = {
 /**
  * First run: the one integration the product needs.
  *
- * Shows what was detected, then the device code. Signing in is the only thing
- * this screen does; there is no second step to configure.
+ * A token rather than a CLI login — it is checked with one request, kept in the
+ * OS keychain, and cannot change which account anything else on the machine uses.
  */
 export default function SetupScreen({ onDone, onSkip }: Props) {
   const [status, setStatus] = useState<GithubStatus | null>(null);
-  const [code, setCode] = useState<string | null>(null);
+  const [token, setToken] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,16 +43,16 @@ export default function SetupScreen({ onDone, onSkip }: Props) {
     };
   }, [onDone]);
 
-  async function signIn() {
+  async function connect() {
     setBusy(true);
     setError(null);
     try {
-      const next = await githubSignIn();
-      setCode(next);
-      const after = await githubStatus();
+      const after = await githubSetToken(token);
       setStatus(after);
       if (after.authenticated) {
         onDone();
+      } else {
+        setError(after.detail || "GitHub did not accept that token");
       }
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause));
@@ -67,32 +67,36 @@ export default function SetupScreen({ onDone, onSkip }: Props) {
         <h1 className="text-2xl font-semibold tracking-tight">Sign in to GitHub</h1>
 
         <div className="mt-6 rounded-xl border border-obd-line bg-obd-surface p-5">
-          <div className="text-[10px] uppercase tracking-wide text-obd-muted">Code</div>
-          <div className="mt-1 font-mono text-2xl font-semibold text-obd-accent">
-            {code ?? "———————"}
-          </div>
-          <ol className="mt-4 space-y-1 text-[12px] text-obd-body">
-            <li>1 · Copy the code</li>
-            <li>2 · Approve at github.com/login/device</li>
-          </ol>
-          <div className="mt-3 font-mono text-[10px] text-obd-subtle">
-            {status === null
-              ? "checking git and gh…"
-              : `git ${status.installed ? "found" : "missing"} · gh ${
-                  status.authenticated ? (status.account ?? "signed in") : "not signed in"
-                }`}
+          <label htmlFor="gh-token" className="text-[10px] uppercase tracking-wide text-obd-muted">
+            Token
+          </label>
+          <input
+            id="gh-token"
+            type="password"
+            value={token}
+            onChange={(event) => setToken(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && token.length > 0) {
+                void connect();
+              }
+            }}
+            placeholder="github_pat_…"
+            className="mt-1.5 w-full rounded-lg border border-obd-line bg-obd-bg px-3 py-2 font-mono text-[12px] text-obd-text outline-none focus:border-obd-accent"
+          />
+          <div className="mt-2 font-mono text-[10px] text-obd-subtle">
+            github.com/settings/personal-access-tokens
           </div>
         </div>
 
         <div className="mt-5 flex items-center gap-3">
           <button
             type="button"
-            onClick={() => void signIn()}
-            disabled={busy}
+            onClick={() => void connect()}
+            disabled={busy || token.trim().length === 0}
             className="flex items-center gap-2 rounded-lg bg-obd-accent px-4 py-2.5 text-[13px] font-semibold text-obd-on-accent disabled:opacity-60"
           >
-            {busy ? <Loader2 className="animate-spin" size={14} /> : <ShieldCheck size={14} />}
-            Sign in with GitHub
+            {busy && <Loader2 className="animate-spin" size={14} />}
+            Connect
           </button>
           <button
             type="button"
@@ -113,11 +117,14 @@ export default function SetupScreen({ onDone, onSkip }: Props) {
           <div>
             <div className="text-[10px] uppercase tracking-wide text-obd-muted">Signed in as</div>
             <div className="mt-1 text-obd-body">{status?.account ?? "Not signed in"}</div>
+            <div className="mt-1 font-mono text-[10px] text-obd-subtle">
+              git {status?.installed === true ? "found" : "missing"}
+            </div>
           </div>
           <div>
             <div className="text-[10px] uppercase tracking-wide text-obd-muted">Permissions</div>
-            <div className="mt-1 text-obd-body">read and write repositories</div>
-            <div className="text-obd-muted">nothing else</div>
+            <div className="mt-1 text-obd-body">contents: read and write</div>
+            <div className="text-obd-muted">issues: read and write</div>
           </div>
         </div>
       </div>

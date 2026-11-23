@@ -57,7 +57,6 @@ import {
   chat as sendChat,
   checkpointDiff as fetchCheckpointDiff,
   githubRepos as fetchGithubRepos,
-  githubSignIn as startGithubSignIn,
   githubStatus as fetchGithubStatus,
   pickManuscript,
   storyIntake,
@@ -2376,18 +2375,15 @@ export default function App() {
   const connectGithub = useCallback(async () => {
     setGithubBusy(true);
     try {
-      const code = await startGithubSignIn();
-      setGithubCode(code);
-      // The CLI opens the browser; we wait for the account to appear.
-      for (let attempt = 0; attempt < 90; attempt += 1) {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        const status = await fetchGithubStatus();
-        if (status.authenticated) {
-          setGithubStatus(status);
-          setGithubCode(null);
-          setGithubRepos(await fetchGithubRepos());
-          break;
-        }
+      // No CLI: the token is stored by the sign-in screen, so all this can do
+      // is re-read the status and the repositories it unlocks.
+      const status = await fetchGithubStatus();
+      setGithubStatus(status);
+      setGithubCode(null);
+      if (status.authenticated) {
+        setGithubRepos(await fetchGithubRepos());
+      } else if (status.detail.length > 0) {
+        setError(status.detail);
       }
     } catch (cause) {
       setError(describeError(cause));

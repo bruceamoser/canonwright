@@ -3,6 +3,7 @@ mod diagnostics;
 pub use diagnostics::early_exit_for;
 mod executor;
 mod git;
+mod github_api;
 mod pipeline;
 mod preview;
 mod process;
@@ -4528,146 +4529,77 @@ struct GithubStatus {
     detail: String,
 }
 
-fn gh_path() -> Option<std::path::PathBuf> {
-    if let Some(path) = canonwright_pipeline::gh_binary() {
-        return Some(path.to_path_buf());
-    }
-    let paths = std::env::var_os("PATH")?;
-    std::env::split_paths(&paths)
-        .map(|directory| directory.join("gh"))
-        .find(|candidate| candidate.is_file())
+/// Whether `git` is on PATH. Git is required — for clone, commit and push —
+/// and it is the only external tool the app depends on now.
+fn git_available() -> bool {
+    std::process::Command::new("git")
+        .arg("--version")
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .is_ok_and(|status| status.success())
 }
 
-fn github_status_now() -> GithubStatus {
-    let Some(gh) = gh_path() else {
-        return GithubStatus {
-            installed: false,
-            authenticated: false,
-            account: None,
-            detail: "The GitHub CLI (`gh`) is not installed. Install it from \
-                     https://cli.github.com and try again."
-                .to_owned(),
-        };
-    };
-    let output = std::process::Command::new(&gh)
-        .args(["api", "user", "--jq", ".login"])
-        .output();
-    match output {
-        Ok(output) if output.status.success() => GithubStatus {
-            installed: true,
-            authenticated: true,
-            account: Some(String::from_utf8_lossy(&output.stdout).trim().to_owned()),
-            detail: String::new(),
-        },
-        Ok(output) => GithubStatus {
-            installed: true,
-            authenticated: false,
-            account: None,
-            detail: format!(
-                "Signed out: {}",
-                String::from_utf8_lossy(&output.stderr).trim()
-            ),
-        },
-        Err(error) => GithubStatus {
-            installed: true,
-            authenticated: false,
-            account: None,
-            detail: error.to_string(),
-        },
-    }
-}
-
+/// The account behind the stored token, or a status saying nothing is stored.
+///
+/// No CLI is involved: a token in the keychain, one request to `GET /user`.
 #[tauri::command]
 fn github_status() -> GithubStatus {
-    github_status_now()
-}
-
-/// Start `gh auth login --web` and return the one-time code it prints.
-///
-/// The CLI owns the flow: it opens the browser and waits. All this does is
-/// surface the code, because a device flow whose code you cannot see is a dead
-/// end for the user.
-#[tauri::command]
-fn github_sign_in() -> Result<String, String> {
-    let gh = gh_path().ok_or_else(|| "the GitHub CLI (`gh`) is not installed".to_owned())?;
-    let mut command = std::process::Command::new(gh);
-    command
-        .args([
-            "auth",
-            "login",
-            "--hostname",
-            "github.com",
-            "--git-protocol",
-            "https",
-            "--web",
-        ])
-        .stdin(std::process::Stdio::null())
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::piped());
-
-    let (sender, receiver) = std::sync::mpsc::channel();
-    std::thread::spawn(move || {
-        let Ok(mut child) = command.spawn() else {
-            let _ = sender.send(Err("could not start `gh auth login`".to_owned()));
-            return;
+    let installed = git_available();
+    let Some(token) = github_api::stored_token() else {
+        return GithubStatus {
+            installed,
+            authenticated: false,
+            account: None,
+            detail: "No GitHub token stored yet.".to_owned(),
         };
-        let mut sent = false;
-        if let Some(stdout) = child.stdout.take() {
-            let reader = std::io::BufReader::new(stdout);
-            for line in std::io::BufRead::lines(reader).map_while(Result::ok) {
-                if !sent {
-                    if let Some(code) = one_time_code(&line) {
-                        let _ = sender.send(Ok(code));
-                        sent = true;
-                    }
-                }
-            }
-        }
-        let _ = child.wait();
-        if !sent {
-            let _ = sender.send(Err(
-                "`gh auth login` finished without printing a one-time code".to_owned(),
-            ));
-        }
-    });
-
-    receiver
-        .recv_timeout(std::time::Duration::from_secs(30))
-        .map_err(|_| "timed out waiting for GitHub to print a code".to_owned())?
+    };
+    match github_api::whoami(&token) {
+        Ok(account) => GithubStatus {
+            installed,
+            authenticated: true,
+            account: Some(account),
+            detail: String::new(),
+        },
+        Err(error) => GithubStatus {
+            installed,
+            authenticated: false,
+            account: None,
+            detail: error,
+        },
+    }
 }
 
-/// Pull the device code out of gh's banner line.
-fn one_time_code(line: &str) -> Option<String> {
-    let (_, rest) = line.split_once("one-time code:")?;
-    let code = rest.trim().trim_end_matches('.').trim();
-    (!code.is_empty()).then(|| code.to_owned())
+/// Verify a token against GitHub and keep it in the OS keychain.
+///
+/// The token is checked before it is stored, so a typo cannot leave the app
+/// "signed in" to nothing.
+#[tauri::command]
+fn github_set_token(token: String) -> Result<GithubStatus, String> {
+    let trimmed = token.trim();
+    if trimmed.is_empty() {
+        return Err("a token is required".to_owned());
+    }
+    let account = github_api::whoami(trimmed)?;
+    github_api::store_token(trimmed)?;
+    Ok(GithubStatus {
+        installed: git_available(),
+        authenticated: true,
+        account: Some(account),
+        detail: String::new(),
+    })
+}
+
+#[tauri::command]
+fn github_sign_out() -> Result<(), String> {
+    github_api::forget_token()
 }
 
 #[tauri::command]
 fn github_repos() -> Result<Vec<String>, String> {
-    let gh = gh_path().ok_or_else(|| "the GitHub CLI (`gh`) is not installed".to_owned())?;
-    let output = std::process::Command::new(gh)
-        .args([
-            "repo",
-            "list",
-            "--limit",
-            "100",
-            "--json",
-            "nameWithOwner",
-            "--jq",
-            ".[].nameWithOwner",
-        ])
-        .output()
-        .map_err(|error| error.to_string())?;
-    if !output.status.success() {
-        return Err(String::from_utf8_lossy(&output.stderr).trim().to_owned());
-    }
-    Ok(String::from_utf8_lossy(&output.stdout)
-        .lines()
-        .map(str::trim)
-        .filter(|line| !line.is_empty())
-        .map(str::to_owned)
-        .collect())
+    let token =
+        github_api::stored_token().ok_or_else(|| "connect GitHub with a token first".to_owned())?;
+    github_api::repos(&token)
 }
 
 /// `owner/name`, with each half a plausible repository segment.
@@ -4707,14 +4639,29 @@ fn clone_repo(root: &Path, repo: &str) -> Result<PathBuf, String> {
             target.display()
         ));
     }
-    let gh = gh_path().ok_or_else(|| "the GitHub CLI (`gh`) is not installed".to_owned())?;
-    let status = std::process::Command::new(gh)
-        .args(["repo", "clone", repo, &target.to_string_lossy()])
+    let token = github_api::stored_token()
+        .ok_or_else(|| "connect GitHub with a token before connecting a repository".to_owned())?;
+    // Cloned with the token in the URL, then the remote is reset: leaving it
+    // would write the credential into .git/config on disk.
+    let authed = format!("https://x-access-token:{token}@github.com/{repo}.git");
+    let status = std::process::Command::new("git")
+        .arg("clone")
+        .arg(&authed)
+        .arg(&target)
         .status()
         .map_err(|error| error.to_string())?;
     if !status.success() {
         return Err(format!("could not clone {repo}"));
     }
+    let _ = std::process::Command::new("git")
+        .args([
+            "remote",
+            "set-url",
+            "origin",
+            &format!("https://github.com/{repo}.git"),
+        ])
+        .current_dir(&target)
+        .status();
     target.canonicalize().map_err(|error| error.to_string())
 }
 
@@ -6546,7 +6493,8 @@ pub fn run() {
             create_project,
             story_intake,
             github_status,
-            github_sign_in,
+            github_set_token,
+            github_sign_out,
             github_repos,
             export_project,
             import_project,
@@ -7757,23 +7705,6 @@ mod tests {
             ..McpServerSpec::default()
         };
         assert!(mcp_server_config_from_spec(&spec, None).is_err());
-    }
-
-    #[test]
-    fn the_device_code_is_read_out_of_the_gh_banner() {
-        assert_eq!(
-            one_time_code("! First copy your one-time code: ABCD-1234").as_deref(),
-            Some("ABCD-1234")
-        );
-        assert_eq!(
-            one_time_code("  one-time code: WXYZ-9876.  ").as_deref(),
-            Some("WXYZ-9876")
-        );
-        assert_eq!(
-            one_time_code("Opening github.com/login/device in your browser"),
-            None
-        );
-        assert_eq!(one_time_code("one-time code:"), None);
     }
 
     #[test]
