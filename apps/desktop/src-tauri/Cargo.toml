@@ -1,0 +1,66 @@
+[package]
+name = "openbad-desktop"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[lib]
+name = "openbad_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[features]
+default = ["keyring"]
+keyring = ["openbad-governance/keyring"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-notification = "2"
+directories = { workspace = true }
+ignore = "0.4"
+blake3 = "1"
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+openbad-core = { path = "../../../crates/openbad-core" }
+openbad-store = { path = "../../../crates/openbad-store" }
+openbad-pipeline = { path = "../../../crates/openbad-pipeline" }
+openbad-agent = { path = "../../../crates/openbad-agent" }
+openbad-harness = { path = "../../../crates/openbad-harness" }
+openbad-llm = { path = "../../../crates/openbad-llm" }
+openbad-tools = { path = "../../../crates/openbad-tools" }
+openbad-lsp = { path = "../../../crates/openbad-lsp" }
+openbad-mcp = { path = "../../../crates/openbad-mcp" }
+openbad-transfer = { path = "../../../crates/openbad-transfer" }
+openbad-update = { path = "../../../crates/openbad-update" }
+openbad-terminal = { path = "../../../crates/openbad-terminal" }
+openbad-workspace = { path = "../../../crates/openbad-workspace" }
+openbad-index = { path = "../../../crates/openbad-index" }
+openbad-governance = { path = "../../../crates/openbad-governance" }
+similar = "2"
+base64 = "0.22"
+async-trait = "0.1"
+tokio = { version = "1", features = ["time"] }
+calamine = "0.35.0"
+zip = { version = "7.3.0", default-features = false, features = ["deflate"] }
+pdf-extract = "0.12.1"
+quick-xml = "0.39"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
+
+# In-process clipboard access for the native image paste fallback. The default
+# `image-data` feature provides `get_image`; `wayland-data-control` reads the
+# clipboard through the compositor instead of shelling out to wl-paste/xclip.
+[target.'cfg(target_os = "linux")'.dependencies]
+arboard = { version = "3.7", features = ["wayland-data-control"] }
+png = "0.18"
+# Only to narrow GLib's fatal log mask and route criticals to our own log.
+glib = "0.18"
+
+[dev-dependencies]
+tempfile = "3"
+tokio = { version = "1", features = ["macros", "rt"] }

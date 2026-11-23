@@ -1,0 +1,100 @@
+name: Release
+
+# Publishing only. The three platform builds and their bundling happen in
+# `Bundles`, which runs on the version-bump commit (and on demand) so the tag
+# job never pays for a cold release compile — GitHub does not share action
+# caches across refs, so a build on a tag always starts from an empty target.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to (re)publish
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Resolve the commit
+        id: commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          sha="$(gh api "repos/$GH_REPO/git/ref/tags/$TAG" -q '.object.sha')"
+          # An annotated tag points at a tag object, which points at the commit.
+          type="$(gh api "repos/$GH_REPO/git/ref/tags/$TAG" -q '.object.type')"
+          if [ "$type" = "tag" ]; then
+            sha="$(gh api "repos/$GH_REPO/git/tags/$sha" -q '.object.sha')"
+          fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "building $TAG at $sha"
+
+      - name: Wait for the bundles built for this commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          set -euo pipefail
+          run_id="$(gh run list --workflow bundles.yml --commit "$SHA" --limit 1 --json databaseId -q '.[0].databaseId')"
+          if [ -z "$run_id" ]; then
+            echo "::error::No Bundles run exists for $SHA. Build it first (gh workflow run bundles.yml --ref main -f ref=$SHA), then re-run this job."
+            exit 1
+          fi
+          echo "waiting on bundles run $run_id"
+          gh run watch "$run_id" --exit-status --interval 15
+          gh run download "$run_id" --pattern 'bundles-*' --dir artifacts
+
+      - name: Collect bundles
+        run: |
+          mkdir -p release-assets
+          find artifacts -type f \
+            \( -name '*.AppImage' -o -name '*.deb' -o -name '*.dmg' \
+               -o -name '*.msi' -o -name '*.exe' \) -print0 \
+            | while IFS= read -r -d '' file; do
+                name="$(basename "$file")"
+                normalized="${name// /_}"
+                cp "$file" "release-assets/$normalized"
+              done
+          ls -l release-assets
+
+      - name: Generate SHA256SUMS
+        working-directory: release-assets
+        run: |
+          sha256sum * > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" release-assets/* --clobber
+            gh release edit "$TAG" --latest
+          else
+            gh release create "$TAG" release-assets/* \
+              --title "OpenBaD $TAG" \
+              --generate-notes \
+              --latest
+          fi

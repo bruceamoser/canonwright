@@ -1,0 +1,690 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import {
+  BookOpen,
+  Download,
+  FileCode2,
+  Loader2,
+  Plus,
+  Printer,
+  Search,
+  Trash2,
+  Upload,
+} from "lucide-react";
+
+import {
+  addKnowledgeNote,
+  deleteKnowledgeDocument,
+  downloadKnowledgeDocument,
+  importKnowledgeFile,
+  importKnowledgeFiles,
+  loadKnowledgeDocument,
+  loadKnowledgeDocuments,
+  loadKnowledgeStaleDocuments,
+  pickFiles,
+  searchProject,
+} from "./backend";
+import { droppedToUploads, fileName, useFileDropZone } from "./dropzone";
+import MarkdownMessage from "./MarkdownMessage";
+import RevealButton from "./RevealButton";
+import type {
+  Artifact,
+  KnowledgeDocument,
+  KnowledgeDocumentSummary,
+  ProjectHit,
+  UploadSource,
+} from "./types";
+
+export function KnowledgePanel({
+  workspacePath,
+  onOpenArtifact,
+  revision,
+  onChanged,
+}: {
+  workspacePath: string;
+  onOpenArtifact: (artifact: Artifact) => void;
+  revision: number;
+  onChanged: () => void;
+}) {
+  const [knowledge, setKnowledge] = useState<KnowledgeDocumentSummary[]>([]);
+  const [stale, setStale] = useState<Set<string>>(new Set());
+  const [query, setQuery] = useState("");
+  const [composing, setComposing] = useState(false);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [tags, setTags] = useState("");
+  const [confidence, setConfidence] = useState("inferred");
+  const [kind, setKind] = useState("note");
+  const [importing, setImporting] = useState(false);
+  const [importPath, setImportPath] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [exportingId, setExportingId] = useState<string | null>(null);
+  const [printDocument, setPrintDocument] = useState<KnowledgeDocument | null>(null);
+
+  const refresh = useCallback(async () => {
+    if (workspacePath.length === 0) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const [documents, staleDocuments] = await Promise.all([
+        loadKnowledgeDocuments(workspacePath),
+        loadKnowledgeStaleDocuments(workspacePath),
+      ]);
+      setKnowledge(documents);
+      setStale(new Set(staleDocuments));
+      setError(null);
+    } catch (cause) {
+      setError(describeError(cause));
+    } finally {
+      setLoading(false);
+    }
+  }, [workspacePath]);
+
+  useEffect(() => {
+    setKnowledge([]);
+    setStale(new Set());
+    setQuery("");
+    setNotice(null);
+  }, [workspacePath]);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh, revision]);
+
+  useEffect(() => {
+    if (printDocument === null) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      window.print();
+      window.setTimeout(() => setPrintDocument(null), 1_000);
+    }, 600);
+    return () => window.clearTimeout(timer);
+  }, [printDocument]);
+
+  const visible = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return needle.length === 0
+      ? knowledge
+      : knowledge.filter(
+          (document) =>
+            document.title.toLowerCase().includes(needle) ||
+            (document.source ?? "").toLowerCase().includes(needle) ||
+            document.tags.some((tag) => tag.toLowerCase().includes(needle)),
+        );
+  }, [knowledge, query]);
+
+  const open = (document: KnowledgeDocumentSummary) => {
+    onOpenArtifact({
+      kind: "markdown",
+      title: document.title,
+      uri: `knowledge:${document.id}`,
+    });
+  };
+
+  const save = async () => {
+    if (content.trim().length === 0) {
+      return;
+    }
+    try {
+      const document = await addKnowledgeNote(
+        workspacePath,
+        title,
+        content,
+        tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        confidence,
+        kind,
+      );
+      setKnowledge((items) => [document, ...items]);
+      setTitle("");
+      setContent("");
+      setTags("");
+      setConfidence("inferred");
+      setKind("note");
+      setComposing(false);
+      setNotice(`Added ${document.title}`);
+      setError(null);
+      onChanged();
+      void refresh();
+    } catch (cause) {
+      setError(describeError(cause));
+    }
+  };
+
+  const remove = async (document: KnowledgeDocumentSummary) => {
+    try {
+      await deleteKnowledgeDocument(workspacePath, document.id);
+      setKnowledge((items) => items.filter((item) => item.id !== document.id));
+      setNotice(`Deleted ${document.title}`);
+      onChanged();
+    } catch (cause) {
+      setError(describeError(cause));
+    }
+  };
+
+  const importFile = async (path: string) => {
+    try {
+      const document = await importKnowledgeFile(workspacePath, path, []);
+      setKnowledge((items) => [document, ...items]);
+      setImportPath("");
+      setImporting(false);
+      setNotice(`Imported ${document.title}`);
+      setError(null);
+      onChanged();
+      void refresh();
+    } catch (cause) {
+      setError(describeError(cause));
+    }
+  };
+
+  const upload = async (sources: UploadSource[]) => {
+    if (sources.length === 0) {
+      return;
+    }
+    setUploading(true);
+    try {
+      const { documents, skipped } = await importKnowledgeFiles(
+        workspacePath,
+        sources,
+        [],
+      );
+      if (documents.length > 0) {
+        setKnowledge((items) => [...documents, ...items]);
+      }
+      const imported = `Imported ${documents.length} document${
+        documents.length === 1 ? "" : "s"
+      }`;
+      setNotice(
+        skipped.length === 0 ? imported : `${imported} · ${skipped.length} skipped`,
+      );
+      setError(skipped.length === 0 ? null : skipped.join(" · "));
+      if (documents.length > 0) {
+        onChanged();
+        void refresh();
+      }
+    } catch (cause) {
+      setError(describeError(cause));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const choose = async () => {
+    try {
+      const chosen = await pickFiles("Upload documents to knowledge");
+      await upload(chosen.map((path) => ({ name: fileName(path), path })));
+    } catch (cause) {
+      setError(describeError(cause));
+    }
+  };
+
+  const drop = useFileDropZone(
+    async (payload) => upload(await droppedToUploads(payload)),
+    { disabled: workspacePath.length === 0 },
+  );
+
+  const download = async (document: KnowledgeDocumentSummary) => {
+    setExportingId(document.id);
+    try {
+      const path = await downloadKnowledgeDocument(workspacePath, document.id);
+      setNotice(path === null ? "Download cancelled" : `Saved ${path}`);
+      setError(null);
+    } catch (cause) {
+      setError(describeError(cause));
+    } finally {
+      setExportingId(null);
+    }
+  };
+
+  const print = async (document: KnowledgeDocumentSummary) => {
+    try {
+      setPrintDocument(await loadKnowledgeDocument(workspacePath, document.id));
+      setNotice("Preparing print / PDF view…");
+      setError(null);
+    } catch (cause) {
+      setError(describeError(cause));
+    }
+  };
+
+  return (
+    <div
+      {...drop.zoneProps}
+      className={`relative min-h-full space-y-2 rounded-lg transition-shadow ${
+        drop.active ? "ring-2 ring-obd-accent/40" : ""
+      }`}
+    >
+      {drop.active && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-obd-accent/10 text-[11px] font-medium text-obd-accent">
+          Drop documents to add them to knowledge
+        </div>
+      )}
+      <p className="px-1 pb-1 text-[10px] leading-4 text-obd-subtle">
+        Knowledge documents: long-form notes, decisions, references, procedures, and
+        findings. They are chunked, full-text indexed, and cited by document. Use Memory
+        for short atomic snippets.
+      </p>
+      <SearchField value={query} onChange={setQuery} label="Filter knowledge" />
+      {loading && knowledge.length === 0 && (
+        <p className="flex items-center gap-1.5 px-1 py-2 text-[10px] text-obd-subtle">
+          <Loader2 size={11} className="animate-spin" /> Loading knowledge…
+        </p>
+      )}
+      {visible.map((document) => {
+        const sourcePath =
+          document.source !== null && document.source.startsWith(`${workspacePath}/`)
+            ? document.source
+            : null;
+        return (
+        <div
+          key={document.id}
+          className="rounded-lg border border-obd-line bg-obd-raised p-2.5"
+        >
+          <div className="flex items-start gap-1">
+          <button
+            type="button"
+            onClick={() => open(document)}
+            className="block min-w-0 flex-1 text-left"
+          >
+            <p className="truncate text-[11px] text-obd-text">{document.title}</p>
+            <p className="mt-0.5 truncate font-mono text-[9px] text-obd-subtle">
+              {document.kind} · {document.chunks} chunk
+              {document.chunks === 1 ? "" : "s"} · {formatBytes(document.characters)}
+            </p>
+            <p className="mt-1 flex items-center gap-1.5 text-[9px]">
+              <span
+                className={
+                  document.confidence === "verified"
+                    ? "rounded bg-obd-accent/15 px-1 py-0.5 text-obd-accent"
+                    : document.confidence === "uncertain"
+                      ? "rounded bg-obd-warning/15 px-1 py-0.5 text-obd-warning"
+                      : "rounded bg-obd-raised-strong px-1 py-0.5 text-obd-muted"
+                }
+              >
+                {document.confidence}
+              </span>
+              {stale.has(document.id) && (
+                <span className="rounded bg-obd-warning/15 px-1 py-0.5 text-obd-warning">
+                  source changed
+                </span>
+              )}
+              {document.review_status !== "accepted" && (
+                <span className="rounded bg-obd-info/15 px-1 py-0.5 text-obd-info">
+                  {document.review_status}
+                </span>
+              )}
+            </p>
+            {document.tags.length > 0 && (
+              <p className="mt-1 truncate text-[9px] text-obd-accent/70">
+                {document.tags.join(" · ")}
+              </p>
+            )}
+          </button>
+          {sourcePath !== null && (
+            <RevealButton
+              workspacePath={workspacePath}
+              path={sourcePath}
+              label="Show knowledge source"
+            />
+          )}
+          </div>
+          <div className="mt-1.5 flex items-center justify-between gap-2">
+            <span className="min-w-0 flex-1 truncate font-mono text-[9px] text-obd-subtle">
+              {document.source ?? "project note"}
+            </span>
+            <div className="flex shrink-0 items-center gap-0.5">
+              <button
+                type="button"
+                aria-label={`Download ${document.title}`}
+                title="Download Markdown"
+                onClick={() => void download(document)}
+                disabled={exportingId === document.id}
+                className="rounded p-1 text-obd-subtle hover:bg-obd-raised hover:text-obd-accent disabled:opacity-40"
+              >
+                {exportingId === document.id ? (
+                  <Loader2 size={11} className="animate-spin" />
+                ) : (
+                  <Download size={11} />
+                )}
+              </button>
+              <button
+                type="button"
+                aria-label={`Export ${document.title} as PDF`}
+                title="Print / save as PDF"
+                onClick={() => void print(document)}
+                className="rounded p-1 text-obd-subtle hover:bg-obd-raised hover:text-obd-accent"
+              >
+                <Printer size={11} />
+              </button>
+              <button
+                type="button"
+                aria-label={`Delete ${document.title}`}
+                onClick={() => void remove(document)}
+                className="rounded p-1 text-obd-subtle hover:bg-obd-raised hover:text-obd-warning"
+              >
+                <Trash2 size={11} />
+              </button>
+            </div>
+          </div>
+        </div>
+        );
+      })}
+      {!loading && visible.length === 0 && (
+        <p className="px-1 py-2 text-[11px] text-obd-subtle">
+          {knowledge.length === 0
+            ? "No knowledge yet. Add a note, upload documents, or import a file."
+            : "No matching documents."}
+        </p>
+      )}
+      <div className="flex gap-1.5">
+        <button
+          type="button"
+          onClick={() => setComposing((value) => !value)}
+          className="flex flex-1 items-center justify-center gap-1 rounded-md border border-obd-line bg-obd-raised px-2 py-1.5 text-[10px] text-obd-body hover:bg-obd-raised-strong"
+        >
+          <Plus size={11} /> Note
+        </button>
+        <button
+          type="button"
+          onClick={() => void choose()}
+          disabled={uploading || workspacePath.length === 0}
+          className="flex flex-1 items-center justify-center gap-1 rounded-md border border-obd-line bg-obd-raised px-2 py-1.5 text-[10px] text-obd-body hover:bg-obd-raised-strong disabled:opacity-40"
+        >
+          {uploading ? (
+            <Loader2 size={11} className="animate-spin" />
+          ) : (
+            <Upload size={11} />
+          )}
+          Upload
+        </button>
+        <button
+          type="button"
+          onClick={() => setImporting((value) => !value)}
+          className="flex flex-1 items-center justify-center gap-1 rounded-md border border-obd-line bg-obd-raised px-2 py-1.5 text-[10px] text-obd-body hover:bg-obd-raised-strong"
+        >
+          <BookOpen size={11} /> Import
+        </button>
+      </div>
+      {importing && (
+        <div className="space-y-1.5 rounded-lg border border-obd-line bg-obd-inset p-2.5">
+          <input
+            value={importPath}
+            onChange={(event) => setImportPath(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && importPath.trim().length > 0) {
+                void importFile(importPath.trim());
+              }
+            }}
+            aria-label="Knowledge import path"
+            placeholder="/home/you/docs/architecture.md"
+            className="w-full rounded-md border border-obd-line bg-obd-inset px-2 py-1.5 font-mono text-[10px] text-obd-text outline-none focus:border-obd-accent/40"
+          />
+          <button
+            type="button"
+            onClick={() => void importFile(importPath.trim())}
+            disabled={importPath.trim().length === 0}
+            className="w-full rounded-md border border-obd-line bg-obd-raised px-2 py-1.5 text-[10px] text-obd-text hover:bg-obd-raised-strong disabled:opacity-30"
+          >
+            Import UTF-8 file
+          </button>
+        </div>
+      )}
+      {composing && (
+        <div className="space-y-1.5 rounded-lg border border-obd-line bg-obd-inset p-2.5">
+          <input
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            aria-label="Knowledge title"
+            placeholder="Title"
+            className="w-full rounded-md border border-obd-line bg-obd-inset px-2 py-1.5 text-[10px] text-obd-text outline-none focus:border-obd-accent/40"
+          />
+          <textarea
+            value={content}
+            onChange={(event) => setContent(event.target.value)}
+            aria-label="Knowledge content"
+            rows={5}
+            placeholder="Durable context the assistant should retrieve later…"
+            className="w-full resize-y rounded-md border border-obd-line bg-obd-inset px-2 py-1.5 text-[10px] leading-4 text-obd-text outline-none focus:border-obd-accent/40"
+          />
+          <input
+            value={tags}
+            onChange={(event) => setTags(event.target.value)}
+            aria-label="Knowledge tags"
+            placeholder="tags, comma separated"
+            className="w-full rounded-md border border-obd-line bg-obd-inset px-2 py-1.5 text-[10px] text-obd-text outline-none focus:border-obd-accent/40"
+          />
+          <select
+            value={kind}
+            onChange={(event) => setKind(event.target.value)}
+            aria-label="Knowledge kind"
+            className="w-full rounded-md border border-obd-line bg-obd-inset px-2 py-1.5 text-[10px] text-obd-text outline-none focus:border-obd-accent/40"
+          >
+            <option value="note">Note</option>
+            <option value="decision">Decision</option>
+            <option value="reference">Reference</option>
+            <option value="gotcha">Gotcha</option>
+            <option value="procedure">Procedure</option>
+            <option value="glossary">Glossary</option>
+            <option value="finding">Finding</option>
+            <option value="question">Question</option>
+          </select>
+          <select
+            value={confidence}
+            onChange={(event) => setConfidence(event.target.value)}
+            aria-label="Knowledge confidence"
+            className="w-full rounded-md border border-obd-line bg-obd-inset px-2 py-1.5 text-[10px] text-obd-text outline-none focus:border-obd-accent/40"
+          >
+            <option value="inferred">Inferred — reasonable, not verified</option>
+            <option value="verified">Verified — checked against source</option>
+            <option value="uncertain">Uncertain — needs confirmation</option>
+          </select>
+          <button
+            type="button"
+            onClick={() => void save()}
+            disabled={content.trim().length === 0}
+            className="w-full rounded-md bg-obd-accent px-2 py-1.5 text-[10px] font-medium text-obd-on-accent hover:bg-obd-accent disabled:opacity-30"
+          >
+            Save to project knowledge
+          </button>
+        </div>
+      )}
+      {notice !== null && <p className="text-[10px] text-obd-accent">{notice}</p>}
+      {error !== null && <p className="text-[10px] text-obd-warning">{error}</p>}
+      {printDocument !== null &&
+        createPortal(
+          <div className="knowledge-print">
+            <p className="knowledge-print-kicker">OpenBaD project knowledge</p>
+            <h1>{printDocument.summary.title}</h1>
+            <p className="knowledge-print-meta">
+              {printDocument.summary.kind} · {printDocument.summary.confidence}
+              {printDocument.summary.tags.length > 0 &&
+                ` · ${printDocument.summary.tags.join(", ")}`}
+            </p>
+            <MarkdownMessage text={printDocument.content} />
+          </div>,
+          document.body,
+        )}
+    </div>
+  );
+}
+
+export function RetrievalPanel({
+  workspacePath,
+  onOpenArtifact,
+  onTab,
+}: {
+  workspacePath: string;
+  onOpenArtifact: (artifact: Artifact) => void;
+  onTab: (tab: "memory") => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [hits, setHits] = useState<ProjectHit[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const search = async () => {
+    if (query.trim().length === 0) {
+      return;
+    }
+    setLoading(true);
+    try {
+      setHits(await searchProject(workspacePath, query.trim()));
+      setError(null);
+    } catch (cause) {
+      setError(describeError(cause));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openHit = (hit: ProjectHit) => {
+    if (hit.source === "knowledge") {
+      onOpenArtifact({
+        kind: "markdown",
+        title: hit.title,
+        uri: `knowledge:${hit.locator.split("#")[0]}`,
+      });
+    } else if (hit.source === "code") {
+      onOpenArtifact({
+        kind: "file",
+        title: hit.title.split("/").at(-1) ?? hit.title,
+        uri: hit.locator,
+      });
+    } else {
+      onTab("memory");
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex gap-1.5">
+        <input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              void search();
+            }
+          }}
+          aria-label="Retrieval query"
+          placeholder="Ask the project corpus…"
+          className="min-w-0 flex-1 rounded-md border border-obd-line bg-obd-inset px-2.5 py-1.5 text-[11px] text-obd-text outline-none focus:border-obd-accent/40"
+        />
+        <button
+          type="button"
+          onClick={() => void search()}
+          disabled={loading || query.trim().length === 0}
+          className="rounded-md bg-obd-accent px-2.5 py-1.5 text-[10px] font-medium text-obd-on-accent hover:bg-obd-accent disabled:opacity-30"
+        >
+          {loading ? "…" : "Search"}
+        </button>
+      </div>
+      <p className="px-1 text-[10px] leading-4 text-obd-subtle">
+        Retrieval fuses knowledge chunks, indexed code, and durable memory. Hits
+        carry locators the assistant can cite.
+      </p>
+      {hits === null && (
+        <p className="px-1 py-2 text-[11px] text-obd-subtle">
+          Run a query to inspect what the project can retrieve.
+        </p>
+      )}
+      {hits !== null && hits.length === 0 && (
+        <p className="px-1 py-2 text-[11px] text-obd-subtle">No matches.</p>
+      )}
+      {hits?.map((hit) => (
+        <div
+          key={`${hit.source}-${hit.locator}`}
+          className="flex items-start gap-1 rounded-lg border border-obd-line bg-obd-raised pr-1 hover:border-obd-line hover:bg-obd-raised"
+        >
+        <button
+          type="button"
+          onClick={() => openHit(hit)}
+          className="block min-w-0 flex-1 p-2.5 text-left"
+        >
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`rounded px-1 py-0.5 text-[8px] uppercase tracking-wide ${
+                hit.source === "knowledge"
+                  ? "bg-obd-info/10 text-obd-info"
+                  : hit.source === "memory"
+                    ? "bg-obd-info/10 text-obd-info"
+                    : "bg-obd-accent/10 text-obd-accent"
+              }`}
+            >
+              {hit.source}
+            </span>
+            {hit.source === "code" ? (
+              <FileCode2 size={10} className="text-obd-subtle" />
+            ) : null}
+            <span className="truncate text-[10px] text-obd-body">{hit.title}</span>
+          </div>
+          <p className="mt-1 line-clamp-3 text-[10px] leading-4 text-obd-subtle">
+            {hit.snippet}
+          </p>
+          <p className="mt-1 truncate font-mono text-[8px] text-obd-subtle">
+            {hit.locator}
+          </p>
+        </button>
+        {hit.source === "code" && (
+          <RevealButton
+            workspacePath={workspacePath}
+            path={hit.locator.split("#")[0]}
+            label="Show retrieved file"
+          />
+        )}
+        </div>
+      ))}
+      {error !== null && <p className="text-[10px] text-obd-warning">{error}</p>}
+    </div>
+  );
+}
+
+function SearchField({
+  value,
+  onChange,
+  label,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+}) {
+  return (
+    <label className="flex items-center gap-2 rounded-md border border-obd-line bg-obd-inset px-2.5 py-1.5">
+      <Search size={11} className="shrink-0 text-obd-subtle" />
+      <input
+        type="search"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder="Filter knowledge"
+        aria-label={label}
+        className="min-w-0 flex-1 bg-transparent text-[10px] text-obd-body outline-none placeholder:text-obd-subtle"
+      />
+    </label>
+  );
+}
+
+function describeError(cause: unknown): string {
+  if (cause instanceof Error) {
+    return cause.message;
+  }
+  if (typeof cause === "string") {
+    return cause;
+  }
+  return "The project area request failed.";
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1_024) {
+    return `${bytes} B`;
+  }
+  if (bytes < 1_048_576) {
+    return `${(bytes / 1_024).toFixed(1)} KB`;
+  }
+  return `${(bytes / 1_048_576).toFixed(1)} MB`;
+}
