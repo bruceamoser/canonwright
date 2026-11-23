@@ -136,6 +136,15 @@ diverge without constraint and OpenBaD stays a general-purpose harness. The MIT
 licence and attribution are preserved in [`NOTICE`](NOTICE). See
 [ADR-010](docs/adr/010-copy-openbad-core-as-a-starting-point.md).
 
+## The screens
+
+The product's UX is designed before it is built, in
+[`design/`](design/README.md) — six screens in a FigCraft document, exported to
+PNG, with both themes specified. They are a **reference for the rebuild**: the
+desktop app is still the inherited shell.
+
+[![The six screens](design/contact-sheet.png)](design/README.md)
+
 ## Build & run
 
 ```sh
