@@ -6623,6 +6623,7 @@ pub fn run() {
             git::git_stage,
             git::git_unstage,
             git::git_commit,
+            git::git_tag,
             git::git_diff,
             git::git_log,
             services::services_status,

@@ -1383,6 +1383,16 @@ export async function gitCommit(
   return runGitCommand("git_commit", { workspacePath, repoPath, message, stageAll });
 }
 
+export async function gitTag(
+  workspacePath: string,
+  repoPath: string,
+  name: string,
+  message?: string | null,
+  push = false,
+): Promise<GitCommandResult> {
+  return runGitCommand("git_tag", { workspacePath, repoPath, name, message, push });
+}
+
 export async function gitDiff(
   workspacePath: string,
   repoPath: string,

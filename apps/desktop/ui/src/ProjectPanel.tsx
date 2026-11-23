@@ -1,3 +1,4 @@
+import SourceControlPanel from "./SourceControlPanel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import {
@@ -60,6 +61,7 @@ export type PanelTab =
   | "agents"
   | "pipeline"
   | "repos"
+  | "source"
   | "knowledge"
   | "retrieval"
   | "memory"
@@ -72,6 +74,7 @@ const panelTabs: { id: PanelTab; label: string }[] = [
   { id: "agents", label: "Agents" },
   { id: "pipeline", label: "Pipeline" },
   { id: "repos", label: "References" },
+  { id: "source", label: "Source" },
   { id: "knowledge", label: "Knowledge" },
   { id: "retrieval", label: "Retrieval" },
   { id: "memory", label: "Memory" },
@@ -549,6 +552,8 @@ export default function ProjectPanel(props: ProjectPanelProps) {
             <PipelinePanel workspacePath={workspacePath} revision={revision} />
           </div>
         )}
+
+        {tab === "source" && project && <SourceControlPanel project={project} />}
 
         {tab === "repos" && (
           <ReferencesPanel

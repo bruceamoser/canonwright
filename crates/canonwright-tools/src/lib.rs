@@ -1,6 +1,7 @@
 //! Tool registry, schemas, and built-in coding tools.
 #![recursion_limit = "256"]
 
+pub mod git_ops;
 pub mod story_project;
 pub mod story_tools;
 pub mod web_services;
@@ -1608,6 +1609,15 @@ impl ToolRegistry {
         registry.register(PreviewWriteTool);
         registry.register(AssertProjectTool);
         registry.register(GitCommitTool);
+        registry.register(git_ops::GitStageTool);
+        registry.register(git_ops::GitUnstageTool);
+        registry.register(git_ops::GitPushTool);
+        registry.register(git_ops::GitPullTool);
+        registry.register(git_ops::GitFetchTool);
+        registry.register(git_ops::GitMergeTool);
+        registry.register(git_ops::GitTagTool);
+        registry.register(git_ops::GitRemoteTool);
+        registry.register(git_ops::GitInitTool);
         registry.register(GitBranchTool);
         registry.register(GitCheckoutTool);
         registry.register(GitLogTool);
@@ -2565,7 +2575,9 @@ fn tool_domain(name: &str) -> &'static str {
         | "stat_repo_file" => "repos",
         "git_blame" | "git_branch" | "git_changes_since" | "git_checkout" | "git_commit"
         | "git_commit_context" | "git_diff" | "git_log" | "git_show" | "git_stash"
-        | "git_status" | "git_worktree" | "github" | "repo_health" => "git",
+        | "git_status" | "git_worktree" | "github" | "repo_health" | "git_stage"
+        | "git_unstage" | "git_push" | "git_pull" | "git_fetch" | "git_merge" | "git_tag"
+        | "git_remote" | "git_init" => "git",
         "run_command" | "run_tests" | "job_list" | "job_logs" | "job_start" | "job_status"
         | "job_stop" | "terminal" => "exec",
         "vault_exec" | "vault_list" => "vault",
@@ -2614,7 +2626,7 @@ fn tool_domain(name: &str) -> &'static str {
     }
 }
 
-fn string_arg(arguments: &Value, name: &str) -> Result<String, ToolError> {
+pub(crate) fn string_arg(arguments: &Value, name: &str) -> Result<String, ToolError> {
     arguments
         .get(name)
         .and_then(Value::as_str)
@@ -3036,7 +3048,7 @@ fn classify_command(command: &str) -> CommandClass {
     }
 }
 
-fn optional_bool(arguments: &Value, name: &str) -> Option<bool> {
+pub(crate) fn optional_bool(arguments: &Value, name: &str) -> Option<bool> {
     arguments.get(name).and_then(Value::as_bool)
 }
 
@@ -3123,7 +3135,10 @@ fn string_array_arg(arguments: &Value, name: &str, max: usize) -> Result<Vec<Str
         .collect()
 }
 
-fn string_array_arg_or_empty(arguments: &Value, name: &str) -> Result<Vec<String>, ToolError> {
+pub(crate) fn string_array_arg_or_empty(
+    arguments: &Value,
+    name: &str,
+) -> Result<Vec<String>, ToolError> {
     let Some(values) = arguments.get(name).and_then(Value::as_array) else {
         return Ok(Vec::new());
     };
@@ -7855,11 +7870,14 @@ fn preview_repo_path(context: &ToolContext, requested: Option<&str>) -> Result<P
     Ok(root.join(path))
 }
 
-fn sh_quote(value: &str) -> String {
+pub(crate) fn sh_quote(value: &str) -> String {
     format!("'{}'", value.replace('\'', "'\\''"))
 }
 
-async fn run_tool_shell(context: &ToolContext, command: String) -> Result<ToolResult, ToolError> {
+pub(crate) async fn run_tool_shell(
+    context: &ToolContext,
+    command: String,
+) -> Result<ToolResult, ToolError> {
     RunCommandTool
         .execute(json!({"command": command, "timeout_seconds": 300}), context)
         .await
@@ -22854,5 +22872,161 @@ invariants:
             .await
             .expect_err("unknown question");
         assert!(error.to_string().contains("favourite_colour"), "{error}");
+    }
+
+    fn git_context(jail: &Path) -> ToolContext {
+        let mut context = context(jail);
+        context.allow_commands = true;
+        context
+    }
+
+    fn git_init(jail: &Path) {
+        std::process::Command::new("git")
+            .args(["init", "-q", "-b", "main"])
+            .current_dir(jail)
+            .status()
+            .expect("git init");
+        for (key, value) in [("user.email", "t@example.com"), ("user.name", "Test")] {
+            std::process::Command::new("git")
+                .args(["config", key, value])
+                .current_dir(jail)
+                .status()
+                .expect("git config");
+        }
+    }
+
+    #[tokio::test]
+    async fn staging_and_unstaging_round_trip() {
+        let jail = tempdir().expect("tempdir");
+        git_init(jail.path());
+        fs::write(jail.path().join("chapter.md"), "The road was closed.\n").expect("write");
+        let context = git_context(jail.path());
+
+        git_ops::GitStageTool
+            .execute(json!({"all": true}), &context)
+            .await
+            .expect("stage");
+        let staged = std::process::Command::new("git")
+            .args(["diff", "--cached", "--name-only"])
+            .current_dir(jail.path())
+            .output()
+            .expect("status");
+        assert!(
+            String::from_utf8_lossy(&staged.stdout).contains("chapter.md"),
+            "the file should be staged"
+        );
+
+        git_ops::GitUnstageTool
+            .execute(json!({"all": true}), &context)
+            .await
+            .expect("unstage");
+        let after = std::process::Command::new("git")
+            .args(["diff", "--cached", "--name-only"])
+            .current_dir(jail.path())
+            .output()
+            .expect("status");
+        assert!(
+            String::from_utf8_lossy(&after.stdout).trim().is_empty(),
+            "the index should be empty again"
+        );
+    }
+
+    #[tokio::test]
+    async fn staging_with_no_paths_is_refused_rather_than_staging_everything() {
+        let jail = tempdir().expect("tempdir");
+        git_init(jail.path());
+        let context = git_context(jail.path());
+        let error = git_ops::GitStageTool
+            .execute(json!({}), &context)
+            .await
+            .expect_err("no paths and no all");
+        assert!(error.to_string().contains("all=true"), "{error}");
+    }
+
+    #[tokio::test]
+    async fn init_is_idempotent() {
+        let jail = tempdir().expect("tempdir");
+        let context = git_context(jail.path());
+
+        let first = git_ops::GitInitTool
+            .execute(json!({}), &context)
+            .await
+            .expect("init runs");
+        assert!(!first.is_error, "{}", first.content);
+
+        let second = git_ops::GitInitTool
+            .execute(json!({}), &context)
+            .await
+            .expect("init runs again");
+        assert!(
+            second.content.contains("already a repository"),
+            "{}",
+            second.content
+        );
+    }
+
+    #[tokio::test]
+    async fn remotes_can_be_added_listed_and_removed() {
+        let jail = tempdir().expect("tempdir");
+        git_init(jail.path());
+        let context = git_context(jail.path());
+
+        git_ops::GitRemoteTool
+            .execute(
+                json!({"action": "add", "name": "origin", "url": "https://example.com/a.git"}),
+                &context,
+            )
+            .await
+            .expect("add");
+        let listed = git_ops::GitRemoteTool
+            .execute(json!({"action": "list"}), &context)
+            .await
+            .expect("list");
+        assert!(
+            listed.content.contains("example.com/a.git"),
+            "{}",
+            listed.content
+        );
+
+        git_ops::GitRemoteTool
+            .execute(json!({"action": "remove", "name": "origin"}), &context)
+            .await
+            .expect("remove");
+        let empty = git_ops::GitRemoteTool
+            .execute(json!({"action": "list"}), &context)
+            .await
+            .expect("list");
+        assert!(!empty.content.contains("example.com"), "{}", empty.content);
+    }
+
+    #[tokio::test]
+    async fn a_tag_is_created_and_listed() {
+        let jail = tempdir().expect("tempdir");
+        git_init(jail.path());
+        fs::write(jail.path().join("a.md"), "x").expect("write");
+        let context = git_context(jail.path());
+        git_ops::GitStageTool
+            .execute(json!({"all": true}), &context)
+            .await
+            .expect("stage");
+        GitCommitTool
+            .execute(json!({"message": "first", "all": true}), &context)
+            .await
+            .expect("commit");
+
+        let tagged = git_ops::GitTagTool
+            .execute(
+                json!({"name": "draft-one", "message": "first draft"}),
+                &context,
+            )
+            .await
+            .expect("tag");
+        assert!(!tagged.is_error, "{}", tagged.content);
+
+        let listed = git_ops::GitTagTool
+            .execute(json!({"list": true}), &context)
+            .await
+            .expect("list");
+        assert!(listed.content.contains("draft-one"), "{}", listed.content);
     }
 }

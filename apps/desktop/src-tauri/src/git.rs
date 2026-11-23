@@ -775,6 +775,49 @@ pub async fn git_unstage(
 }
 
 #[tauri::command]
+pub async fn git_tag(
+    state: State<'_, AppState>,
+    workspace_path: String,
+    repo_path: String,
+    name: String,
+    message: Option<String>,
+    push: bool,
+) -> Result<GitCommandResult, String> {
+    let name = name.trim().to_owned();
+    if name.is_empty() {
+        return Err("tag name is required".to_owned());
+    }
+    validate_branch(&name)?;
+    let repo = checked_repo(&state, &workspace_path, &repo_path)?;
+    off_thread(move || {
+        let message = message
+            .map(|message| message.trim().to_owned())
+            .filter(|message| !message.is_empty())
+            .unwrap_or_else(|| name.clone());
+        let tagged = run_action(
+            &repo,
+            &[
+                "tag".to_owned(),
+                "-a".to_owned(),
+                name.clone(),
+                "-m".to_owned(),
+                message,
+            ],
+            GIT_PROBE_TIMEOUT,
+        )?;
+        if !tagged.ok || !push {
+            return Ok(tagged);
+        }
+        run_action(
+            &repo,
+            &["push".to_owned(), "origin".to_owned(), name],
+            GIT_NETWORK_TIMEOUT,
+        )
+    })
+    .await
+}
+
+#[tauri::command]
 pub async fn git_commit(
     state: State<'_, AppState>,
     workspace_path: String,
