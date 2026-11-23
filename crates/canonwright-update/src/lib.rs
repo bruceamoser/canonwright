@@ -416,6 +416,36 @@ impl UpdateService {
         }
     }
 
+    /// Whether anyone can see the repository, asked without a token.
+    ///
+    /// A 404 here means private or nonexistent; either way an anonymous caller
+    /// cannot read its releases.
+    fn repo_is_public(&self) -> Result<bool, UpdateError> {
+        let url = format!(
+            "{}/repos/{}",
+            self.api_base.trim_end_matches('/'),
+            self.repo
+        );
+        if !secure_url(&url) {
+            return Err(UpdateError::Network(format!(
+                "refusing to query an insecure update endpoint: {url}"
+            )));
+        }
+        let response = self
+            .client()?
+            .get(&url)
+            .header("Accept", "application/vnd.github+json")
+            .send()
+            .map_err(|error| UpdateError::Network(error.to_string()))?;
+        if !response.status().is_success() {
+            return Ok(false);
+        }
+        let body: Value = response
+            .json()
+            .map_err(|error| UpdateError::Network(error.to_string()))?;
+        Ok(body.get("private").and_then(Value::as_bool) == Some(false))
+    }
+
     fn latest_release(&self) -> Result<Option<Value>, UpdateError> {
         let url = format!(
             "{}/repos/{}/releases/latest",
@@ -439,10 +469,12 @@ impl UpdateService {
             .map_err(|error| UpdateError::Network(error.to_string()))?;
         if response.status() == reqwest::StatusCode::NOT_FOUND {
             // A private repository hides itself from anonymous callers, so the
-            // same 404 means "no release" to a token and "you cannot see this"
-            // to anyone else. Guessing "up to date" here is what made 0.2.0
-            // invisible after it shipped.
-            return if self.token.is_some() {
+            // same 404 means "no release" and "you cannot see this". Ask which
+            // one this repository is rather than guessing: on a public repo a
+            // 404 really does mean there is no release, and reporting
+            // NeedsAuth there would be just as wrong as reporting UpToDate on
+            // a private one.
+            return if self.token.is_some() || self.repo_is_public()? {
                 Ok(None)
             } else {
                 Err(UpdateError::NeedsAuth)
@@ -1136,6 +1168,30 @@ mod tests {
         format!("http://127.0.0.1:{}", address.port())
     }
 
+    /// Answers each request in order, so a test can exercise a path that asks
+    /// twice (release, then "is this repo public?").
+    fn serve_replies(replies: Vec<(&'static str, String)>) -> String {
+        use std::io::{Read, Write};
+        use std::net::TcpListener;
+
+        let listener = TcpListener::bind("127.0.0.1:0").expect("listener");
+        let address = listener.local_addr().expect("address");
+        std::thread::spawn(move || {
+            for (status, body) in replies {
+                if let Ok((mut stream, _)) = listener.accept() {
+                    let mut buffer = [0_u8; 2048];
+                    let _ = stream.read(&mut buffer);
+                    let response = format!(
+                        "HTTP/1.1 {status}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                        body.len()
+                    );
+                    let _ = stream.write_all(response.as_bytes());
+                }
+            }
+        });
+        format!("http://127.0.0.1:{}", address.port())
+    }
+
     #[test]
     fn an_anonymous_404_asks_for_a_token_instead_of_claiming_up_to_date() {
         // A private repository answers 404 to callers without a token. Treating
@@ -1169,23 +1225,36 @@ mod tests {
 
     #[test]
     fn missing_release_is_reported_as_no_release() {
-        // The same 404 means two different things depending on whether we asked
-        // as a caller who can see private repositories.
-        let api_base = serve_once("404 Not Found", String::new());
+        // Three cases, one status code, because 404 means different things to
+        // callers who can and cannot see the repository.
+        let private = serve_replies(vec![
+            ("404 Not Found", String::new()),
+            ("404 Not Found", String::new()),
+        ]);
         let anonymous = UpdateService::new(DEFAULT_REPO)
-            .with_api_base(api_base)
+            .with_api_base(private)
             .with_target(linux_x64());
         assert!(matches!(
-            anonymous.check("0.2.0"),
+            anonymous.check("0.2.1"),
             Err(UpdateError::NeedsAuth)
         ));
+
+        let public = serve_replies(vec![
+            ("404 Not Found", String::new()),
+            ("200 OK", r#"{"private": false}"#.to_owned()),
+        ]);
+        let anonymous_public = UpdateService::new(DEFAULT_REPO)
+            .with_api_base(public)
+            .with_target(linux_x64());
+        let status = anonymous_public.check("0.2.1").expect("check");
+        assert!(matches!(status, UpdateStatus::NoRelease { .. }));
 
         let api_base = serve_once("404 Not Found", String::new());
         let authenticated = UpdateService::new(DEFAULT_REPO)
             .with_api_base(api_base)
             .with_token(Some("ghp_example".to_owned()))
             .with_target(linux_x64());
-        let status = authenticated.check("0.2.0").expect("check");
+        let status = authenticated.check("0.2.1").expect("check");
         assert!(matches!(status, UpdateStatus::NoRelease { .. }));
     }
 
