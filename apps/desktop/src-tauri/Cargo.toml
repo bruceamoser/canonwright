@@ -1,5 +1,5 @@
 [package]
-name = "openbad-desktop"
+name = "canonwright-desktop"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -7,12 +7,12 @@ license.workspace = true
 authors.workspace = true
 
 [lib]
-name = "openbad_desktop_lib"
+name = "canonwright_desktop_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [features]
 default = ["keyring"]
-keyring = ["openbad-governance/keyring"]
+keyring = ["canonwright-governance/keyring"]
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
@@ -27,21 +27,21 @@ blake3 = "1"
 serde = { workspace = true }
 serde_json = { workspace = true }
 uuid = { workspace = true }
-openbad-core = { path = "../../../crates/openbad-core" }
-openbad-store = { path = "../../../crates/openbad-store" }
-openbad-pipeline = { path = "../../../crates/openbad-pipeline" }
-openbad-agent = { path = "../../../crates/openbad-agent" }
-openbad-harness = { path = "../../../crates/openbad-harness" }
-openbad-llm = { path = "../../../crates/openbad-llm" }
-openbad-tools = { path = "../../../crates/openbad-tools" }
-openbad-lsp = { path = "../../../crates/openbad-lsp" }
-openbad-mcp = { path = "../../../crates/openbad-mcp" }
-openbad-transfer = { path = "../../../crates/openbad-transfer" }
-openbad-update = { path = "../../../crates/openbad-update" }
-openbad-terminal = { path = "../../../crates/openbad-terminal" }
-openbad-workspace = { path = "../../../crates/openbad-workspace" }
-openbad-index = { path = "../../../crates/openbad-index" }
-openbad-governance = { path = "../../../crates/openbad-governance" }
+canonwright-core = { path = "../../../crates/canonwright-core" }
+canonwright-store = { path = "../../../crates/canonwright-store" }
+canonwright-pipeline = { path = "../../../crates/canonwright-pipeline" }
+canonwright-agent = { path = "../../../crates/canonwright-agent" }
+canonwright-harness = { path = "../../../crates/canonwright-harness" }
+canonwright-llm = { path = "../../../crates/canonwright-llm" }
+canonwright-tools = { path = "../../../crates/canonwright-tools" }
+canonwright-lsp = { path = "../../../crates/canonwright-lsp" }
+canonwright-mcp = { path = "../../../crates/canonwright-mcp" }
+canonwright-transfer = { path = "../../../crates/canonwright-transfer" }
+canonwright-update = { path = "../../../crates/canonwright-update" }
+canonwright-terminal = { path = "../../../crates/canonwright-terminal" }
+canonwright-workspace = { path = "../../../crates/canonwright-workspace" }
+canonwright-index = { path = "../../../crates/canonwright-index" }
+canonwright-governance = { path = "../../../crates/canonwright-governance" }
 similar = "2"
 base64 = "0.22"
 async-trait = "0.1"

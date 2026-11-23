@@ -1,4 +1,4 @@
-# SearXNG configuration for the local OpenBaD instance.
+# SearXNG configuration for the local Canonwright instance.
 #
 # `web_search` needs the JSON output format; SearXNG enables only HTML by
 # default, and its limiter blocks programmatic clients. Both are changed here.
@@ -10,7 +10,7 @@
 use_default_settings: true
 
 general:
-  instance_name: "OpenBaD"
+  instance_name: "Canonwright"
 
 search:
   safe_search: 1
@@ -19,6 +19,6 @@ search:
     - json
 
 server:
-  secret_key: "openbad-local-loopback-only"
+  secret_key: "canonwright-local-loopback-only"
   limiter: false
   image_proxy: false

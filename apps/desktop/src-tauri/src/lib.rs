@@ -15,29 +15,29 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use base64::Engine as _;
-use openbad_agent::{
+use canonwright_agent::{
     AgentConfig, AgentError, AgentObserver, ApprovalGate, AttemptFailure, CompactionRecord, Inbox,
     StepOutcome, StepSettlement, ToolStatus, default_agent,
 };
-use openbad_core::event::{NewEvent, SessionEventKind};
-use openbad_core::{SessionId, WorkspaceId};
+use canonwright_core::event::{NewEvent, SessionEventKind};
+use canonwright_core::{SessionId, WorkspaceId};
 #[cfg(feature = "keyring")]
-use openbad_governance::secrets::KeychainSecretStore;
+use canonwright_governance::secrets::KeychainSecretStore;
 #[cfg(not(feature = "keyring"))]
-use openbad_governance::secrets::MemorySecretStore;
-use openbad_governance::secrets::{Secret, SecretStore};
-use openbad_governance::{ApprovalDecision, ApprovalRequest, ToolPolicy};
-use openbad_harness::{ReasoningEffort, RequestEnvelope};
-use openbad_index::{IndexReport, WorkspaceIndexer};
-use openbad_llm::chat::{ChatMessage, ChatRole, ToolCall};
-use openbad_llm::{DeepSeekClient, FLASH_MODEL, ReqwestTransport, UsageTotals};
-use openbad_store::Store;
-use openbad_store::types::{
+use canonwright_governance::secrets::MemorySecretStore;
+use canonwright_governance::secrets::{Secret, SecretStore};
+use canonwright_governance::{ApprovalDecision, ApprovalRequest, ToolPolicy};
+use canonwright_harness::{ReasoningEffort, RequestEnvelope};
+use canonwright_index::{IndexReport, WorkspaceIndexer};
+use canonwright_llm::chat::{ChatMessage, ChatRole, ToolCall};
+use canonwright_llm::{DeepSeekClient, FLASH_MODEL, ReqwestTransport, UsageTotals};
+use canonwright_store::Store;
+use canonwright_store::types::{
     AuditReport, DoctorReport, KnowledgeDocument, KnowledgeDocumentSummary, ModelRouteRecord,
     NewModelRoute, NewProvider, ProjectHit, ProjectOverview, ProjectRepo, ProviderRecord,
     SessionMessage, SessionSummary, SubagentRecord, SubagentUpdate,
 };
-use openbad_tools::{
+use canonwright_tools::{
     CheckpointSink, KnowledgeDocumentRef, KnowledgeEntryRef, LspLocation as ToolLspLocation,
     LspService, McpServerChange, McpServerSpec, McpServerSummary, McpService, McpToolSummary,
     MemoryStore, OutsideGrant, ProjectAreas, ProjectRepoRef, QuestionAnswer, QuestionGate,
@@ -45,7 +45,7 @@ use openbad_tools::{
     SessionReads, SubagentInfo, SubagentRuntime, SubagentSpec, TerminalRead, TerminalService,
     WorkspaceSearch, new_session_reads,
 };
-use openbad_workspace::WorkspaceService;
+use canonwright_workspace::WorkspaceService;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use tauri::ipc::Channel;
@@ -53,7 +53,7 @@ use tauri::{Emitter, Manager, State};
 use tauri_plugin_notification::{NotificationExt, PermissionState};
 use uuid::Uuid;
 
-const API_KEY_REFERENCE: &str = "openbad/deepseek/api_key";
+const API_KEY_REFERENCE: &str = "canonwright/deepseek/api_key";
 const USER_ID_SETTING: &str = "install_user_id";
 const DEFAULT_SUBAGENT_RETENTION_SECONDS: i64 = 60;
 
@@ -78,7 +78,7 @@ pub fn now_millis() -> i64 {
 }
 
 fn subagent_retention_ms() -> i64 {
-    std::env::var("OPENBAD_SUBAGENT_RETENTION_SECONDS")
+    std::env::var("CANONWRIGHT_SUBAGENT_RETENTION_SECONDS")
         .ok()
         .and_then(|value| value.parse::<i64>().ok())
         .filter(|seconds| *seconds >= 0)
@@ -97,7 +97,7 @@ pub struct AppState {
     /// In-flight approval prompts, keyed by request id.
     pending_approvals: Arc<Mutex<HashMap<Uuid, std::sync::mpsc::Sender<ApprovalDecision>>>>,
     subagent_cancels: Arc<Mutex<HashMap<String, Arc<AtomicBool>>>>,
-    terminal: Arc<openbad_terminal::TerminalManager>,
+    terminal: Arc<canonwright_terminal::TerminalManager>,
     mcp: McpManagers,
     /// Reads recorded per session, so a file read in one turn does not have to
     /// be read again by the next one while it is unchanged.
@@ -111,7 +111,7 @@ pub struct AppState {
     /// Cancellation flags for tickets whose pipeline executor is running.
     pipeline_runs: Arc<Mutex<HashMap<String, Arc<AtomicBool>>>>,
     /// Execution slots per project, so concurrent tickets respect `execution.slots`.
-    pipeline_slots: Arc<Mutex<HashMap<WorkspaceId, openbad_pipeline::execution::Slots>>>,
+    pipeline_slots: Arc<Mutex<HashMap<WorkspaceId, canonwright_pipeline::execution::Slots>>>,
     /// Projects being watched, keyed by their path, with the flag that stops them.
     pipeline_watchers: Arc<Mutex<HashMap<String, Arc<AtomicBool>>>>,
 }
@@ -326,11 +326,11 @@ fn steer_registered_run(
 /// subagents observe the same server processes and configuration.
 #[derive(Default)]
 struct McpManagers {
-    managers: Mutex<HashMap<PathBuf, Arc<openbad_mcp::McpManager>>>,
+    managers: Mutex<HashMap<PathBuf, Arc<canonwright_mcp::McpManager>>>,
 }
 
 impl McpManagers {
-    fn get(&self, root: &Path) -> Result<Arc<openbad_mcp::McpManager>, String> {
+    fn get(&self, root: &Path) -> Result<Arc<canonwright_mcp::McpManager>, String> {
         let mut managers = self
             .managers
             .lock()
@@ -339,7 +339,7 @@ impl McpManagers {
             return Ok(Arc::clone(manager));
         }
         let manager = Arc::new(
-            openbad_mcp::McpManager::new(root)
+            canonwright_mcp::McpManager::new(root)
                 .map_err(|error| format!("could not load MCP configuration: {error}"))?,
         );
         managers.insert(root.to_path_buf(), Arc::clone(&manager));
@@ -425,7 +425,7 @@ impl MemoryStore for WorkspaceMemory {
         content: &str,
         tags: Vec<String>,
         pinned: bool,
-    ) -> Result<openbad_tools::MemoryEntry, String> {
+    ) -> Result<canonwright_tools::MemoryEntry, String> {
         let store = self
             .store
             .lock()
@@ -441,8 +441,8 @@ impl MemoryStore for WorkspaceMemory {
         content: &str,
         tags: Vec<String>,
         pinned: bool,
-        options: openbad_tools::MemoryWriteOptions,
-    ) -> Result<openbad_tools::MemoryEntry, String> {
+        options: canonwright_tools::MemoryWriteOptions,
+    ) -> Result<canonwright_tools::MemoryEntry, String> {
         let store = self
             .store
             .lock()
@@ -471,7 +471,7 @@ impl MemoryStore for WorkspaceMemory {
         tags: Option<Vec<String>>,
         pinned: Option<bool>,
         scope: Option<&str>,
-    ) -> Result<openbad_tools::MemoryEntry, String> {
+    ) -> Result<canonwright_tools::MemoryEntry, String> {
         let store = self
             .store
             .lock()
@@ -494,7 +494,7 @@ impl MemoryStore for WorkspaceMemory {
         &self,
         query: Option<&str>,
         limit: usize,
-    ) -> Result<Vec<openbad_tools::MemoryEntry>, String> {
+    ) -> Result<Vec<canonwright_tools::MemoryEntry>, String> {
         let store = self
             .store
             .lock()
@@ -708,7 +708,7 @@ impl ProjectAreas for StoreProjectAreas {
         &self,
         query: &str,
         limit: usize,
-    ) -> Result<Vec<openbad_tools::ProjectHit>, String> {
+    ) -> Result<Vec<canonwright_tools::ProjectHit>, String> {
         let store = self
             .store
             .lock()
@@ -718,7 +718,7 @@ impl ProjectAreas for StoreProjectAreas {
             .map_err(|error| error.to_string())
             .map(|hits| {
                 hits.into_iter()
-                    .map(|hit| openbad_tools::ProjectHit {
+                    .map(|hit| canonwright_tools::ProjectHit {
                         source: hit.source,
                         title: hit.title,
                         snippet: hit.snippet,
@@ -730,8 +730,8 @@ impl ProjectAreas for StoreProjectAreas {
     }
 }
 
-fn memory_entry(memory: openbad_store::types::MemoryRecord) -> openbad_tools::MemoryEntry {
-    openbad_tools::MemoryEntry {
+fn memory_entry(memory: canonwright_store::types::MemoryRecord) -> canonwright_tools::MemoryEntry {
+    canonwright_tools::MemoryEntry {
         id: memory.id,
         content: memory.content,
         tags: memory.tags,
@@ -790,24 +790,24 @@ fn knowledge_document_ref(document: KnowledgeDocument) -> KnowledgeDocumentRef {
 }
 
 struct DesktopLsp {
-    manager: Result<Arc<openbad_lsp::LspManager>, String>,
+    manager: Result<Arc<canonwright_lsp::LspManager>, String>,
 }
 
 impl DesktopLsp {
     fn new(root: PathBuf) -> Self {
         Self {
-            manager: openbad_lsp::LspManager::new(root)
+            manager: canonwright_lsp::LspManager::new(root)
                 .map(Arc::new)
                 .map_err(|error| error.to_string()),
         }
     }
 
-    fn manager(&self) -> Result<Arc<openbad_lsp::LspManager>, String> {
+    fn manager(&self) -> Result<Arc<canonwright_lsp::LspManager>, String> {
         self.manager.as_ref().map(Arc::clone).map_err(Clone::clone)
     }
 }
 
-fn tool_locations(locations: Vec<openbad_lsp::LspLocation>) -> Vec<ToolLspLocation> {
+fn tool_locations(locations: Vec<canonwright_lsp::LspLocation>) -> Vec<ToolLspLocation> {
     locations
         .into_iter()
         .map(|location| ToolLspLocation {
@@ -888,21 +888,21 @@ impl LspService for DesktopLsp {
 }
 
 struct DesktopMcp {
-    manager: Arc<openbad_mcp::McpManager>,
+    manager: Arc<canonwright_mcp::McpManager>,
 }
 
 impl DesktopMcp {
-    fn new(manager: Arc<openbad_mcp::McpManager>) -> Self {
+    fn new(manager: Arc<canonwright_mcp::McpManager>) -> Self {
         Self { manager }
     }
 }
 
-fn mcp_server_summary(state: &openbad_mcp::McpServerState) -> McpServerSummary {
+fn mcp_server_summary(state: &canonwright_mcp::McpServerState) -> McpServerSummary {
     McpServerSummary {
         name: state.config.name.clone(),
         transport: match state.config.transport {
-            openbad_mcp::McpTransport::Stdio => "stdio".to_owned(),
-            openbad_mcp::McpTransport::Http => "http".to_owned(),
+            canonwright_mcp::McpTransport::Stdio => "stdio".to_owned(),
+            canonwright_mcp::McpTransport::Http => "http".to_owned(),
         },
         command: state.config.command.clone(),
         args: state.config.args.clone(),
@@ -914,7 +914,7 @@ fn mcp_server_summary(state: &openbad_mcp::McpServerState) -> McpServerSummary {
     }
 }
 
-fn mcp_tool_summary(tool: openbad_mcp::McpToolInfo) -> McpToolSummary {
+fn mcp_tool_summary(tool: canonwright_mcp::McpToolInfo) -> McpToolSummary {
     McpToolSummary {
         server: tool.server,
         name: tool.name,
@@ -924,23 +924,23 @@ fn mcp_tool_summary(tool: openbad_mcp::McpToolInfo) -> McpToolSummary {
 
 fn mcp_server_config_from_spec(
     spec: &McpServerSpec,
-    base: Option<openbad_mcp::McpServerConfig>,
-) -> Result<openbad_mcp::McpServerConfig, String> {
+    base: Option<canonwright_mcp::McpServerConfig>,
+) -> Result<canonwright_mcp::McpServerConfig, String> {
     let creating = base.is_none();
     let mut config =
-        base.unwrap_or_else(|| openbad_mcp::McpServerConfig::stdio(spec.name.clone(), ""));
+        base.unwrap_or_else(|| canonwright_mcp::McpServerConfig::stdio(spec.name.clone(), ""));
     config.name = spec.name.clone();
     if let Some(transport) = spec.transport.as_deref() {
         config.transport = match transport.to_ascii_lowercase().as_str() {
-            "stdio" => openbad_mcp::McpTransport::Stdio,
-            "http" => openbad_mcp::McpTransport::Http,
+            "stdio" => canonwright_mcp::McpTransport::Stdio,
+            "http" => canonwright_mcp::McpTransport::Http,
             other => return Err(format!("unsupported MCP transport: {other}")),
         };
     } else if creating {
         config.transport = if spec.command.is_none() && spec.url.is_some() {
-            openbad_mcp::McpTransport::Http
+            canonwright_mcp::McpTransport::Http
         } else {
-            openbad_mcp::McpTransport::Stdio
+            canonwright_mcp::McpTransport::Stdio
         };
     }
     if let Some(command) = &spec.command {
@@ -971,7 +971,7 @@ fn mcp_server_config_from_spec(
 }
 
 fn probe_mcp_server(
-    manager: &openbad_mcp::McpManager,
+    manager: &canonwright_mcp::McpManager,
     name: &str,
 ) -> (Vec<McpToolSummary>, Option<String>) {
     match manager.probe(name) {
@@ -1126,7 +1126,7 @@ impl McpService for DesktopMcp {
 }
 
 struct DesktopTerminal {
-    manager: Arc<openbad_terminal::TerminalManager>,
+    manager: Arc<canonwright_terminal::TerminalManager>,
 }
 
 #[async_trait::async_trait]
@@ -1201,8 +1201,8 @@ struct SubagentSettings {
     base_url: String,
     user_id: String,
     grants: Vec<OutsideGrant>,
-    terminal: Arc<openbad_terminal::TerminalManager>,
-    mcp: Arc<openbad_mcp::McpManager>,
+    terminal: Arc<canonwright_terminal::TerminalManager>,
+    mcp: Arc<canonwright_mcp::McpManager>,
     /// The parent turn's policy. A child inherits it, so delegating cannot
     /// turn "ask before writes" into "write freely".
     policy: ToolPolicy,
@@ -1386,7 +1386,7 @@ impl AgentObserver for SubagentObserver {
         );
     }
 
-    fn on_tool_call(&self, step: u32, call: &openbad_llm::chat::ToolCall) {
+    fn on_tool_call(&self, step: u32, call: &canonwright_llm::chat::ToolCall) {
         let args = truncate_for_ui(&call.function.arguments);
         update_subagent_record(
             &self.store,
@@ -1404,7 +1404,7 @@ impl AgentObserver for SubagentObserver {
     fn on_tool_result(
         &self,
         step: u32,
-        call: &openbad_llm::chat::ToolCall,
+        call: &canonwright_llm::chat::ToolCall,
         content: &str,
         is_error: bool,
         _metadata: &Value,
@@ -1535,7 +1535,7 @@ async fn run_subagent(
         events: settings.events.clone(),
     };
     let prompt = format!(
-        "You are a directed subagent spawned by the main OpenBaD agent. Work only on the task below. You share the parent workspace and access mode, cannot spawn further subagents, and must not ask the user questions. Use tools as needed, verify your work, and finish with a concise report covering what changed, what you checked, and any remaining risk.\n\nTask:\n{}",
+        "You are a directed subagent spawned by the main Canonwright agent. Work only on the task below. You share the parent workspace and access mode, cannot spawn further subagents, and must not ask the user questions. Use tools as needed, verify your work, and finish with a concise report covering what changed, what you checked, and any remaining risk.\n\nTask:\n{}",
         spec.task
     );
     let outcome = agent
@@ -1600,7 +1600,7 @@ impl WorkspaceSearch for StoreSearch {
         &self,
         query: &str,
         limit: usize,
-    ) -> Result<Vec<openbad_tools::WorkspaceSearchHit>, String> {
+    ) -> Result<Vec<canonwright_tools::WorkspaceSearchHit>, String> {
         let store = self
             .store
             .lock()
@@ -1610,7 +1610,7 @@ impl WorkspaceSearch for StoreSearch {
             .map_err(|error| error.to_string())?;
         Ok(hits
             .into_iter()
-            .map(|hit| openbad_tools::WorkspaceSearchHit {
+            .map(|hit| canonwright_tools::WorkspaceSearchHit {
                 path: hit.path,
                 snippet: hit.snippet,
             })
@@ -1622,7 +1622,7 @@ impl WorkspaceSearch for StoreSearch {
         query: &str,
         kind: Option<&str>,
         limit: usize,
-    ) -> Result<Vec<openbad_tools::WorkspaceSymbolHit>, String> {
+    ) -> Result<Vec<canonwright_tools::WorkspaceSymbolHit>, String> {
         let store = self
             .store
             .lock()
@@ -1632,7 +1632,7 @@ impl WorkspaceSearch for StoreSearch {
             .map_err(|error| error.to_string())?;
         Ok(hits
             .into_iter()
-            .map(|hit| openbad_tools::WorkspaceSymbolHit {
+            .map(|hit| canonwright_tools::WorkspaceSymbolHit {
                 path: hit.path,
                 name: hit.name,
                 kind: hit.kind,
@@ -1869,7 +1869,7 @@ impl AgentObserver for ChannelObserver {
     fn on_tool_status(
         &self,
         step: u32,
-        call: &openbad_llm::chat::ToolCall,
+        call: &canonwright_llm::chat::ToolCall,
         status: ToolStatus,
         duration_ms: Option<u64>,
     ) {
@@ -1995,7 +1995,7 @@ impl AgentObserver for ChannelObserver {
         });
     }
 
-    fn on_tool_call(&self, step: u32, call: &openbad_llm::chat::ToolCall) {
+    fn on_tool_call(&self, step: u32, call: &canonwright_llm::chat::ToolCall) {
         let _ = self.channel.send(AgentEvent::ToolCall {
             step,
             call_id: call.id.clone(),
@@ -2007,7 +2007,7 @@ impl AgentObserver for ChannelObserver {
     fn on_tool_result(
         &self,
         step: u32,
-        call: &openbad_llm::chat::ToolCall,
+        call: &canonwright_llm::chat::ToolCall,
         content: &str,
         is_error: bool,
         metadata: &Value,
@@ -2373,12 +2373,12 @@ pub struct ProjectAreaCounts {
 #[tauri::command]
 fn project_manifest(
     workspace_path: String,
-) -> Result<Option<openbad_workspace::ProjectManifest>, String> {
+) -> Result<Option<canonwright_workspace::ProjectManifest>, String> {
     let root = PathBuf::from(&workspace_path);
     if !root.is_dir() {
         return Err(format!("workspace is not a directory: {workspace_path}"));
     }
-    openbad_workspace::load_project_manifest(&root).map_err(|error| error.to_string())
+    canonwright_workspace::load_project_manifest(&root).map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -2388,19 +2388,20 @@ async fn project_todos(workspace_path: String) -> Result<Vec<ProjectTodo>, Strin
 
 fn read_project_todos(workspace_path: String) -> Result<Vec<ProjectTodo>, String> {
     let path = PathBuf::from(&workspace_path)
-        .join(".openbad")
+        .join(".canonwright")
         .join("todos.json");
     if !path.is_file() {
         return Ok(Vec::new());
     }
     let content = std::fs::read_to_string(&path).map_err(|error| error.to_string())?;
-    serde_json::from_str(&content).map_err(|error| format!("invalid .openbad/todos.json: {error}"))
+    serde_json::from_str(&content)
+        .map_err(|error| format!("invalid .canonwright/todos.json: {error}"))
 }
 
 /// Warns when an imported project enables MCP servers this machine has not
 /// defined globally.
 fn mcp_transfer_warnings(state: &AppState, workspace_root: &Path) -> Vec<String> {
-    let Ok(project) = openbad_mcp::McpProjectConfig::load(workspace_root) else {
+    let Ok(project) = canonwright_mcp::McpProjectConfig::load(workspace_root) else {
         return Vec::new();
     };
     if project.enabled.is_empty() {
@@ -2439,7 +2440,7 @@ async fn export_project(
     state: State<'_, AppState>,
     workspace_path: String,
     destination: String,
-) -> Result<openbad_transfer::ExportReport, String> {
+) -> Result<canonwright_transfer::ExportReport, String> {
     let store = Arc::clone(&state.store);
     let version = app.package_info().version.to_string();
     tauri::async_runtime::spawn_blocking(move || {
@@ -2447,7 +2448,7 @@ async fn export_project(
             .lock()
             .map_err(|error| format!("store lock poisoned: {error}"))?;
         let workspace = project_workspace(&store, &workspace_path)?;
-        openbad_transfer::export_project(&store, workspace, Path::new(&destination), &version)
+        canonwright_transfer::export_project(&store, workspace, Path::new(&destination), &version)
             .map_err(|error| error.to_string())
     })
     .await
@@ -2460,11 +2461,11 @@ async fn import_project(
     state: State<'_, AppState>,
     bundle_path: String,
     destination_parent: String,
-) -> Result<openbad_transfer::ImportReport, String> {
-    let manifest = openbad_transfer::bundle_manifest(Path::new(&bundle_path))
+) -> Result<canonwright_transfer::ImportReport, String> {
+    let manifest = canonwright_transfer::bundle_manifest(Path::new(&bundle_path))
         .map_err(|error| error.to_string())?;
     let destination = PathBuf::from(&destination_parent).join(
-        openbad_transfer::safe_project_directory_name(&manifest.project_name),
+        canonwright_transfer::safe_project_directory_name(&manifest.project_name),
     );
     let store = Arc::clone(&state.store);
     let bundle_for_import = bundle_path.clone();
@@ -2473,7 +2474,7 @@ async fn import_project(
         let store = store
             .lock()
             .map_err(|error| format!("store lock poisoned: {error}"))?;
-        openbad_transfer::import_project(
+        canonwright_transfer::import_project(
             &store,
             Path::new(&bundle_for_import),
             &destination_for_import,
@@ -2495,7 +2496,7 @@ async fn import_project_into(
     state: State<'_, AppState>,
     workspace_path: String,
     bundle_path: String,
-) -> Result<openbad_transfer::ImportReport, String> {
+) -> Result<canonwright_transfer::ImportReport, String> {
     let store = Arc::clone(&state.store);
     let workspace_for_import = workspace_path.clone();
     let mut report = tauri::async_runtime::spawn_blocking(move || {
@@ -2503,7 +2504,7 @@ async fn import_project_into(
             .lock()
             .map_err(|error| format!("store lock poisoned: {error}"))?;
         let workspace = project_workspace(&store, &workspace_for_import)?;
-        openbad_transfer::import_project_merge(&store, workspace, Path::new(&bundle_path))
+        canonwright_transfer::import_project_merge(&store, workspace, Path::new(&bundle_path))
             .map_err(|error| error.to_string())
     })
     .await
@@ -2546,14 +2547,14 @@ fn project_area_counts_payload(
         .list_subagents(workspace, 200)
         .map_err(|error| error.to_string())?;
     let todos: Vec<ProjectTodo> = {
-        let path = root.join(".openbad").join("todos.json");
+        let path = root.join(".canonwright").join("todos.json");
         match std::fs::read_to_string(path) {
             Ok(content) => serde_json::from_str(&content).unwrap_or_default(),
             Err(_) => Vec::new(),
         }
     };
-    let questions = openbad_workspace::load_questions(&root).unwrap_or_default();
-    let plan = openbad_workspace::load_plan(&root).ok().flatten();
+    let questions = canonwright_workspace::load_questions(&root).unwrap_or_default();
+    let plan = canonwright_workspace::load_plan(&root).ok().flatten();
     let todos_open = todos
         .iter()
         .filter(|todo| todo.state != "done" && todo.state != "dropped")
@@ -2602,7 +2603,7 @@ fn project_area_counts_payload(
 /// Derived from rows rather than tracked, so the sidebar cannot drift from the
 /// panel it mirrors.
 fn pipeline_area_counts(store: &Store, workspace: WorkspaceId) -> Result<(u64, u64), String> {
-    use openbad_pipeline::stage::{StageInput, stage_of};
+    use canonwright_pipeline::stage::{StageInput, stage_of};
 
     let tickets = store
         .list_pipeline_tickets(workspace, 500)
@@ -2629,7 +2630,7 @@ fn pipeline_area_counts(store: &Store, workspace: WorkspaceId) -> Result<(u64, u
         if stage.needs_a_person() {
             needs_person += 1;
         }
-        if stage == openbad_pipeline::stage::Stage::Working {
+        if stage == canonwright_pipeline::stage::Stage::Working {
             working += 1;
         }
     }
@@ -2739,7 +2740,7 @@ fn set_project_repo_read_only(
 fn outside_access_grants(
     state: State<'_, AppState>,
     workspace_path: String,
-) -> Result<Vec<openbad_store::types::OutsideAccessGrant>, String> {
+) -> Result<Vec<canonwright_store::types::OutsideAccessGrant>, String> {
     let store = state
         .store
         .lock()
@@ -2782,11 +2783,11 @@ fn grant_outside_access(
     path: String,
     write_access: bool,
     reason: String,
-) -> Result<openbad_store::types::OutsideAccessGrant, String> {
+) -> Result<canonwright_store::types::OutsideAccessGrant, String> {
     let path = canonical_grant_path(&path)?;
     let reason = reason.trim();
     let reason = if reason.is_empty() {
-        "granted from the OpenBaD access prompt"
+        "granted from the Canonwright access prompt"
     } else {
         reason
     };
@@ -2859,7 +2860,7 @@ fn knowledge_documents(
 fn project_plan(
     state: State<'_, AppState>,
     workspace_path: String,
-) -> Result<Option<openbad_workspace::Plan>, String> {
+) -> Result<Option<canonwright_workspace::Plan>, String> {
     let path = PathBuf::from(&workspace_path);
     if !path.is_dir() {
         return Err(format!("workspace is not a directory: {workspace_path}"));
@@ -2871,14 +2872,14 @@ fn project_plan(
     store
         .ensure_workspace(workspace_name(&path), &workspace_path)
         .map_err(|error| error.to_string())?;
-    openbad_workspace::load_plan(&path).map_err(|error| error.to_string())
+    canonwright_workspace::load_plan(&path).map_err(|error| error.to_string())
 }
 
 #[tauri::command]
 fn approve_project_plan(
     state: State<'_, AppState>,
     workspace_path: String,
-) -> Result<openbad_workspace::Plan, String> {
+) -> Result<canonwright_workspace::Plan, String> {
     let path = PathBuf::from(&workspace_path);
     if !path.is_dir() {
         return Err(format!("workspace is not a directory: {workspace_path}"));
@@ -2890,14 +2891,14 @@ fn approve_project_plan(
     store
         .ensure_workspace(workspace_name(&path), &workspace_path)
         .map_err(|error| error.to_string())?;
-    openbad_workspace::approve_plan(&path).map_err(|error| error.to_string())
+    canonwright_workspace::approve_plan(&path).map_err(|error| error.to_string())
 }
 
 #[tauri::command]
 fn project_questions(
     state: State<'_, AppState>,
     workspace_path: String,
-) -> Result<Vec<openbad_workspace::Question>, String> {
+) -> Result<Vec<canonwright_workspace::Question>, String> {
     let path = PathBuf::from(&workspace_path);
     if !path.is_dir() {
         return Err(format!("workspace is not a directory: {workspace_path}"));
@@ -2909,7 +2910,7 @@ fn project_questions(
     store
         .ensure_workspace(workspace_name(&path), &workspace_path)
         .map_err(|error| error.to_string())?;
-    openbad_workspace::load_questions(&path).map_err(|error| error.to_string())
+    canonwright_workspace::load_questions(&path).map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -2918,7 +2919,7 @@ fn answer_project_question(
     workspace_path: String,
     question_id: String,
     answer: String,
-) -> Result<openbad_workspace::Question, String> {
+) -> Result<canonwright_workspace::Question, String> {
     let path = PathBuf::from(&workspace_path);
     if !path.is_dir() {
         return Err(format!("workspace is not a directory: {workspace_path}"));
@@ -2930,7 +2931,7 @@ fn answer_project_question(
     store
         .ensure_workspace(workspace_name(&path), &workspace_path)
         .map_err(|error| error.to_string())?;
-    openbad_workspace::answer_question(&path, &question_id, &answer)
+    canonwright_workspace::answer_question(&path, &question_id, &answer)
         .map_err(|error| error.to_string())
 }
 
@@ -3984,7 +3985,7 @@ fn open_path(
 fn memories(
     state: State<'_, AppState>,
     workspace_path: String,
-) -> Result<Vec<openbad_store::types::MemoryRecord>, String> {
+) -> Result<Vec<canonwright_store::types::MemoryRecord>, String> {
     let path = PathBuf::from(&workspace_path);
     if !path.is_dir() {
         return Err(format!("workspace is not a directory: {workspace_path}"));
@@ -4016,7 +4017,7 @@ fn forget_memory(state: State<'_, AppState>, memory_id: String) -> Result<(), St
 fn checkpoints(
     state: State<'_, AppState>,
     session_id: String,
-) -> Result<Vec<openbad_store::types::FileCheckpointSummary>, String> {
+) -> Result<Vec<canonwright_store::types::FileCheckpointSummary>, String> {
     let session = SessionId::from(
         Uuid::parse_str(&session_id).map_err(|error| format!("invalid session id: {error}"))?,
     );
@@ -4061,7 +4062,7 @@ fn restore_checkpoint(state: State<'_, AppState>, checkpoint_id: String) -> Resu
             .ok_or_else(|| "checkpoint has no original content".to_owned())?;
         let content = String::from_utf8(content)
             .map_err(|error| format!("checkpoint is not UTF-8: {error}"))?;
-        openbad_tools::atomic_write(&path, &content).map_err(|error| error.to_string())?;
+        canonwright_tools::atomic_write(&path, &content).map_err(|error| error.to_string())?;
     } else if path.exists() {
         std::fs::remove_file(&path).map_err(|error| error.to_string())?;
     }
@@ -4149,7 +4150,7 @@ fn fork_session(
 /// the UI renders, including the tool cards the live stream produced.
 fn build_ui_messages(
     messages: &[SessionMessage],
-    turns: &[openbad_store::types::SessionTurn],
+    turns: &[canonwright_store::types::SessionTurn],
 ) -> (Vec<UiMessage>, u64) {
     let (turn_durations, total_duration_ms) = summarize_turn_durations(turns);
     // Tool results are separate stored messages; the transcript shows them on
@@ -4345,7 +4346,7 @@ fn build_ui_messages(
 }
 
 fn summarize_turn_durations(
-    turns: &[openbad_store::types::SessionTurn],
+    turns: &[canonwright_store::types::SessionTurn],
 ) -> (std::collections::HashMap<u32, u64>, u64) {
     let mut durations = std::collections::HashMap::new();
     let mut total = 0_u64;
@@ -4377,7 +4378,7 @@ fn keep_last_assistant_duration_per_turn(messages: &mut [UiMessage], turns: &[Op
 #[tauri::command]
 fn list_projects(
     state: State<'_, AppState>,
-) -> Result<Vec<openbad_store::types::WorkspaceSummary>, String> {
+) -> Result<Vec<canonwright_store::types::WorkspaceSummary>, String> {
     let store = state
         .store
         .lock()
@@ -4390,7 +4391,7 @@ fn add_project(
     state: State<'_, AppState>,
     path: String,
     name: Option<String>,
-) -> Result<openbad_store::types::WorkspaceSummary, String> {
+) -> Result<canonwright_store::types::WorkspaceSummary, String> {
     let path = PathBuf::from(&path);
     if !path.is_dir() {
         return Err(format!("project is not a directory: {}", path.display()));
@@ -4413,12 +4414,12 @@ fn add_project(
 }
 
 fn default_workspaces_directory() -> Result<PathBuf, String> {
-    if let Some(path) = std::env::var_os("OPENBAD_WORKSPACES_DIR") {
+    if let Some(path) = std::env::var_os("CANONWRIGHT_WORKSPACES_DIR") {
         return Ok(PathBuf::from(path));
     }
     let base = directories::BaseDirs::new()
         .ok_or_else(|| "could not resolve the home directory".to_owned())?;
-    Ok(base.home_dir().join("OpenBaD").join("workspaces"))
+    Ok(base.home_dir().join("Canonwright").join("workspaces"))
 }
 
 fn project_slug(name: &str) -> String {
@@ -4485,7 +4486,7 @@ fn workspaces_directory() -> Result<String, String> {
 fn create_project(
     state: State<'_, AppState>,
     name: String,
-) -> Result<openbad_store::types::WorkspaceSummary, String> {
+) -> Result<canonwright_store::types::WorkspaceSummary, String> {
     let name = name.trim();
     if name.is_empty() {
         return Err("project name must not be empty".to_owned());
@@ -4588,7 +4589,7 @@ fn set_session_access_mode(
 fn workspace_index_status(
     state: State<'_, AppState>,
     workspace_path: String,
-) -> Result<openbad_store::types::IndexSummary, String> {
+) -> Result<canonwright_store::types::IndexSummary, String> {
     let path = PathBuf::from(&workspace_path);
     if !path.is_dir() {
         return Err(format!("workspace is not a directory: {workspace_path}"));
@@ -4604,7 +4605,7 @@ fn workspace_index_status(
     let summary = store
         .workspace_index_summary(workspace)
         .map_err(|error| error.to_string())?;
-    if std::env::var_os("OPENBAD_DEBUG_AGENT").is_some() {
+    if std::env::var_os("CANONWRIGHT_DEBUG_AGENT").is_some() {
         eprintln!("[index] status {workspace_path}: {summary:?}");
     }
     Ok(summary)
@@ -4630,7 +4631,7 @@ async fn refresh_workspace_index(
         let report = WorkspaceIndexer::new(&store, workspace, &path)
             .refresh()
             .map_err(|error| error.to_string())?;
-        if std::env::var_os("OPENBAD_DEBUG_AGENT").is_some() {
+        if std::env::var_os("CANONWRIGHT_DEBUG_AGENT").is_some() {
             eprintln!(
                 "[index] refresh {}: seen={} added={} updated={} removed={} elapsed={}ms",
                 path.display(),
@@ -4690,7 +4691,7 @@ fn workspace_default() -> String {
         "go.mod",
         "Makefile",
         "AGENTS.md",
-        ".openbad",
+        ".canonwright",
     ];
     if markers.iter().any(|marker| path.join(marker).exists()) {
         path.display().to_string()
@@ -4786,13 +4787,13 @@ pub struct McpServerInput {
     pub timeout_seconds: Option<u64>,
 }
 
-fn mcp_server_view(state: &openbad_mcp::McpServerState) -> McpServerView {
+fn mcp_server_view(state: &canonwright_mcp::McpServerState) -> McpServerView {
     let config = &state.config;
     McpServerView {
         name: config.name.clone(),
         transport: match config.transport {
-            openbad_mcp::McpTransport::Stdio => "stdio".to_owned(),
-            openbad_mcp::McpTransport::Http => "http".to_owned(),
+            canonwright_mcp::McpTransport::Stdio => "stdio".to_owned(),
+            canonwright_mcp::McpTransport::Http => "http".to_owned(),
         },
         command: config.command.clone(),
         args: config.args.clone(),
@@ -4805,7 +4806,7 @@ fn mcp_server_view(state: &openbad_mcp::McpServerState) -> McpServerView {
     }
 }
 
-fn mcp_tool_view(tool: openbad_mcp::McpToolInfo) -> McpToolView {
+fn mcp_tool_view(tool: canonwright_mcp::McpToolInfo) -> McpToolView {
     McpToolView {
         server: tool.server,
         name: tool.name,
@@ -4971,14 +4972,14 @@ async fn test_mcp_server(
     .map_err(|error| error.to_string())?
 }
 
-fn update_service() -> openbad_update::UpdateService {
-    let repo = std::env::var("OPENBAD_UPDATE_REPO")
+fn update_service() -> canonwright_update::UpdateService {
+    let repo = std::env::var("CANONWRIGHT_UPDATE_REPO")
         .ok()
         .filter(|repo| !repo.trim().is_empty())
-        .unwrap_or_else(|| openbad_update::DEFAULT_REPO.to_owned());
-    let mut service = openbad_update::UpdateService::new(repo)
-        .with_self_installable(openbad_update::running_app_image().is_some());
-    if let Ok(api_base) = std::env::var("OPENBAD_UPDATE_API") {
+        .unwrap_or_else(|| canonwright_update::DEFAULT_REPO.to_owned());
+    let mut service = canonwright_update::UpdateService::new(repo)
+        .with_self_installable(canonwright_update::running_app_image().is_some());
+    if let Ok(api_base) = std::env::var("CANONWRIGHT_UPDATE_API") {
         if !api_base.trim().is_empty() {
             service = service.with_api_base(api_base);
         }
@@ -4987,7 +4988,9 @@ fn update_service() -> openbad_update::UpdateService {
 }
 
 #[tauri::command]
-async fn check_for_updates(app: tauri::AppHandle) -> Result<openbad_update::UpdateStatus, String> {
+async fn check_for_updates(
+    app: tauri::AppHandle,
+) -> Result<canonwright_update::UpdateStatus, String> {
     let current = app.package_info().version.to_string();
     tauri::async_runtime::spawn_blocking(move || {
         update_service()
@@ -5002,12 +5005,12 @@ async fn check_for_updates(app: tauri::AppHandle) -> Result<openbad_update::Upda
 async fn install_update(
     app: tauri::AppHandle,
     version: String,
-) -> Result<openbad_update::InstallOutcome, String> {
+) -> Result<canonwright_update::InstallOutcome, String> {
     let current = app.package_info().version.to_string();
     let outcome = tauri::async_runtime::spawn_blocking(move || {
         let service = update_service();
         let status = service.check(&current).map_err(|error| error.to_string())?;
-        let openbad_update::UpdateStatus::Available {
+        let canonwright_update::UpdateStatus::Available {
             latest,
             release,
             asset,
@@ -5020,11 +5023,11 @@ async fn install_update(
         if latest != version {
             return Err("the available update changed; check again".to_owned());
         }
-        let downloads = openbad_update::downloads_directory();
+        let downloads = canonwright_update::downloads_directory();
         let downloaded = service
             .download(&release, &asset, &downloads)
             .map_err(|error| error.to_string())?;
-        let app_image = openbad_update::running_app_image();
+        let app_image = canonwright_update::running_app_image();
         service
             .install(
                 &asset,
@@ -5038,7 +5041,7 @@ async fn install_update(
     .await
     .map_err(|error| error.to_string())??;
 
-    if let openbad_update::InstallOutcome::AppImageReplaced { path } = &outcome {
+    if let canonwright_update::InstallOutcome::AppImageReplaced { path } = &outcome {
         std::process::Command::new(path)
             .spawn()
             .map_err(|error| format!("could not restart the updated app: {error}"))?;
@@ -5442,10 +5445,10 @@ async fn chat(
 
     let (history, user_id, surface_seqs) = history;
     let strict_tools = strict_tools.unwrap_or(false);
-    let base_url = std::env::var("OPENBAD_DEEPSEEK_BASE_URL").unwrap_or_else(|_| {
+    let base_url = std::env::var("CANONWRIGHT_DEEPSEEK_BASE_URL").unwrap_or_else(|_| {
         if strict_tools {
             // Strict mode is served from the beta endpoint only.
-            openbad_llm::deepseek::BETA_BASE_URL.to_owned()
+            canonwright_llm::deepseek::BETA_BASE_URL.to_owned()
         } else {
             "https://api.deepseek.com".to_owned()
         }
@@ -5484,7 +5487,7 @@ async fn chat(
             .ok()
             .and_then(|sets| sets.get(&session).cloned());
         stored.unwrap_or_else(|| {
-            openbad_tools::HOT_TOOLS
+            canonwright_tools::HOT_TOOLS
                 .iter()
                 .map(|name| (*name).to_owned())
                 .collect()
@@ -5709,7 +5712,7 @@ async fn chat(
             return;
         };
         match WorkspaceIndexer::new(&store, workspace, &index_root).refresh() {
-            Ok(report) if std::env::var_os("OPENBAD_DEBUG_AGENT").is_some() => {
+            Ok(report) if std::env::var_os("CANONWRIGHT_DEBUG_AGENT").is_some() => {
                 eprintln!(
                     "[index] post-turn {}: added={} updated={} removed={} elapsed={}ms",
                     index_root.display(),
@@ -5721,7 +5724,7 @@ async fn chat(
             }
             Ok(_) => {}
             Err(error) => {
-                if std::env::var_os("OPENBAD_DEBUG_AGENT").is_some() {
+                if std::env::var_os("CANONWRIGHT_DEBUG_AGENT").is_some() {
                     eprintln!("[index] post-turn refresh failed: {error}");
                 }
             }
@@ -5865,7 +5868,7 @@ fn load_history(
     // Sessions recorded before empty assistant turns were skipped can still
     // hold one, and replaying it fails every later request with `content or
     // tool_calls must be set`. Drop them on the way in so old sessions work.
-    openbad_llm::drop_empty_assistant_messages(&mut history);
+    canonwright_llm::drop_empty_assistant_messages(&mut history);
     Ok((history, entries))
 }
 
@@ -5884,7 +5887,7 @@ fn persist_compaction(
     store: &Store,
     session: SessionId,
     turn: u32,
-    compaction: &openbad_agent::CompactionRecord,
+    compaction: &canonwright_agent::CompactionRecord,
     surface_seqs: &[Option<u64>],
 ) -> Result<(), String> {
     let cutoff = shadowed_through_seq(surface_seqs, compaction.shadowed_messages);
@@ -5958,7 +5961,7 @@ fn chat_message_from_session(message: &SessionMessage) -> Result<ChatMessage, St
                 .transpose()
                 .map_err(|error| format!("invalid tool calls in history: {error}"))?;
             if let Some(calls) = tool_calls.as_mut() {
-                openbad_agent::sanitize_tool_arguments(calls);
+                canonwright_agent::sanitize_tool_arguments(calls);
             }
             Ok(ChatMessage {
                 role: ChatRole::Assistant,
@@ -6026,7 +6029,7 @@ fn foundation_payload(store: &Store) -> Result<Foundation, String> {
 fn secret_store() -> Box<dyn SecretStore> {
     #[cfg(feature = "keyring")]
     {
-        Box::new(KeychainSecretStore::new("OpenBaD Desktop"))
+        Box::new(KeychainSecretStore::new("Canonwright Desktop"))
     }
     #[cfg(not(feature = "keyring"))]
     {
@@ -6074,7 +6077,7 @@ fn ensure_defaults(store: &Store) -> Result<(), String> {
 pub fn run() {
     diagnostics::init();
     diagnostics::init_glib_logging();
-    let store = Store::open_default().expect("failed to open the OpenBaD store");
+    let store = Store::open_default().expect("failed to open the Canonwright store");
     ensure_defaults(&store).expect("failed to seed default providers");
     diagnostics::record("INFO", "store opened");
 
@@ -6088,7 +6091,7 @@ pub fn run() {
             approvals: Arc::new(Mutex::new(ApprovalCache::default())),
             pending_approvals: Arc::new(Mutex::new(HashMap::new())),
             subagent_cancels: Arc::new(Mutex::new(HashMap::new())),
-            terminal: Arc::new(openbad_terminal::TerminalManager::new()),
+            terminal: Arc::new(canonwright_terminal::TerminalManager::new()),
             mcp: McpManagers::default(),
             session_reads: Arc::new(Mutex::new(HashMap::new())),
             active_tools: Arc::new(Mutex::new(HashMap::new())),
@@ -6116,7 +6119,7 @@ pub fn run() {
                 .ok()
                 .and_then(|mut slot| slot.take());
             if let Some(session_id) = fresh_notification_session(pending, Instant::now()) {
-                let _ = window.emit("openbad:notification-opened", session_id);
+                let _ = window.emit("canonwright:notification-opened", session_id);
             }
         })
         .invoke_handler(tauri::generate_handler![
@@ -6231,7 +6234,7 @@ pub fn run() {
             chat
         ])
         .run(tauri::generate_context!())
-        .expect("error while running OpenBaD Desktop");
+        .expect("error while running Canonwright Desktop");
 }
 
 #[cfg(test)]
@@ -6250,7 +6253,7 @@ mod tests {
     fn replay_matches_the_projected_history() {
         let store = Store::open_in_memory().expect("store");
         let workspace = store
-            .create_workspace("replay", "/tmp/openbad-replay")
+            .create_workspace("replay", "/tmp/canonwright-replay")
             .expect("workspace");
         let session = store
             .create_session(Some(workspace), Some("replay"))
@@ -6298,7 +6301,7 @@ mod tests {
 
         let (history, _) = load_history(&store, session).expect("history");
         let events = store.load_events(session).expect("events");
-        let replayed = openbad_llm::derive_messages(&events)
+        let replayed = canonwright_llm::derive_messages(&events)
             .into_iter()
             .map(|entry| entry.message)
             .collect::<Vec<_>>();
@@ -6323,7 +6326,7 @@ mod tests {
     fn repairs_a_turn_interrupted_mid_tool_call() {
         let store = Store::open_in_memory().expect("store");
         let workspace = store
-            .create_workspace("repair", "/tmp/openbad-repair")
+            .create_workspace("repair", "/tmp/canonwright-repair")
             .expect("workspace");
         let session = store
             .create_session(Some(workspace), Some("repair"))
@@ -6454,7 +6457,7 @@ mod tests {
     #[test]
     fn project_area_counts_include_sidecars_and_agents() {
         let root = tempfile::tempdir().expect("tempdir");
-        let sidecars = root.path().join(".openbad");
+        let sidecars = root.path().join(".canonwright");
         std::fs::create_dir_all(&sidecars).expect("sidecars");
         std::fs::write(
             sidecars.join("todos.json"),
@@ -7086,8 +7089,8 @@ mod tests {
 
     #[test]
     fn turn_durations_persist_on_the_last_assistant_message() {
-        use openbad_core::SessionId;
-        use openbad_store::types::SessionTurn;
+        use canonwright_core::SessionId;
+        use canonwright_store::types::SessionTurn;
         use uuid::Uuid;
 
         let session = SessionId::from(Uuid::nil());
@@ -7289,7 +7292,7 @@ mod tests {
             ..McpServerSpec::default()
         };
         let config = mcp_server_config_from_spec(&spec, None).expect("stdio config");
-        assert_eq!(config.transport, openbad_mcp::McpTransport::Stdio);
+        assert_eq!(config.transport, canonwright_mcp::McpTransport::Stdio);
         assert_eq!(config.args, vec!["-y", "@example/mcp-docs"]);
 
         let spec = McpServerSpec {
@@ -7298,9 +7301,9 @@ mod tests {
             ..McpServerSpec::default()
         };
         let config = mcp_server_config_from_spec(&spec, None).expect("http config");
-        assert_eq!(config.transport, openbad_mcp::McpTransport::Http);
+        assert_eq!(config.transport, canonwright_mcp::McpTransport::Http);
 
-        let existing = openbad_mcp::McpServerConfig::stdio("docs", "npx");
+        let existing = canonwright_mcp::McpServerConfig::stdio("docs", "npx");
         let patch = McpServerSpec {
             name: "docs".to_owned(),
             enabled: Some(false),

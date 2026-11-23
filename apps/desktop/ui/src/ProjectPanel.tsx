@@ -325,7 +325,7 @@ export default function ProjectPanel(props: ProjectPanelProps) {
           <button
             type="button"
             aria-label="Import project bundle"
-            title="Merge an OpenBaD project bundle into this project"
+            title="Merge an Canonwright project bundle into this project"
             onClick={onImportBundle}
             className="rounded-md p-1.5 text-obd-subtle hover:bg-obd-raised hover:text-obd-accent"
           >
@@ -409,7 +409,7 @@ export default function ProjectPanel(props: ProjectPanelProps) {
               </div>
               {manifest === null ? (
                 <p className="mt-2 text-[10px] leading-4 text-obd-subtle">
-                  Add <code className="text-obd-muted">.openbad/project.yaml</code> to
+                  Add <code className="text-obd-muted">.canonwright/project.yaml</code> to
                   declare named tasks, verification recipes, validators, scope, and
                   invariants.
                 </p>

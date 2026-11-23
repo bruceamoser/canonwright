@@ -13,7 +13,7 @@ type RegisteredZone = {
   setActive: (active: boolean) => void;
 };
 
-const ZONE_ATTRIBUTE = "data-openbad-dropzone";
+const ZONE_ATTRIBUTE = "data-canonwright-dropzone";
 const zones = new Map<string, RegisteredZone>();
 let nextZoneId = 1;
 let activeZoneId: string | null = null;
@@ -86,7 +86,7 @@ function bindBrowserFallback() {
 let browserBound = false;
 
 export type DropZoneProps = {
-  "data-openbad-dropzone": string;
+  "data-canonwright-dropzone": string;
   onDragEnter: (event: React.DragEvent<HTMLElement>) => void;
   onDragOver: (event: React.DragEvent<HTMLElement>) => void;
   onDragLeave: (event: React.DragEvent<HTMLElement>) => void;
@@ -97,7 +97,7 @@ export function useFileDropZone(
   onDrop: (payload: DropPayload) => void | Promise<void>,
   options: { disabled?: boolean } = {},
 ): { active: boolean; zoneProps: DropZoneProps } {
-  const [id] = useState(() => `openbad-drop-${nextZoneId++}`);
+  const [id] = useState(() => `canonwright-drop-${nextZoneId++}`);
   const [active, setActive] = useState(false);
   const handler = useRef(onDrop);
   handler.current = onDrop;

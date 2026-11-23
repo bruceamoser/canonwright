@@ -1,0 +1,11 @@
+Canonwright
+Copyright (c) 2026 Bruce Amoser
+
+This product contains code copied from OpenBaD
+(https://github.com/bruceamoser/OpenBaD), Copyright (c) 2026 Bruce Amoser,
+licensed under the MIT License.
+
+The copy was taken from OpenBaD v0.3.31 (commit 3b59840) with `git archive`
+and committed to a fresh repository, so the two projects share no git history.
+OpenBaD remains a separate, general-purpose agent harness and is not affected
+by changes made here.

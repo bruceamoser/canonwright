@@ -82,7 +82,7 @@ pub struct ProviderCapabilities {
 - The adapter serializes tool arguments deterministically and rejects
   non-object arguments for historical messages.
 - Chat Completion supports mid-conversation `system` messages; it does not
-  support inserting tool calls mid-conversation. OpenBaD appends, so this is
+  support inserting tool calls mid-conversation. Canonwright appends, so this is
   not a limitation. The Anthropic and Responses formats are available if a
   future feature needs insertion.
 

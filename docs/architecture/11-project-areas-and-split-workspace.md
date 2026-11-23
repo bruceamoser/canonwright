@@ -4,7 +4,7 @@
 
 A coding agent needs more than a root directory. It needs the code it may edit,
 references it may only read, durable decisions, curated documents, and a way to
-show the user what it found. OpenBaD therefore treats a **project** as a
+show the user what it found. Canonwright therefore treats a **project** as a
 container with six project-scoped areas:
 
 | Area | Purpose | Default access |
@@ -53,32 +53,32 @@ Migration `0006_project_areas` adds the project areas; migration
   human, with a read/write flag and reason. The assistant can request a grant
   but cannot create one; Settings → Access revokes them.
 
-Project truth lives in `.openbad/canon.yaml`, `.openbad/glossary.yaml`, and
-`.openbad/adr/`; `yaml_query` gives bounded access to project YAML documents
+Project truth lives in `.canonwright/canon.yaml`, `.canonwright/glossary.yaml`, and
+`.canonwright/adr/`; `yaml_query` gives bounded access to project YAML documents
 without loading whole files.
 
-Claims and known unknowns live in `.openbad/claims.json` and
-`.openbad/unknowns.json`; both are injected into the next prompt.
+Claims and known unknowns live in `.canonwright/claims.json` and
+`.canonwright/unknowns.json`; both are injected into the next prompt.
 
-Plan mode lives in `.openbad/plan.json`; drafts are approved in Project → Plan
+Plan mode lives in `.canonwright/plan.json`; drafts are approved in Project → Plan
 and steps carry executable `verify_with` checks.
 
 Structured questions block the turn until they are answered in the question
-dialog; every exchange is appended to `.openbad/questions.json`, and the
+dialog; every exchange is appended to `.canonwright/questions.json`, and the
 Project → Questions panel lists that log.
 
-`.openbad/context.yaml` pins files that should stay resident and excludes paths
-that must never load. `.openbad/dead-ends.json` records negative knowledge so a
+`.canonwright/context.yaml` pins files that should stay resident and excludes paths
+that must never load. `.canonwright/dead-ends.json` records negative knowledge so a
 later session does not repeat a ruled-out search.
 
-A sibling `.openbad/permissions.yaml` can restrict writes and command classes.
+A sibling `.canonwright/permissions.yaml` can restrict writes and command classes.
 It is reviewable policy, not prompt discipline: tools check it before mutating
 files or spawning commands and return the specific rule that blocked the action.
 
-Optional capabilities live under `.openbad/plugins/<name>/`. Each plugin has a
+Optional capabilities live under `.canonwright/plugins/<name>/`. Each plugin has a
 `plugin.yaml`, an entrypoint, and optionally a `SKILL.md`; it exchanges one JSON
 request/response over stdin/stdout and runs under the same command policy and
-timeout rules. Run evidence goes to `.openbad/plugin-runs/`. The assistant can
+timeout rules. Run evidence goes to `.canonwright/plugin-runs/`. The assistant can
 scaffold, edit, test, and call plugins, and the bundled AsciiDoc plugin is
 installed with `plugin_install_builtin` rather than adding a mandatory
 `asciidoctor` dependency to the desktop build.
@@ -88,7 +88,7 @@ allow that explicitly. Invariant `check: manual` is attested, not executed.
 Canon lint supports fenced-code skipping, off markers, and `paths_ignore`.
 
 Verification `gates:` group those recipes into named checklists. `run_gate`
-records evidence under `.openbad/gates/`; `prove_it: true` turns unverified
+records evidence under `.canonwright/gates/`; `prove_it: true` turns unverified
 claims into explicit labels.
 
 Project manifests also declare a `recipes:` registry for verification
@@ -118,8 +118,8 @@ identity is `(document_id, seq)`, which becomes the citation locator
 ### Managed workspace
 
 A project owns exactly one workspace. New projects require only a name:
-OpenBaD resolves the default workspaces directory (`~/OpenBaD/workspaces`,
-overridable with `OPENBAD_WORKSPACES_DIR`), creates a unique slug directory,
+Canonwright resolves the default workspaces directory (`~/Canonwright/workspaces`,
+overridable with `CANONWRIGHT_WORKSPACES_DIR`), creates a unique slug directory,
 and records that path as the project workspace. Existing workspace paths remain
 supported for projects created before managed workspaces.
 
@@ -143,7 +143,7 @@ picker, so no upload action is drag-only.
   workspace index is refreshed after the copy so the new documents are
   searchable.
 - **References** — files are copied into a managed `Uploaded documents`
-  reference folder under `~/OpenBaD/references/<project-slug>`, a sibling of the
+  reference folder under `~/Canonwright/references/<project-slug>`, a sibling of the
   managed workspaces directory. The folder is registered as a read-only
   reference on first upload, so the agent can read it with `read_repo_file`.
 - **Knowledge** — files are imported like `import_knowledge_file`: they must be
@@ -203,7 +203,7 @@ stage without changing the project model, locator contract, or tools.
 `ToolContext` carries an optional `ProjectAreas` implementation. The desktop
 shell backs it with the SQLite store and the active workspace id. Tool results
 carry a `metadata` value; `present_artifact` uses
-`metadata.openbad_artifact` to request the split pane.
+`metadata.canonwright_artifact` to request the split pane.
 
 The agent system prompt tells the model that project knowledge is separate from
 code, to call `search_project` before answering questions that may depend on

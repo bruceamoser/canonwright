@@ -532,7 +532,7 @@ function ChatComposer({
             rows={1}
             placeholder={
               hasProject
-                ? "Ask OpenBaD, or paste files and images…"
+                ? "Ask Canonwright, or paste files and images…"
                 : "Add a project to start…"
             }
             className="block w-full resize-none bg-transparent px-3.5 pt-3 text-[13px] leading-5 text-obd-strong outline-none placeholder:text-obd-subtle"

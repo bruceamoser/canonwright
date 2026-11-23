@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read the desktop session log without disturbing the running app.
 
-The app records every turn in `openbad.db`: user messages, assistant text,
+The app records every turn in `canonwright.db`: user messages, assistant text,
 tool calls and their results, usage, and errors verbatim. That makes it the
 best record of what actually happened; it is just not readable by eye.
 
@@ -28,9 +28,9 @@ import time
 from pathlib import Path
 
 DB = Path(
-    os.environ.get("OPENBAD_DB", Path.home() / ".local/share/openbaddesktop/openbad.db")
+    os.environ.get("CANONWRIGHT_DB", Path.home() / ".local/share/canonwrightdesktop/canonwright.db")
 )
-APP_LOG = DB.parent / "openbad.log"
+APP_LOG = DB.parent / "canonwright.log"
 
 # Anything that looks like a credential is replaced before printing. The log is
 # a debugging aid, not a place to leak a key into a transcript.
@@ -175,7 +175,7 @@ def detail(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Read the OpenBaD session log.")
+    parser = argparse.ArgumentParser(description="Read the Canonwright session log.")
     parser.add_argument("--since", default="24h", help="window: 30m, 2h, 7d, or epoch millis")
     parser.add_argument("--session", help="only this session id")
     parser.add_argument("--list", action="store_true", help="list sessions and stop")

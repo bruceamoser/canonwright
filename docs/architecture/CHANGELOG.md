@@ -41,7 +41,7 @@ overflow. See the 2026-10-27 compaction entry for details.
 ## 2026-11-04
 
 - **Supervised work pipeline (ADR-009), through admission.** A project opts in with
-  `.openbad/pipeline.yaml`; a tick polls each enabled source through `gh api`,
+  `.canonwright/pipeline.yaml`; a tick polls each enabled source through `gh api`,
   judges every trigger against its thread, and records the tickets, mandates, and
   read positions in the existing store. The host now exposes `pipeline_status` and
   `pipeline_tick`, so the panel can show what a project listens to and a person can
@@ -64,7 +64,7 @@ overflow. See the 2026-10-27 compaction entry for details.
   and stops at a step boundary as `waiting`. One `worker-<ticket>` session is
   resumed across assignments, slots are enforced, and a message on a live ticket
   wakes its executor. The panel lists tickets by derived stage (needs-a-person
-  first) and edits `.openbad/pipeline.yaml`, refusing to save what the loader would
+  first) and edits `.canonwright/pipeline.yaml`, refusing to save what the loader would
   refuse to run; the branch-protection check names each missing guard rather than
   accepting a promise.
 
@@ -93,12 +93,12 @@ overflow. See the 2026-10-27 compaction entry for details.
   that still cannot fit returns a clear `ContextOverflow` error instead of a raw
   provider 400. The desktop chat shows at most one `context compacted` marker
   per turn.
-- **Project export/import.** New `openbad-transfer` crate packs a project into a
-  single `.openbad-project` zip: workspace files (including `.git` and
-  `.openbad`, excluding rebuildable output and `.gitignore`d paths) plus
+- **Project export/import.** New `canonwright-transfer` crate packs a project into a
+  single `.canonwright-project` zip: workspace files (including `.git` and
+  `.canonwright`, excluding rebuildable output and `.gitignore`d paths) plus
   sessions/events/messages/turns, memories, knowledge chunks, and file
   checkpoints. Reference folders, secrets, and global MCP definitions are
-  excluded by design. `openbad-store` gains `export_workspace_state` /
+  excluded by design. `canonwright-store` gains `export_workspace_state` /
   `import_workspace_state` with idempotent upserts. Desktop adds
   `export_project`, `import_project` (new project), and `import_project_into`
   (merge/overwrite) plus Project-menu and project-panel UI. Extraction rejects
@@ -126,7 +126,7 @@ overflow. See the 2026-10-27 compaction entry for details.
 
 ## 2026-10-24
 
-- **Linux updates prefer the `.deb` package.** `openbad-update` now ranks
+- **Linux updates prefer the `.deb` package.** `canonwright-update` now ranks
   `.deb` ahead of `.AppImage` on Linux unless the app is running from an
   AppImage, in which case the AppImage stays preferred so the running binary is
   replaced. A selected `.deb` is installed through `pkexec` (`apt-get install
@@ -143,8 +143,8 @@ project-scoped MCP enablement, and any-file chat attachments described below.
 ## 2026-10-23
 
 - **Global MCP definitions, per-project enablement.** Global server definitions
-  move to the application config file (`OPENBAD_MCP_CONFIG` overrides it); each
-  workspace stores only `enabled: [names]` in `.openbad/mcp.yaml`. Legacy
+  move to the application config file (`CANONWRIGHT_MCP_CONFIG` overrides it); each
+  workspace stores only `enabled: [names]` in `.canonwright/mcp.yaml`. Legacy
   project-scoped definitions migrate on first load. The model gains
   `mcp_server_set_enabled`, and `mcp_server_add` enables the new server for the
   current project by default.
@@ -162,14 +162,14 @@ project-scoped MCP enablement, and any-file chat attachments described below.
 
 ## 2026-10-22
 
-- **MCP server management.** `openbad-mcp` now supports `enabled`, `env`,
+- **MCP server management.** `canonwright-mcp` now supports `enabled`, `env`,
   `cwd`, and `timeout_seconds`, validates configurations, persists changes to
-  `.openbad/mcp.yaml` atomically, restarts only affected server processes, and
+  `.canonwright/mcp.yaml` atomically, restarts only affected server processes, and
   reloads when another manager writes the file. The desktop caches one manager
   per workspace and exposes `mcp_servers`, `add_mcp_server`,
   `update_mcp_server`, `remove_mcp_server`, `set_mcp_server_enabled`, and
   `test_mcp_server`, plus an MCP settings tab.
-- **MCP tool domain.** `openbad-tools` adds `mcp_servers_list`,
+- **MCP tool domain.** `canonwright-tools` adds `mcp_servers_list`,
   `mcp_server_add`, `mcp_server_update`, `mcp_server_remove`, and
   `mcp_server_test`, and moves `mcp_call`/`tool_search` into a dedicated `mcp`
   domain. Environment values are never exposed to the model. The registry now
@@ -178,7 +178,7 @@ project-scoped MCP enablement, and any-file chat attachments described below.
   provider request, after the cached history prefix, instead of being inserted
   before history. Adding or removing a server changes the volatile tail without
   rewriting the cached prefix.
-- **In-app updates.** New `openbad-update` crate checks GitHub releases for the
+- **In-app updates.** New `canonwright-update` crate checks GitHub releases for the
   current OS and architecture, selects AppImage/deb/rpm/msi/setup.exe/dmg
   assets, verifies `SHA256SUMS` when published, replaces a running AppImage
   atomically, and hands other installers to the platform. Settings → About and
@@ -188,7 +188,7 @@ project-scoped MCP enablement, and any-file chat attachments described below.
 ## 2026-10-21
 
 - **Tool approval prompt.** A risk-gate denial now carries
-  `openbad_approval` metadata. The desktop shows the tool, risk, and reason,
+  `canonwright_approval` metadata. The desktop shows the tool, risk, and reason,
   and approving switches the session to Full access, persists it, and sends a
   continuation so the task resumes.
 - **Session archive and delete.** Sessions can now be archived, restored, or
@@ -208,7 +208,7 @@ project-scoped MCP enablement, and any-file chat attachments described below.
   Write and execute calls remain serial, and tool-message order and audit
   records are preserved.
 - **Tool-output spilling.** Results above the 64 KiB model-facing cap are saved
-  under `.openbad/spill/` with a `spilled_path`, and the new `read_spill` tool
+  under `.canonwright/spill/` with a `spilled_path`, and the new `read_spill` tool
   pages through them. The internal extraction cap remains 256 KiB.
 - **Domain-based tool surface.** Built-in tools are now grouped into 17
   domains. The model sees `<domain>_list` and `<domain>_run` for each domain,
@@ -232,12 +232,12 @@ project-scoped MCP enablement, and any-file chat attachments described below.
 - **Plugin runtime.** `plugin_list`, `plugin_describe`, `plugin_call`,
   `plugin_test`, `write_plugin`, and `plugin_install_builtin` are documented in
   section 11.1 of `05-agent-runtime-and-tools.md`. Plugins live in
-  `.openbad/plugins/<name>/`, exchange JSON over stdin/stdout, and record runs
-  in `.openbad/plugin-runs/`.
+  `.canonwright/plugins/<name>/`, exchange JSON over stdin/stdout, and record runs
+  in `.canonwright/plugin-runs/`.
 - **AsciiDoc is optional.** The bundled AsciiDoc plugin is installed with
   `plugin_install_builtin`; `asciidoctor` is not a core dependency.
 - **Project sidecars.** `docs/architecture/11-project-areas-and-split-workspace.md`
-  now lists `.openbad/plugins/` and plugin run evidence alongside the existing
+  now lists `.canonwright/plugins/` and plugin run evidence alongside the existing
   canon, claims, plan, questions, context, and permissions files.
 - **Session access mode.** Read only / Can edit / Full access is stored per
   session in `metadata_json`, restored when reopening the session, and new
@@ -291,28 +291,28 @@ project-scoped MCP enablement, and any-file chat attachments described below.
   covers project counts, the Agents area, chat, and top/bottom/user copy
   controls. See `08-desktop-application.md`.
 - **Finished-agent cleanup.** Terminal subagent records are pruned after 60
-  seconds (`OPENBAD_SUBAGENT_RETENTION_SECONDS` override), and the Agents panel
+  seconds (`CANONWRIGHT_SUBAGENT_RETENTION_SECONDS` override), and the Agents panel
   keeps polling after completion so removed workers disappear without a click.
 - **Tool surface consolidation.** `record_claim`/`list_claims`,
   `record_unknown`/`list_unknowns`, and `record_dead_end`/`list_dead_ends`
   merged into `ledger`; `snapshot_*` into `snapshot`; `golden_*` into `golden`;
   `canon_*` and `glossary_*` into `canon`; and the context-rule tools into
   `context_rules`. The built-in surface is now 113 of the 128-slot cap.
-- **LSP code intelligence.** New `openbad-lsp` crate, `LspService` seam, and
+- **LSP code intelligence.** New `canonwright-lsp` crate, `LspService` seam, and
   `lsp` tool for definition, references, implementation, and hover queries over
-  a configured stdio language server. Configure servers in `.openbad/lsp.yaml`.
+  a configured stdio language server. Configure servers in `.canonwright/lsp.yaml`.
   The built-in surface is now 114 of 128 slots.
 - **Session history search.** `session_fts` indexes user, assistant, and tool
   event text. The `session` tool searches this workspace's history and reads a
   sequence range; cross-workspace reads are rejected. Schema is now
   `0013_session_fts`, and the built-in surface is 115 of 128 slots.
-- **MCP client and proxy tools.** `openbad-mcp` now speaks line-delimited
-  JSON-RPC over stdio and JSON-RPC over HTTP, loads `.openbad/mcp.yaml`, and
+- **MCP client and proxy tools.** `canonwright-mcp` now speaks line-delimited
+  JSON-RPC over stdio and JSON-RPC over HTTP, loads `.canonwright/mcp.yaml`, and
   enforces per-server `allowed_tools`. `tool_search` searches the catalog and
   `mcp_call` invokes a tool; the catalog is appended as an untrusted tail
   message so server changes do not alter the cached prefix. The built-in
   surface is 117 of 128 slots.
-- **Persistent terminal.** New `openbad-terminal` crate wraps `portable-pty`
+- **Persistent terminal.** New `canonwright-terminal` crate wraps `portable-pty`
   with create/send/read/close sessions, a bounded output ring, and process-group
   cleanup. The `terminal` tool requires Full access, and cancelling a turn
   closes terminal sessions. The built-in surface is 118 of 128 slots.
@@ -421,7 +421,7 @@ also stops a shifted boundary from indexing past the end.
 
 Fix release on top of 0.3.2. The packaged app icon was a placeholder on Linux:
 the `.deb` installed a 415×415 lockup into `hicolor/415x415/`, a directory no
-desktop environment looks in, so `Icon=openbad-desktop` resolved to nothing. The
+desktop environment looks in, so `Icon=canonwright-desktop` resolved to nothing. The
 icon set is now generated from `assets/app-icon.png` — the mark alone on a
 transparent 1024×1024 canvas — and installed at 32, 64, 128, 256, and 512, with
 `icon.icns` for macOS and an `icon.ico` whose 16–256 sizes come from the mark
@@ -472,19 +472,19 @@ collapsible, search expands matches) instead of a flat file list. The settings
 dialog's close control is in the standard top-right corner. `ask_question` now
 blocks: the desktop host shows a question dialog and returns the answer in the
 tool result, for parent and delegated runs alike, instead of queueing into an
-inbox nobody opened. The exchange is still logged to `.openbad/questions.json`,
+inbox nobody opened. The exchange is still logged to `.canonwright/questions.json`,
 which Project → Questions now presents as a log.
 
 **Skills.** Four engineering-process skills ship in the binary next to the four
 capability skills and are indexed in every prompt: `pre-push-checks`,
 `error-handling`, `test-reliability`, and `code-review`.
 
-**Goals.** `.openbad/goal.json` holds one durable objective per workspace with
+**Goals.** `.canonwright/goal.json` holds one durable objective per workspace with
 timestamps and progress notes; an open goal is re-summarised into every system
 prompt, and `create_goal`/`get_goal`/`update_goal` manage it. Creating a second
 objective while one is open is refused.
 
-**Team board.** `.openbad/team.json` is a shared board of units of work with
+**Team board.** `.canonwright/team.json` is a shared board of units of work with
 stable ids, a state, an owner, and a result, so a parent can divide work between
 subagents and see what is outstanding: `team_task_create`, `team_task_list`,
 `team_task_update`, `team_task_get`.
@@ -519,24 +519,24 @@ or pass the flag — and `ToolError::OutsideRoot` gains the same guidance for fi
 tools. The phrase "outside the workspace" is unchanged, because the agent system
 prompt keys off it.
 
-**Diagnostics you can read.** `scripts/diagnostics.py` opens `openbad.db`
+**Diagnostics you can read.** `scripts/diagnostics.py` opens `canonwright.db`
 read-only, joins each session's workspace root, redacts credentials, and prints
 either a summary or, with `--full`, the exchange with tool calls and reasoning;
 `--errors` filters to failures and `--log` tails the new app log. The desktop
-now writes `openbad.log` beside the database — startup version, pid, and
+now writes `canonwright.log` beside the database — startup version, pid, and
 platform, plus any panic with its message and location — capped at 4 MiB with
-one rotation and following `OPENBAD_DB_PATH` for isolated runs.
+one rotation and following `CANONWRIGHT_DB_PATH` for isolated runs.
 
 ## v0.3.9
 
-**Five days of logs, then gone.** Nothing pruned `.openbad/`: one workspace had
+**Five days of logs, then gone.** Nothing pruned `.canonwright/`: one workspace had
 2195 command logs, another 1326, and `spill/` and `audit.jsonl` only grew. Age is
 now the rule — command logs and spill files live five days — with file-count and
 byte ceilings kept only as a backstop so a runaway day cannot fill a disk. The
-audit trail rotates at 8 MiB keeping one archive, and `openbad.log` rotates at
+audit trail rotates at 8 MiB keeping one archive, and `canonwright.log` rotates at
 4 MiB through the same helper. Pruning is best effort, never prunes directories
 or symlinks, and keeps a file whose timestamp is in the future rather than
-deleting it over a clock disagreement. `.openbad/undo` and the session database
+deleting it over a clock disagreement. `.canonwright/undo` and the session database
 are recovery and product data and stay outside the policy.
 
 ## v0.3.10
@@ -547,7 +547,7 @@ clamped 1–365, and it travels `ChatInput` → `AgentConfig` →
 `ToolContext::log_retention_days` to the prune sites. The file-count and byte
 ceilings stay fixed as last-resort guards for a runaway day, and because they
 trim newest-first within the chosen window they can never shorten it behind your
-back. The audit trail and `openbad.log` keep size-based rotation.
+back. The audit trail and `canonwright.log` keep size-based rotation.
 
 ## v0.3.11
 
@@ -569,7 +569,7 @@ the valid actions now.
 **Startup no longer dies on a GLib log.** Seven core dumps in seven days were
 SIGABRT. GLib aborts on any level in its always-fatal mask and **skips every
 installed handler** while doing so, so the fix is to narrow that mask to errors
-before GTK initialises and then route warnings and criticals to `openbad.log` —
+before GTK initialises and then route warnings and criticals to `canonwright.log` —
 verified with a throwaway C program, not assumed. `g_error` stays fatal on
 purpose. `--version` and `--help` also exit before anything touches the display:
 they used to reach `gtk_init_check`, which calls `g_error` when the xsettings
@@ -650,7 +650,7 @@ reserves a scrollbar gutter, so the composer sat right of the text above it.
 ## v0.3.17
 
 **The supervised work pipeline (ADR-009) runs end to end.** A project opts in with
-`.openbad/pipeline.yaml`; a watcher polls its sources, judges each trigger against
+`.canonwright/pipeline.yaml`; a watcher polls its sources, judges each trigger against
 its thread, and admits what the rules allow as a ticket with a mandate. A ticket is
 checked out into its own worktree on `worker/<ticket>`, prepared inside it, and run
 by the app's own agent in a `worker-<ticket>` session it keeps across assignments —
@@ -675,7 +675,7 @@ it only when asked to, and reports what branch protection actually says. Its
 description carries the document's shape and the four rules that change behaviour —
 labels admit, `allowed` authorizes, a disabled source keeps its read position, and a
 failing prepare fails the ticket — so the model does not have to guess a schema it
-cannot see. Guard rules moved into `openbad-pipeline::guards`, so the panel and the
+cannot see. Guard rules moved into `canonwright-pipeline::guards`, so the panel and the
 agent get the same answer.
 
 ## v0.3.18
@@ -696,7 +696,7 @@ validates through the loader's own parser before saving (with `dry_run` to check
 without saving), and `guards` reports what branch protection actually says, so
 auto-merge is never promised on a guess.
 
-The guard rules moved into `openbad-pipeline::guards`, which means the panel that
+The guard rules moved into `canonwright-pipeline::guards`, which means the panel that
 refuses the switch and the agent that checks it compute the same answer.
 
 ## v0.3.19
@@ -730,7 +730,7 @@ app. That makes a bare `Command::new("gh")` a silent failure — a spawn error t
 caller discards, indistinguishable from "there is nothing there". The lookup now
 checks `PATH` first, then the directories installers use (`~/.local/bin`,
 `/usr/local/bin`, Homebrew on both Linux and macOS, `~/.nix-profile/bin`,
-`~/.asdf/shims`), and `OPENBAD_GH` names the binary outright. The app on this
+`~/.asdf/shims`), and `CANONWRIGHT_GH` names the binary outright. The app on this
 machine does have `~/.local/bin` on its `PATH`, so nothing was broken by it here;
 the lookup removes a way for it to break silently somewhere else.
 
@@ -763,7 +763,7 @@ mid-turn still wakes the live executor.
 `gh auth switch` mutates one global setting, so a person signed in as their work
 account for other projects and their personal account here would have each side
 flip the other — and whichever ran last decided who a commit or a comment was
-attributed to. `github.user` in `.openbad/pipeline.yaml` now pins an account:
+attributed to. `github.user` in `.canonwright/pipeline.yaml` now pins an account:
 polling, guard checks, pull-request detection, and the executor's own `gh` and
 `git` all read that account's saved credential and carry it per process, in an
 isolated token-free config directory. Nothing global changes, so the other
@@ -929,11 +929,11 @@ The failures are actionable. A loopback endpoint is TCP-probed before the reques
 so a stopped instance fails in milliseconds, and connect, timeout, HTTP, and
 non-JSON outcomes all name the service, the endpoint, the environment variable,
 and the compose command. A 403 or a non-JSON body points at `search.formats`; a
-deliberate `OPENBAD_SEARXNG_URL=off` says the tool is switched off instead of
+deliberate `CANONWRIGHT_SEARXNG_URL=off` says the tool is switched off instead of
 pretending the network failed. Remote endpoints skip the probe so an egress proxy
 stays usable.
 
 SearXNG is still a hard requirement — there is no fallback search backend — but
 that is now stated plainly instead of being implied by a stack trace. The probe
-lives in `openbad_tools::web_services`, and the desktop services panel reports the
+lives in `canonwright_tools::web_services`, and the desktop services panel reports the
 same two endpoints through it.

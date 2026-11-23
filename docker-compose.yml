@@ -5,9 +5,9 @@
 #   docker compose down       stop
 #
 # Both ports bind to loopback only. Point the tools elsewhere with
-# OPENBAD_SEARXNG_URL / OPENBAD_JINA_READER_URL. See docs/web-services.md.
+# CANONWRIGHT_SEARXNG_URL / CANONWRIGHT_JINA_READER_URL. See docs/web-services.md.
 
-name: openbad-web-services
+name: canonwright-web-services
 
 services:
   searxng:

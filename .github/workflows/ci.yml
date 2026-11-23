@@ -223,7 +223,7 @@ jobs:
       - name: Native Tauri end-to-end tests
         working-directory: apps/desktop/native-e2e
         env:
-          OPENBAD_APP_BINARY: ${{ github.workspace }}/target/debug/openbad-desktop
+          CANONWRIGHT_APP_BINARY: ${{ github.workspace }}/target/debug/canonwright-desktop
         run: |
           export WEBKIT_WEBDRIVER_BIN="$(command -v WebKitWebDriver)"
           xvfb-run -a npm test

@@ -11,6 +11,7 @@
 | [007](007-deepseek-first-provider-strategy.md) | DeepSeek-first provider strategy | Accepted |
 | [008](008-flat-tools-activation-discovery.md) | Flat tools with activation-based discovery | Accepted |
 | [009](009-supervised-work-pipeline.md) | Supervised work pipeline | Accepted |
+| [010](010-copy-openbad-core-as-a-starting-point.md) | Copy OpenBaD core instead of forking | Accepted |
 
 ADRs are immutable once accepted. A changed decision is a new ADR that
 supersedes the old one.

@@ -6,7 +6,7 @@ The autonomic system keeps the app healthy without the user asking: it indexes,
 consolidates, backs up, schedules, and reports. The governance system keeps it
 safe: policy, approvals, audit, redaction, and sandboxing.
 
-These are the refined descendants of OpenBaD v0's heartbeat, interoception,
+These are the refined descendants of Canonwright v0's heartbeat, interoception,
 reflex arc, immune system, and endocrine system. They are concrete services,
 not simulations.
 
@@ -306,7 +306,7 @@ optional per workspace.
 
 ## 11. Affective / endocrine modes
 
-OpenBaD v0 modeled adrenaline, endorphins, and exhaustion. In the refined
+Canonwright v0 modeled adrenaline, endorphins, and exhaustion. In the refined
 design these become **explicit control presets**, not simulated emotions.
 
 | Mode | Temperature | Autonomy | Verbosity | Budget |

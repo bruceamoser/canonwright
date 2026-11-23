@@ -115,7 +115,7 @@ let mockKnowledge: KnowledgeDocumentSummary[] = [
 const mockKnowledgeContent = new Map<string, string>([
   [
     "mock-knowledge-1",
-    "OpenBaD is a desktop coding harness. Projects own one workspace plus reference folders, a knowledge library, retrieval corpus, and durable memories. Keep the chat focused and open visual artifacts beside it.",
+    "Canonwright is a desktop coding harness. Projects own one workspace plus reference folders, a knowledge library, retrieval corpus, and durable memories. Keep the chat focused and open visual artifacts beside it.",
   ],
 ]);
 
@@ -164,8 +164,8 @@ let mockFiles = [
   "apps/desktop/ui/src/App.tsx",
   "apps/desktop/ui/src/backend.ts",
   "assets/logo.png",
-  "crates/openbad-agent/src/lib.rs",
-  "crates/openbad-store/src/store.rs",
+  "crates/canonwright-agent/src/lib.rs",
+  "crates/canonwright-store/src/store.rs",
   "data/releases.csv",
   "docs/architecture/00-vision-and-feature-set.md",
   "docs/index.html",
@@ -221,7 +221,7 @@ let mockQuestions: ProjectQuestion[] = [
 ];
 
 const mockManifest: ProjectManifest = {
-  name: "OpenBaD",
+  name: "Canonwright",
   description: "Desktop coding harness with project-scoped context.",
   scope: {
     authoritative: ["crates/**", "apps/**", "docs/**"],
@@ -275,12 +275,12 @@ let mockIndex: WorkspaceIndexSummary = {
   indexed_at: Date.now() - 60_000,
 };
 const mockSessions: SessionSummary[] = [];
-const mockWorkspacesDirectory = "/home/you/OpenBaD/workspaces";
+const mockWorkspacesDirectory = "/home/you/Canonwright/workspaces";
 let mockProjects: WorkspaceSummary[] = [
   {
     id: "mock-workspace",
-    name: "OpenBaD",
-    path: "/mnt/disk4/repos/OpenBaD",
+    name: "Canonwright",
+    path: "/mnt/disk4/repos/Canonwright",
     created_at: Date.now() - 86_400_000,
     updated_at: Date.now(),
     session_count: 0,
@@ -327,7 +327,7 @@ const mockFoundation: Foundation = {
 };
 
 export async function workspaceDefault(): Promise<string> {
-  return isTauri ? invoke<string>("workspace_default") : "/mnt/disk4/repos/OpenBaD";
+  return isTauri ? invoke<string>("workspace_default") : "/mnt/disk4/repos/Canonwright";
 }
 
 export async function loadFoundation(): Promise<Foundation> {
@@ -375,10 +375,10 @@ export async function pickSaveFile(
     return save({
       title,
       defaultPath,
-      filters: [{ name: "OpenBaD project", extensions: ["openbad-project"] }],
+      filters: [{ name: "Canonwright project", extensions: ["canonwright-project"] }],
     });
   }
-  return `${mockWorkspacesDirectory}/${defaultPath.split("/").at(-1) ?? "project.openbad-project"}`;
+  return `${mockWorkspacesDirectory}/${defaultPath.split("/").at(-1) ?? "project.canonwright-project"}`;
 }
 
 export async function pickImportBundle(): Promise<string | null> {
@@ -386,12 +386,12 @@ export async function pickImportBundle(): Promise<string | null> {
     const selected = await open({
       directory: false,
       multiple: false,
-      title: "Import OpenBaD project",
-      filters: [{ name: "OpenBaD project", extensions: ["openbad-project"] }],
+      title: "Import Canonwright project",
+      filters: [{ name: "Canonwright project", extensions: ["canonwright-project"] }],
     });
     return typeof selected === "string" ? selected : null;
   }
-  return `${mockWorkspacesDirectory}/OpenBaD.openbad-project`;
+  return `${mockWorkspacesDirectory}/Canonwright.canonwright-project`;
 }
 
 export async function exportProject(
@@ -403,7 +403,7 @@ export async function exportProject(
   }
   return {
     path: destination,
-    project_name: "OpenBaD",
+    project_name: "Canonwright",
     files: 128,
     bytes: 18_450_000,
     sessions: 4,
@@ -427,12 +427,12 @@ export async function importProject(
       destinationParent,
     });
   }
-  const path = `${destinationParent}/OpenBaD`;
+  const path = `${destinationParent}/Canonwright`;
   if (!mockProjects.some((project) => project.path === path)) {
     mockProjects = [
       {
         id: `mock-project-${mockProjects.length + 1}`,
-        name: "OpenBaD",
+        name: "Canonwright",
         path,
         created_at: Date.now(),
         updated_at: Date.now(),
@@ -443,7 +443,7 @@ export async function importProject(
   }
   return {
     path,
-    project_name: "OpenBaD",
+    project_name: "Canonwright",
     files: 128,
     sessions: 4,
     memories: 7,
@@ -468,7 +468,7 @@ export async function importProjectInto(
   }
   return {
     path: workspacePath,
-    project_name: "OpenBaD",
+    project_name: "Canonwright",
     files: 128,
     sessions: 2,
     memories: 7,
@@ -915,7 +915,7 @@ export async function onNotificationOpened(
   if (!isTauri) {
     return () => undefined;
   }
-  return listen<string>("openbad:notification-opened", (event) =>
+  return listen<string>("canonwright:notification-opened", (event) =>
     handler(event.payload),
   );
 }
@@ -1580,7 +1580,7 @@ export async function previewProjectFile(
     return {
       ...base,
       kind: "pdf",
-      content: "OpenBaD report",
+      content: "Canonwright report",
       data_url: MOCK_PDF,
       mime: "application/pdf",
       size: 470,
@@ -1605,8 +1605,8 @@ export async function previewProjectFile(
           name: "CSV",
           rows: [
             ["crate", "tests"],
-            ["openbad-store", "42"],
-            ["openbad-tools", "58"],
+            ["canonwright-store", "42"],
+            ["canonwright-tools", "58"],
           ],
           truncated: false,
         },
@@ -1967,7 +1967,7 @@ async function mockChat(
         "",
         "[^1]: Footnotes render at the end.",
       ].join("\n")
-    : "I read `Cargo.toml`. It is a virtual workspace with twelve `openbad-*` crates plus the Tauri desktop app. The core crates are store, harness, llm, tools, agent, workspace, governance, memory, knowledge, autonomic, and mcp.";
+    : "I read `Cargo.toml`. It is a virtual workspace with twelve `canonwright-*` crates plus the Tauri desktop app. The core crates are store, harness, llm, tools, agent, workspace, governance, memory, knowledge, autonomic, and mcp.";
   const attached = input.attachments ?? [];
   const reply = attached.length === 0
     ? text
@@ -2008,19 +2008,19 @@ async function mockChat(
       type: "tool_call",
       step: 2,
       name: "present_artifact",
-      arguments: '{"kind":"web","title":"OpenBaD architecture","uri":"https://example.com"}',
+      arguments: '{"kind":"web","title":"Canonwright architecture","uri":"https://example.com"}',
     });
     await tick(80, input.runId);
     onEvent({
       type: "tool_result",
       step: 2,
       name: "present_artifact",
-      content: 'Presented web artifact "OpenBaD architecture" beside the chat.',
+      content: 'Presented web artifact "Canonwright architecture" beside the chat.',
       is_error: false,
       metadata: {
-        openbad_artifact: {
+        canonwright_artifact: {
           kind: "web",
-          title: "OpenBaD architecture",
+          title: "Canonwright architecture",
           uri: "https://example.com",
         },
       },
@@ -2040,10 +2040,10 @@ async function mockChat(
       step: 2,
       name: "request_fs_access",
       content:
-        "Filesystem access requested for /home/you/other-project (read only). Stop this turn and ask the human to approve it in OpenBaD; retry only after approval.",
+        "Filesystem access requested for /home/you/other-project (read only). Stop this turn and ask the human to approve it in Canonwright; retry only after approval.",
       is_error: false,
       metadata: {
-        openbad_access_request: {
+        canonwright_access_request: {
           path: "/home/you/other-project",
           write: false,
           reason: "Compare the implementation",
@@ -2082,7 +2082,7 @@ async function mockChat(
   if (mockCheckpoints.length === 0) {
     mockCheckpoints.push({
       id: `mock-checkpoint-${Date.now()}`,
-      path: "/mnt/disk4/repos/OpenBaD/src/main.rs",
+      path: "/mnt/disk4/repos/Canonwright/src/main.rs",
       existed: true,
       bytes: 128,
       created_at: Date.now(),

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OpenBaD Desktop</title>
+    <title>Canonwright Desktop</title>
   </head>
   <body>
     <div id="root"></div>
@@ -12,7 +12,7 @@
         const showFatal = (message) => {
           const root = document.getElementById("root");
           if (root && root.childElementCount === 0) {
-            root.textContent = `OpenBaD failed to start: ${message}`;
+            root.textContent = `Canonwright failed to start: ${message}`;
             root.style.cssText =
               "padding:24px;color:#fca5a5;font:14px/1.5 ui-monospace,monospace;white-space:pre-wrap";
           }

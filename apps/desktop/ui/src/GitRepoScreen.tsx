@@ -394,7 +394,7 @@ export default function GitRepoScreen({
           </p>
           <p className="mt-2 text-[10px] leading-4 text-obd-subtle">
             Initialize Git to track changes, stage files, and commit from
-            OpenBaD.
+            Canonwright.
           </p>
           {status.error !== null && (
             <p className="mt-1 text-[10px] text-obd-warning">{status.error}</p>

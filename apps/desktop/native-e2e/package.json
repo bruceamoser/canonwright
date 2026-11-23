@@ -1,9 +1,9 @@
 {
-  "name": "openbad-native-e2e",
+  "name": "canonwright-native-e2e",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test --test-concurrency=1 openbad.native.test.mjs"
+    "test": "node --test --test-concurrency=1 canonwright.native.test.mjs"
   },
   "engines": {
     "node": ">=22.5"

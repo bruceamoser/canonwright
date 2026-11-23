@@ -265,7 +265,7 @@ export default function McpSettings({ workspacePath }: { workspacePath: string }
           <p className="text-[12px] font-medium text-obd-text">MCP servers</p>
           <p className="mt-0.5 text-[11px] text-obd-subtle">
             Servers are defined once globally. Each project chooses which ones
-            it enables in <code>.openbad/mcp.yaml</code>. The model can add,
+            it enables in <code>.canonwright/mcp.yaml</code>. The model can add,
             change, and toggle servers through the mcp domain.
           </p>
         </div>

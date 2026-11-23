@@ -11,7 +11,7 @@
 ## 2. Workspace layout
 
 ```text
-OpenBaD/
+Canonwright/
 ├── Cargo.toml                     # workspace
 ├── rust-toolchain.toml            # pinned toolchain
 ├── rustfmt.toml
@@ -38,20 +38,20 @@ OpenBaD/
 │           │   └── styles/
 │           └── tests/
 ├── crates/
-│   ├── openbad-core/
-│   ├── openbad-store/          # includes migrations/
-│   ├── openbad-harness/
-│   ├── openbad-llm/
-│   ├── openbad-agent/
-│   ├── openbad-tools/
-│   ├── openbad-workspace/
-│   ├── openbad-memory/
-│   ├── openbad-knowledge/
-│   ├── openbad-autonomic/
-│   ├── openbad-governance/
-│   ├── openbad-mcp/
-│   ├── openbad-update/
-│   └── openbad-transfer/
+│   ├── canonwright-core/
+│   ├── canonwright-store/          # includes migrations/
+│   ├── canonwright-harness/
+│   ├── canonwright-llm/
+│   ├── canonwright-agent/
+│   ├── canonwright-tools/
+│   ├── canonwright-workspace/
+│   ├── canonwright-memory/
+│   ├── canonwright-knowledge/
+│   ├── canonwright-autonomic/
+│   ├── canonwright-governance/
+│   ├── canonwright-mcp/
+│   ├── canonwright-update/
+│   └── canonwright-transfer/
 ├── tests/
 │   ├── integration/
 │   ├── fixtures/
@@ -64,60 +64,60 @@ OpenBaD/
 
 | Crate | Owns | Must not own |
 | --- | --- | --- |
-| `openbad-core` | IDs, domain events, config types, errors, clock, capability traits, canonical JSON | SQL, HTTP, UI, process spawning |
-| `openbad-store` | SQLite connection pool, migrations, repositories, projections, FTS, vector search | Business rules, prompt assembly |
-| `openbad-harness` | Session runtime, routing, prompt assembly, token meter, compaction, evidence gate | Concrete provider APIs, concrete tools |
-| `openbad-llm` | `ModelProvider` implementations, streaming, usage/cache normalization, cost model | Session persistence |
-| `openbad-llm::deepseek` | DeepSeek chat, thinking, Files, Search/Fetch, FIM, prefix completion, cache accounting | Tool execution |
-| `openbad-tools` | Tool registry, schemas, policy checks, execution pipeline, built-in tools | Agent loop |
-| `openbad-agent` | Turn/step loop, tool dispatch, step budgets, usage accumulation | Provider wire formats, tool implementations |
-| `openbad-workspace` | File tree, watcher, indexer, Git, LSP, PTY, process supervision | Memory/knowledge semantics |
-| `openbad-memory` | Engrams, ACT-R, associations, extraction, consolidation, retrieval | UI |
-| `openbad-knowledge` | Library, ingestion, chunking, embeddings, hybrid search | Chat UI |
-| `openbad-autonomic` | Heartbeat, job supervisor, schedules, pulse metrics | Tool execution details |
-| `openbad-governance` | Capability policy, risk classification, approvals, audit, redaction, secrets | Model calls |
-| `openbad-mcp` | MCP server lifecycle, tool/resource/prompt import, auth | Agent loop |
-| `openbad-update` | GitHub release checks, asset selection, checksum-verified downloads, AppImage and installer handoff | UI, session runtime |
-| `openbad-transfer` | Portable project bundles: workspace packing with rebuildable-output exclusions, project state export/import | Agent loop, tools |
-| `openbad-terminal` | Persistent PTY sessions, output buffering, process-group cleanup | Agent loop |
+| `canonwright-core` | IDs, domain events, config types, errors, clock, capability traits, canonical JSON | SQL, HTTP, UI, process spawning |
+| `canonwright-store` | SQLite connection pool, migrations, repositories, projections, FTS, vector search | Business rules, prompt assembly |
+| `canonwright-harness` | Session runtime, routing, prompt assembly, token meter, compaction, evidence gate | Concrete provider APIs, concrete tools |
+| `canonwright-llm` | `ModelProvider` implementations, streaming, usage/cache normalization, cost model | Session persistence |
+| `canonwright-llm::deepseek` | DeepSeek chat, thinking, Files, Search/Fetch, FIM, prefix completion, cache accounting | Tool execution |
+| `canonwright-tools` | Tool registry, schemas, policy checks, execution pipeline, built-in tools | Agent loop |
+| `canonwright-agent` | Turn/step loop, tool dispatch, step budgets, usage accumulation | Provider wire formats, tool implementations |
+| `canonwright-workspace` | File tree, watcher, indexer, Git, LSP, PTY, process supervision | Memory/knowledge semantics |
+| `canonwright-memory` | Engrams, ACT-R, associations, extraction, consolidation, retrieval | UI |
+| `canonwright-knowledge` | Library, ingestion, chunking, embeddings, hybrid search | Chat UI |
+| `canonwright-autonomic` | Heartbeat, job supervisor, schedules, pulse metrics | Tool execution details |
+| `canonwright-governance` | Capability policy, risk classification, approvals, audit, redaction, secrets | Model calls |
+| `canonwright-mcp` | MCP server lifecycle, tool/resource/prompt import, auth | Agent loop |
+| `canonwright-update` | GitHub release checks, asset selection, checksum-verified downloads, AppImage and installer handoff | UI, session runtime |
+| `canonwright-transfer` | Portable project bundles: workspace packing with rebuildable-output exclusions, project state export/import | Agent loop, tools |
+| `canonwright-terminal` | Persistent PTY sessions, output buffering, process-group cleanup | Agent loop |
 | `apps/desktop/src-tauri` | Tauri commands, event bridge, window/tray/menu, updater | Domain logic |
 
 ## 4. Dependency graph
 
 ```mermaid
 flowchart BT
-    Core[openbad-core]
-    Store[openbad-store] --> Core
-    Llm[openbad-llm] --> Core
-    Gov[openbad-governance] --> Core
-    Ws[openbad-workspace] --> Core
-    Mem[openbad-memory] --> Core
+    Core[canonwright-core]
+    Store[canonwright-store] --> Core
+    Llm[canonwright-llm] --> Core
+    Gov[canonwright-governance] --> Core
+    Ws[canonwright-workspace] --> Core
+    Mem[canonwright-memory] --> Core
     Mem --> Store
-    Know[openbad-knowledge] --> Core
+    Know[canonwright-knowledge] --> Core
     Know --> Store
-    Tools[openbad-tools] --> Core
+    Tools[canonwright-tools] --> Core
     Tools --> Gov
     Tools --> Ws
     Tools --> Mem
     Tools --> Know
-    Harness[openbad-harness] --> Core
+    Harness[canonwright-harness] --> Core
     Harness --> Store
     Harness --> Mem
     Harness --> Know
     Harness --> Gov
-    Agent[openbad-agent] --> Harness
+    Agent[canonwright-agent] --> Harness
     Agent --> Llm
     Agent --> Tools
     Agent --> Ws
-    Auto[openbad-autonomic] --> Core
+    Auto[canonwright-autonomic] --> Core
     Auto --> Store
     Auto --> Ws
     Auto --> Mem
     Auto --> Know
-    Mcp[openbad-mcp] --> Core
+    Mcp[canonwright-mcp] --> Core
     Tools --> Mcp
-    Upd[openbad-update]
-    Transfer[openbad-transfer] --> Store
+    Upd[canonwright-update]
+    Transfer[canonwright-transfer] --> Store
     Desktop[apps/desktop] --> Harness
     Desktop --> Auto
     Desktop --> Store
@@ -129,10 +129,10 @@ flowchart BT
 
 Rules:
 
-- `openbad-core` has no internal dependencies.
-- `openbad-store` is the only crate that imports a SQL driver.
-- `openbad-harness` depends on traits, not concrete providers or tools.
-- `openbad-tools` may depend on workspace/memory/knowledge services, but those
+- `canonwright-core` has no internal dependencies.
+- `canonwright-store` is the only crate that imports a SQL driver.
+- `canonwright-harness` depends on traits, not concrete providers or tools.
+- `canonwright-tools` may depend on workspace/memory/knowledge services, but those
   services do not depend on tools.
 - `apps/desktop` is the only crate that knows about Tauri.
 
@@ -150,7 +150,7 @@ Rules:
 | Logging | `tracing`, `tracing-subscriber`, `tracing-appender` | Structured logs |
 | SQLite | `rusqlite` (bundled) | FTS5, extension loading, sync API |
 | Pool | `r2d2`, `r2d2_sqlite` | Read connection pool |
-| Migrations | Embedded SQL runner | `crates/openbad-store/migrations` + `schema_migrations` |
+| Migrations | Embedded SQL runner | `crates/canonwright-store/migrations` + `schema_migrations` |
 | HTTP | `reqwest` (rustls) | SSE and JSON APIs |
 | SSE | `eventsource-stream` or `reqwest` byte stream | Streaming tokens |
 | Process | `tokio::process`, `command-group`, `portable-pty` | Shell, PTY, process trees |
@@ -178,18 +178,18 @@ Rules:
 resolver = "3"
 members = [
     "apps/desktop/src-tauri",
-    "crates/openbad-core",
-    "crates/openbad-store",
-    "crates/openbad-harness",
-    "crates/openbad-llm",
-    "crates/openbad-tools",
-    "crates/openbad-workspace",
-    "crates/openbad-memory",
-    "crates/openbad-knowledge",
-    "crates/openbad-autonomic",
-    "crates/openbad-governance",
-    "crates/openbad-mcp",
-    "crates/openbad-update",
+    "crates/canonwright-core",
+    "crates/canonwright-store",
+    "crates/canonwright-harness",
+    "crates/canonwright-llm",
+    "crates/canonwright-tools",
+    "crates/canonwright-workspace",
+    "crates/canonwright-memory",
+    "crates/canonwright-knowledge",
+    "crates/canonwright-autonomic",
+    "crates/canonwright-governance",
+    "crates/canonwright-mcp",
+    "crates/canonwright-update",
 ]
 
 [workspace.package]
@@ -222,17 +222,17 @@ Exact versions are pinned in `Cargo.lock` and updated deliberately.
 
 | Feature | Crate | Default | Effect |
 | --- | --- | --- | --- |
-| `deepseek-native` | `openbad-llm` | on | Files, Search/Fetch, FIM, prefix completion, thinking budgets |
-| `local-embeddings` | `openbad-knowledge` | on | Bundle `fastembed`; used because DeepSeek has no embeddings endpoint |
-| `provider-embeddings` | `openbad-knowledge` | off | Allow a secondary embeddings provider |
-| `lsp` | `openbad-workspace` | on | Language server support |
-| `pty` | `openbad-workspace` | on | Interactive terminal |
-| `mcp` | `openbad-mcp` | on | MCP client |
-| `sqlcipher` | `openbad-store` | off | Encrypted database at rest |
-| `otel` | `openbad-autonomic` | off | OpenTelemetry export |
-| `browser` | `openbad-tools` | off | Browser automation |
-| `computer-use` | `openbad-tools` | off | Screen/input automation |
-| `cloud-sync` | `openbad-store` | off | Optional encrypted backup/sync |
+| `deepseek-native` | `canonwright-llm` | on | Files, Search/Fetch, FIM, prefix completion, thinking budgets |
+| `local-embeddings` | `canonwright-knowledge` | on | Bundle `fastembed`; used because DeepSeek has no embeddings endpoint |
+| `provider-embeddings` | `canonwright-knowledge` | off | Allow a secondary embeddings provider |
+| `lsp` | `canonwright-workspace` | on | Language server support |
+| `pty` | `canonwright-workspace` | on | Interactive terminal |
+| `mcp` | `canonwright-mcp` | on | MCP client |
+| `sqlcipher` | `canonwright-store` | off | Encrypted database at rest |
+| `otel` | `canonwright-autonomic` | off | OpenTelemetry export |
+| `browser` | `canonwright-tools` | off | Browser automation |
+| `computer-use` | `canonwright-tools` | off | Screen/input automation |
+| `cloud-sync` | `canonwright-store` | off | Optional encrypted backup/sync |
 
 The default build should remain under 30 MB for the shell. Heavy features are
 opt-in or lazily downloaded (for example, embedding models).
@@ -351,4 +351,4 @@ fast to rebuild.
 - Public APIs have doc comments; private helpers do not need them.
 - New dependencies require a license check (MIT, Apache-2.0, BSD only).
 - Every crate exposes a `testing` module behind `#[cfg(any(test, feature = "testing"))]`.
-- SQL lives in `crates/openbad-store/migrations/` and repository modules, never in domain crates.
+- SQL lives in `crates/canonwright-store/migrations/` and repository modules, never in domain crates.

@@ -2,7 +2,7 @@
 
 ## 1. Objective
 
-Deliver OpenBaD Desktop v1.0: a DeepSeek-first, cache-first coding harness for
+Deliver Canonwright Desktop v1.0: a DeepSeek-first, cache-first coding harness for
 Linux, macOS, and Windows, built in Rust with Tauri v2 and React, with cognitive
 memory, knowledge/RAG, and autonomic governance.
 
@@ -59,7 +59,7 @@ project archived and the new decisions recorded.
 
 | ID | Task | Acceptance |
 | --- | --- | --- |
-| P0-01 | Archive v0 docs and code under `archive/openbad-v0/` | `git log --follow` preserves history; archive README explains status |
+| P0-01 | Archive v0 docs and code under `archive/canonwright-v0/` | `git log --follow` preserves history; archive README explains status |
 | P0-02 | Write architecture docs 00–10 and ADRs 001–007 | Docs pass link check and Mermaid validation |
 | P0-03 | Create Cargo workspace with empty crates | `cargo check --workspace` succeeds |
 | P0-04 | Create Tauri v2 app shell and React/Vite UI | `cargo tauri dev` opens a window |
@@ -89,8 +89,8 @@ secrets.
 
 | ID | Task | Acceptance |
 | --- | --- | --- |
-| P1-01 | `openbad-core`: IDs, errors, clock, domain events, config types | Table-driven tests; no IO |
-| P1-02 | `openbad-store`: SQLite pool, writer actor, migrations | Migrations apply to empty DB; schema hash test |
+| P1-01 | `canonwright-core`: IDs, errors, clock, domain events, config types | Table-driven tests; no IO |
+| P1-02 | `canonwright-store`: SQLite pool, writer actor, migrations | Migrations apply to empty DB; schema hash test |
 | P1-03 | Implement `session_events` + projections | Append/replay tests; projection rebuild equals live |
 | P1-04 | Implement workspaces, sessions, settings, providers, routes | CRUD tests; foreign keys enforced |
 | P1-05 | Implement audit log with hash chain | Tamper detection test |
@@ -114,7 +114,7 @@ secrets.
 
 ### Implementation notes
 
-- `openbad-store::Store` owns a dedicated writer thread and a separate reader
+- `canonwright-store::Store` owns a dedicated writer thread and a separate reader
   connection. Every mutation goes through `WriteCommand`; event append and
   projection update share one transaction.
 - `0005_project_memory.sql` adds workspace-scoped durable memories.
@@ -127,7 +127,7 @@ secrets.
   record on tamper.
 - Backup uses `VACUUM INTO`; `Store::restore_from` validates
   `PRAGMA integrity_check` before copying over an offline target.
-- `openbad-governance` defines `SecretStore`, `MemorySecretStore` for tests, and
+- `canonwright-governance` defines `SecretStore`, `MemorySecretStore` for tests, and
   a `KeychainSecretStore` behind the optional `keyring` feature. Linux Secret
   Service round-trip and cross-process persistence are validated by the
   `keychain_roundtrip` example; macOS and Windows validation is still pending.
@@ -175,7 +175,7 @@ accounting.
 
 ### Phase 2 implementation notes
 
-- `openbad-llm` now has a `DeepSeekClient` over an `HttpTransport` seam. The
+- `canonwright-llm` now has a `DeepSeekClient` over an `HttpTransport` seam. The
   reqwest transport is the production default; tests use an in-process mock
   transport.
 - `ChatRequest` freezes deterministic request bytes, preserves
@@ -185,7 +185,7 @@ accounting.
   deltas, usage, and `[DONE]`.
 - `RawUsage::normalize` maps DeepSeek disjoint hit/miss counters and
   OpenAI-style `cached_tokens` into the shared `Usage` shape.
-- `openbad-llm::pricing` contains the current flash/pro off-peak and peak
+- `canonwright-llm::pricing` contains the current flash/pro off-peak and peak
   prices, the 01:00–04:00 and 06:00–10:00 UTC weekday calendar, holiday
   overrides, and per-session `UsageTotals`.
 - `SeriesGuard` reports the first cache-breaking field change. `RetryPolicy`
@@ -235,7 +235,7 @@ commands with approvals.
 
 ### Phase 3 implementation notes
 
-- `openbad-tools` now has a `Tool` trait, a `ToolRegistry`, OpenAI-style tool
+- `canonwright-tools` now has a `Tool` trait, a `ToolRegistry`, OpenAI-style tool
   schemas, and seventeen built-in tools: `read_file`, `list_dir`, `grep`,
   `search_code`, `glob`, `find_symbols`, `write_file`, `edit_file`,
   `run_command`, `run_tests`, `git_status`, `git_diff`, `repo_map`, `remember`,
@@ -244,7 +244,7 @@ commands with approvals.
   paths and rejects parent or symlink escapes. Existing files must be read before
   they can be overwritten or edited. Writes use a temporary file plus rename and
   preserve existing Unix permissions; new files are created as `0644`.
-- `openbad-agent` runs the DeepSeek turn/step loop, accumulates usage and cost,
+- `canonwright-agent` runs the DeepSeek turn/step loop, accumulates usage and cost,
   and feeds tool errors back to the model as tool messages. The step budget is
   unlimited by default (`max_steps = 0`) so long coding tasks are not cut off;
   callers can still set an explicit cap. Reasoning and content deltas stream
@@ -276,13 +276,13 @@ commands with approvals.
   output directory as a workspace. The store uses a literal
   `LIKE` search with escaped wildcards, and the UI debounces input before
   querying.
-- `openbad-agent` has a `live_chat` example for headless end-to-end checks
+- `canonwright-agent` has a `live_chat` example for headless end-to-end checks
   against the real DeepSeek endpoint; it uses the desktop keychain entry or
   `DEEPSEEK_API_KEY`.
 - The desktop build enables the `keyring` feature by default; `DEEPSEEK_API_KEY`
-  and `OPENBAD_DEEPSEEK_BASE_URL` remain available for headless or mock runs.
+  and `CANONWRIGHT_DEEPSEEK_BASE_URL` remain available for headless or mock runs.
 - The agent appends root project conventions from `AGENTS.md`, `CLAUDE.md`,
-  `.github/copilot-instructions.md`, `.openbad/instructions.md`, and
+  `.github/copilot-instructions.md`, `.canonwright/instructions.md`, and
   `.cursorrules` to its stable system prompt (32 KiB cap).
 - `run_tests` detects Cargo, pnpm/npm/yarn, pytest, Go, and make projects,
   runs the suite through the gated command tool, and surfaces failure summary
@@ -316,7 +316,7 @@ commands with approvals.
 | P4-08 | Editor with FIM inline completion | Ghost text; accept/reject; separate series |
 | P4-09 | Prefix-completion constrained edit flow | Validation and retry |
 | P4-10 | Workspace fingerprint and explicit refresh | Series reset only on refresh |
-| P4-11 | `openbad doctor` workspace report | Index/LSP/Git diagnostics |
+| P4-11 | `canonwright doctor` workspace report | Index/LSP/Git diagnostics |
 
 ### Acceptance criteria
 
@@ -336,7 +336,7 @@ commands with approvals.
 
 ### Phase 4 implementation notes
 
-- `openbad-index` walks the workspace with `ignore`, hashes file contents with
+- `canonwright-index` walks the workspace with `ignore`, hashes file contents with
   BLAKE3, and stores changed files, symbols, and full text in SQLite. Unchanged
   files are skipped on refresh, and deleted files are removed from the index.
 - `0003_workspace_index` adds `workspace_files`, `workspace_symbols`, and an
@@ -471,8 +471,8 @@ schedules.
 
 ### Phase 6 implementation notes
 
-- Workspace skills are discovered from `.openbad/skills` and `.claude/skills`
-  (`.openbad` wins on duplicate names). Both flat `.md` files and
+- Workspace skills are discovered from `.canonwright/skills` and `.claude/skills`
+  (`.canonwright` wins on duplicate names). Both flat `.md` files and
   `<name>/SKILL.md` directories are supported.
 - Skill frontmatter provides `name` and `description`. Only the index is added
   to the stable system prompt; `read_skill` loads the body on demand. Discovery
@@ -664,7 +664,7 @@ A release is done when:
 ## 18. First ten issues
 
 1. `#1: Archive v0 and create the Rust/Tauri workspace skeleton`
-2. `#2: Implement openbad-core domain types and event vocabulary`
+2. `#2: Implement canonwright-core domain types and event vocabulary`
 3. `#3: Implement SQLite store, migrations, and session event log`
 4. `#4: Implement DeepSeek chat adapter with streaming and thinking`
 5. `#5: Implement prompt section registry and cache-first assembly`

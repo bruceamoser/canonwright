@@ -19,17 +19,17 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::{Duration, Instant};
 
-use openbad_core::event::NewEvent;
-use openbad_core::{SessionId, WorkspaceId};
-use openbad_llm::chat::ChatMessage;
-use openbad_pipeline::config::{ExecutionConfig, load_pipeline_config};
-use openbad_pipeline::execution::{
+use canonwright_core::event::NewEvent;
+use canonwright_core::{SessionId, WorkspaceId};
+use canonwright_llm::chat::ChatMessage;
+use canonwright_pipeline::config::{ExecutionConfig, load_pipeline_config};
+use canonwright_pipeline::execution::{
     Budget, LaunchPlan, PREPARE_TIMEOUT, SlotPriority, Slots, Spent, effects_of, launch_plan,
     ticket_prompt,
 };
-use openbad_pipeline::ticket::{AssignmentState, ReportOutcome, TicketState};
-use openbad_store::Store;
-use openbad_store::pipeline::{NewAssignment, TicketRecord};
+use canonwright_pipeline::ticket::{AssignmentState, ReportOutcome, TicketState};
+use canonwright_store::Store;
+use canonwright_store::pipeline::{NewAssignment, TicketRecord};
 use serde::Serialize;
 use tauri::State;
 
@@ -239,7 +239,7 @@ fn execution_root(execution: &ExecutionConfig, project_root: &Path) -> PathBuf {
             project_root
                 .parent()
                 .unwrap_or_else(|| Path::new("/"))
-                .join(".openbad-executors")
+                .join(".canonwright-executors")
                 .join(name)
         }
     }
@@ -447,7 +447,7 @@ pub struct ExecutionOptions {
     /// Shared per project, so two tickets cannot run when the project allows one.
     pub slots: Arc<Mutex<HashMap<WorkspaceId, Slots>>>,
     /// The GitHub account this project's pipeline acts as, if it names one.
-    pub github: Option<openbad_pipeline::GitHubIdentity>,
+    pub github: Option<canonwright_pipeline::GitHubIdentity>,
 }
 
 /// What an execution did with its ticket.
@@ -616,7 +616,7 @@ pub async fn execute<R: TurnRunner>(
     if let Ok(store) = store.lock() {
         let _ = store.append_event(
             session,
-            NewEvent::new(openbad_core::event::SessionEventKind::TurnStart).with_turn(turn),
+            NewEvent::new(canonwright_core::event::SessionEventKind::TurnStart).with_turn(turn),
         );
     }
 
@@ -845,18 +845,18 @@ async fn review_then_merge<R: TurnRunner>(
     base: &str,
     thread: &str,
     pull_request: &str,
-    execution: &openbad_pipeline::config::ExecutionConfig,
-    identity: Option<&openbad_pipeline::GitHubIdentity>,
+    execution: &canonwright_pipeline::config::ExecutionConfig,
+    identity: Option<&canonwright_pipeline::GitHubIdentity>,
     runner: &R,
     cancel: &Arc<AtomicBool>,
 ) -> ReviewOutcome {
-    use openbad_pipeline::config::{MergePolicy, ReviewPolicy};
+    use canonwright_pipeline::config::{MergePolicy, ReviewPolicy};
 
     if matches!(execution.review, ReviewPolicy::None) {
         return ReviewOutcome::Skipped;
     }
 
-    let prompt = openbad_pipeline::review_prompt(thread, branch, base, None);
+    let prompt = canonwright_pipeline::review_prompt(thread, branch, base, None);
     let head_before = git(worktree, &["rev-parse", "HEAD"]).ok();
 
     let answer = match runner.review(worktree, &prompt, cancel).await {
@@ -873,12 +873,12 @@ async fn review_then_merge<R: TurnRunner>(
     // A reviewer that moved the branch has changed what it was asked to judge.
     let head_after = git(worktree, &["rev-parse", "HEAD"]).ok();
     let verdict = if head_before.is_some() && head_before != head_after {
-        openbad_pipeline::Verdict {
+        canonwright_pipeline::Verdict {
             approved: false,
             reason: "the reviewer changed the branch it was reviewing".to_owned(),
         }
     } else {
-        openbad_pipeline::parse_verdict(&answer)
+        canonwright_pipeline::parse_verdict(&answer)
     };
 
     if !verdict.approved {
@@ -1031,13 +1031,13 @@ fn update_branch(
     binary: &Path,
     worktree: &Path,
     pull_request: &str,
-    identity: Option<&openbad_pipeline::GitHubIdentity>,
+    identity: Option<&canonwright_pipeline::GitHubIdentity>,
 ) -> Result<(), String> {
     let mut command = Command::new(binary);
     command
         .current_dir(worktree)
         .args(["pr", "update-branch", pull_request]);
-    openbad_pipeline::github::apply(identity, &mut command);
+    canonwright_pipeline::github::apply(identity, &mut command);
     let output = command
         .output()
         .map_err(|error| format!("cannot run gh pr update-branch: {error}"))?;
@@ -1071,9 +1071,9 @@ fn update_branch(
 fn merge_pull_request(
     worktree: &Path,
     pull_request: &str,
-    identity: Option<&openbad_pipeline::GitHubIdentity>,
+    identity: Option<&canonwright_pipeline::GitHubIdentity>,
 ) -> Result<String, String> {
-    let binary = openbad_pipeline::gh_binary()
+    let binary = canonwright_pipeline::gh_binary()
         .ok_or_else(|| "cannot find gh, so the pull request cannot be merged".to_owned())?;
 
     for attempt in 0..2 {
@@ -1103,7 +1103,7 @@ fn merge_pull_request(
             "--squash",
             "--delete-branch",
         ]);
-        openbad_pipeline::github::apply(identity, &mut merge);
+        canonwright_pipeline::github::apply(identity, &mut merge);
         let output = merge
             .output()
             .map_err(|error| format!("cannot run gh pr merge: {error}"))?;
@@ -1125,7 +1125,7 @@ fn pull_request_state(
     binary: &Path,
     worktree: &Path,
     pull_request: &str,
-    identity: Option<&openbad_pipeline::GitHubIdentity>,
+    identity: Option<&canonwright_pipeline::GitHubIdentity>,
 ) -> Result<(String, String, usize), String> {
     let mut view = Command::new(binary);
     view.current_dir(worktree).args([
@@ -1135,7 +1135,7 @@ fn pull_request_state(
         "--json",
         "mergeable,mergeStateStatus,statusCheckRollup",
     ]);
-    openbad_pipeline::github::apply(identity, &mut view);
+    canonwright_pipeline::github::apply(identity, &mut view);
     let output = view
         .output()
         .map_err(|error| format!("cannot run gh pr view: {error}"))?;
@@ -1186,9 +1186,9 @@ fn pull_request_state(
 fn detect_pull_request(
     worktree: &Path,
     branch: &str,
-    identity: Option<&openbad_pipeline::GitHubIdentity>,
+    identity: Option<&canonwright_pipeline::GitHubIdentity>,
 ) -> Option<String> {
-    let binary = match openbad_pipeline::gh_binary() {
+    let binary = match canonwright_pipeline::gh_binary() {
         Some(binary) => binary,
         None => {
             crate::diagnostics::record(
@@ -1202,7 +1202,7 @@ fn detect_pull_request(
     command.current_dir(worktree).args([
         "pr", "list", "--head", branch, "--state", "open", "--json", "url", "--jq", ".[0].url",
     ]);
-    openbad_pipeline::github::apply(identity, &mut command);
+    canonwright_pipeline::github::apply(identity, &mut command);
     let output = command.output().ok()?;
     if !output.status.success() {
         return None;
@@ -1249,11 +1249,11 @@ fn finish_session(store: &Store, session: SessionId, turn: u32, text: &str) {
     let _ = store.append_events(
         session,
         vec![
-            NewEvent::new(openbad_core::event::SessionEventKind::AssistantMessage)
+            NewEvent::new(canonwright_core::event::SessionEventKind::AssistantMessage)
                 .with_turn(turn)
                 .with_step(1)
                 .with_payload(serde_json::json!({ "content": text })),
-            NewEvent::new(openbad_core::event::SessionEventKind::TurnEnd)
+            NewEvent::new(canonwright_core::event::SessionEventKind::TurnEnd)
                 .with_turn(turn)
                 .with_payload(serde_json::json!({ "reason": "complete" })),
         ],
@@ -1341,7 +1341,7 @@ impl WatcherCredentials {
             let store = lock(&state.store)?;
             crate::ensure_user_id(&store)?
         };
-        let base_url = std::env::var("OPENBAD_DEEPSEEK_BASE_URL")
+        let base_url = std::env::var("CANONWRIGHT_DEEPSEEK_BASE_URL")
             .unwrap_or_else(|_| "https://api.deepseek.com".to_owned());
         Ok(Self {
             api_key,
@@ -1368,7 +1368,7 @@ pub fn start_watcher(
     project_path: String,
     interval: Duration,
     credentials: WatcherCredentials,
-    github: Option<openbad_pipeline::GitHubIdentity>,
+    github: Option<canonwright_pipeline::GitHubIdentity>,
 ) -> bool {
     let cancel = Arc::new(AtomicBool::new(false));
     {
@@ -1446,7 +1446,7 @@ pub fn resume_watchers(app: &tauri::AppHandle, state: &AppState) {
 
     for (workspace, path) in projects {
         let root = PathBuf::from(&path);
-        if !openbad_pipeline::config::pipeline_config_path(&root).is_file() {
+        if !canonwright_pipeline::config::pipeline_config_path(&root).is_file() {
             continue;
         }
         let wanted = match state.store.lock() {
@@ -1494,7 +1494,7 @@ pub struct Watcher {
     user_id: String,
     /// Resolved when the watcher starts: polling, pull-request detection, and the
     /// executor's own `gh` and `git` all act as this account.
-    github: Option<openbad_pipeline::GitHubIdentity>,
+    github: Option<canonwright_pipeline::GitHubIdentity>,
 }
 
 /// Starts watching a project. Idempotent: watching twice is still one watcher.
@@ -1603,7 +1603,9 @@ impl Watcher {
             PathBuf::from(project_path),
         );
         match supervisor
-            .tick(&openbad_pipeline::source::GhCli::new(self.github.clone()))
+            .tick(&canonwright_pipeline::source::GhCli::new(
+                self.github.clone(),
+            ))
             .await
         {
             Ok(report) => {
@@ -1754,12 +1756,12 @@ impl Watcher {
 
     /// Whether GitHub still has this pull request open.
     fn pull_request_open(&self, pull_request: &str) -> bool {
-        let Some(binary) = openbad_pipeline::gh_binary() else {
+        let Some(binary) = canonwright_pipeline::gh_binary() else {
             return false;
         };
         let mut command = Command::new(binary);
         command.args(["pr", "view", pull_request, "--json", "state"]);
-        openbad_pipeline::github::apply(self.github.as_ref(), &mut command);
+        canonwright_pipeline::github::apply(self.github.as_ref(), &mut command);
         match command.output() {
             Ok(output) if output.status.success() => {
                 let value: serde_json::Value =
@@ -1798,7 +1800,7 @@ impl Watcher {
                     app: self.app.clone(),
                     ticket: ticket.id.clone(),
                     api_key: self.api_key.clone(),
-                    model: openbad_llm::FLASH_MODEL.to_owned(),
+                    model: canonwright_llm::FLASH_MODEL.to_owned(),
                     base_url: self.base_url.clone(),
                     user_id: self.user_id.clone(),
                     max_steps: 0,
@@ -1851,7 +1853,7 @@ pub struct AgentTurn {
     max_steps: u32,
     /// The account the turn's `gh` and `git` act as, handed to every command it
     /// runs. Absent means the machine's own `gh` configuration.
-    github: Option<openbad_pipeline::GitHubIdentity>,
+    github: Option<canonwright_pipeline::GitHubIdentity>,
 }
 
 impl AgentTurn {
@@ -1866,7 +1868,7 @@ impl AgentTurn {
             let store = lock(&state.store)?;
             crate::ensure_user_id(&store)?
         };
-        let base_url = std::env::var("OPENBAD_DEEPSEEK_BASE_URL")
+        let base_url = std::env::var("CANONWRIGHT_DEEPSEEK_BASE_URL")
             .unwrap_or_else(|_| "https://api.deepseek.com".to_owned());
         let github = {
             let store = lock(&state.store)?;
@@ -1877,7 +1879,7 @@ impl AgentTurn {
             ticket: ticket.to_owned(),
             github,
             api_key,
-            model: openbad_llm::FLASH_MODEL.to_owned(),
+            model: canonwright_llm::FLASH_MODEL.to_owned(),
             base_url,
             user_id,
             max_steps: 0,
@@ -1899,12 +1901,12 @@ impl PipelineObserver {
     }
 }
 
-impl openbad_agent::AgentObserver for PipelineObserver {
+impl canonwright_agent::AgentObserver for PipelineObserver {
     fn on_step(&self, step: u32) {
         self.emit(serde_json::json!({ "ticket": self.ticket, "kind": "step", "step": step }));
     }
 
-    fn on_tool_call(&self, step: u32, call: &openbad_llm::chat::ToolCall) {
+    fn on_tool_call(&self, step: u32, call: &canonwright_llm::chat::ToolCall) {
         self.emit(serde_json::json!({
             "ticket": self.ticket,
             "kind": "tool_call",
@@ -1917,7 +1919,7 @@ impl openbad_agent::AgentObserver for PipelineObserver {
     fn on_tool_result(
         &self,
         step: u32,
-        call: &openbad_llm::chat::ToolCall,
+        call: &canonwright_llm::chat::ToolCall,
         content: &str,
         is_error: bool,
         _metadata: &serde_json::Value,
@@ -1945,28 +1947,28 @@ impl TurnRunner for AgentTurn {
         history: &[ChatMessage],
         cancel: &Arc<AtomicBool>,
     ) -> Result<TurnResult, String> {
-        let client = openbad_llm::DeepSeekClient::new(
-            openbad_llm::ReqwestTransport::new(),
+        let client = canonwright_llm::DeepSeekClient::new(
+            canonwright_llm::ReqwestTransport::new(),
             self.api_key.clone(),
         )
         .with_model(self.model.clone())
         .with_base_url(self.base_url.clone())
         .with_user_id(self.user_id.clone());
-        let agent = openbad_agent::default_agent(
+        let agent = canonwright_agent::default_agent(
             client,
-            Arc::new(openbad_workspace::WorkspaceService::new(
+            Arc::new(canonwright_workspace::WorkspaceService::new(
                 worktree.to_path_buf(),
             )),
-            openbad_agent::AgentConfig {
-                policy: openbad_governance::ToolPolicy::FullAccess,
+            canonwright_agent::AgentConfig {
+                policy: canonwright_governance::ToolPolicy::FullAccess,
                 max_steps: self.max_steps,
                 stream: false,
                 command_env: self
                     .github
                     .as_ref()
-                    .map(openbad_pipeline::GitHubIdentity::variables)
+                    .map(canonwright_pipeline::GitHubIdentity::variables)
                     .unwrap_or_default(),
-                ..openbad_agent::AgentConfig::default()
+                ..canonwright_agent::AgentConfig::default()
             },
         )
         .with_redactions({
@@ -2008,28 +2010,28 @@ impl TurnRunner for AgentTurn {
         prompt: &str,
         cancel: &Arc<AtomicBool>,
     ) -> Result<String, String> {
-        let client = openbad_llm::DeepSeekClient::new(
-            openbad_llm::ReqwestTransport::new(),
+        let client = canonwright_llm::DeepSeekClient::new(
+            canonwright_llm::ReqwestTransport::new(),
             self.api_key.clone(),
         )
         .with_model(self.model.clone())
         .with_base_url(self.base_url.clone())
         .with_user_id(self.user_id.clone());
-        let agent = openbad_agent::default_agent(
+        let agent = canonwright_agent::default_agent(
             client,
-            Arc::new(openbad_workspace::WorkspaceService::new(
+            Arc::new(canonwright_workspace::WorkspaceService::new(
                 worktree.to_path_buf(),
             )),
-            openbad_agent::AgentConfig {
+            canonwright_agent::AgentConfig {
                 // Commands are needed to run the tests the review depends on.
-                policy: openbad_governance::ToolPolicy::FullAccess,
+                policy: canonwright_governance::ToolPolicy::FullAccess,
                 stream: false,
                 command_env: self
                     .github
                     .as_ref()
-                    .map(openbad_pipeline::GitHubIdentity::variables)
+                    .map(canonwright_pipeline::GitHubIdentity::variables)
                     .unwrap_or_default(),
-                ..openbad_agent::AgentConfig::default()
+                ..canonwright_agent::AgentConfig::default()
             },
         )
         .with_redactions({
@@ -2061,10 +2063,10 @@ impl TurnRunner for AgentTurn {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use openbad_pipeline::mandate::{Mandate, MandateStrength};
-    use openbad_pipeline::trigger::ThreadId;
-    use openbad_store::pipeline::NewTicket;
-    use openbad_store::types::NewWorkspace;
+    use canonwright_pipeline::mandate::{Mandate, MandateStrength};
+    use canonwright_pipeline::trigger::ThreadId;
+    use canonwright_store::pipeline::NewTicket;
+    use canonwright_store::types::NewWorkspace;
 
     struct Project {
         root: tempfile::TempDir,
@@ -2098,9 +2100,9 @@ mod tests {
         .expect("commit");
 
         let executors = tempfile::tempdir().expect("executors");
-        std::fs::create_dir_all(path.join(".openbad")).expect("dir");
+        std::fs::create_dir_all(path.join(".canonwright")).expect("dir");
         std::fs::write(
-            path.join(".openbad/pipeline.yaml"),
+            path.join(".canonwright/pipeline.yaml"),
             format!(
                 "sources:\n  - id: main\n    repository: o/r\n    labels: [\"agent:run\"]\nexecution:\n  execution_root: {:?}\n  prepare: {prepare:?}\n",
                 executors.path().display().to_string()
@@ -2361,10 +2363,14 @@ mod tests {
         let project = project("true");
         project.launch().expect("launch");
         let mut config =
-            std::fs::read_to_string(project.root.path().join(".openbad/pipeline.yaml"))
+            std::fs::read_to_string(project.root.path().join(".canonwright/pipeline.yaml"))
                 .expect("config");
         config.push_str("  budget:\n    steps: 5\n");
-        std::fs::write(project.root.path().join(".openbad/pipeline.yaml"), config).expect("config");
+        std::fs::write(
+            project.root.path().join(".canonwright/pipeline.yaml"),
+            config,
+        )
+        .expect("config");
         let runner = FakeTurn::new(turn("still going", 5, 0));
 
         let report = execute(
@@ -2606,7 +2612,7 @@ mod tests {
         }
 
         std::fs::write(
-            stopped.root.path().join(".openbad/pipeline.yaml"),
+            stopped.root.path().join(".canonwright/pipeline.yaml"),
             "sources:\n  - id: slow\n    repository: o/r\n    poll_interval_secs: 300\n  - id: fast\n    repository: o/r2\n    poll_interval_secs: 30\n  - id: off\n    repository: o/r3\n    enabled: false\n    poll_interval_secs: 1\n",
         )
         .expect("config");
@@ -2635,7 +2641,7 @@ mod tests {
         }
 
         std::fs::write(
-            fresh.root.path().join(".openbad/pipeline.yaml"),
+            fresh.root.path().join(".canonwright/pipeline.yaml"),
             "sources:\n  - id: off\n    repository: o/r3\n    enabled: false\n",
         )
         .expect("config");
@@ -2649,13 +2655,13 @@ mod tests {
     }
 
     fn review_and_merge_config(
-        review: openbad_pipeline::config::ReviewPolicy,
-        merge: openbad_pipeline::config::MergePolicy,
-    ) -> openbad_pipeline::config::ExecutionConfig {
-        openbad_pipeline::config::ExecutionConfig {
+        review: canonwright_pipeline::config::ReviewPolicy,
+        merge: canonwright_pipeline::config::MergePolicy,
+    ) -> canonwright_pipeline::config::ExecutionConfig {
+        canonwright_pipeline::config::ExecutionConfig {
             review,
             merge,
-            ..openbad_pipeline::config::ExecutionConfig::default()
+            ..canonwright_pipeline::config::ExecutionConfig::default()
         }
     }
 
@@ -2671,8 +2677,8 @@ mod tests {
             "owner/repo#4",
             "https://github.com/owner/repo/pull/4",
             &review_and_merge_config(
-                openbad_pipeline::config::ReviewPolicy::Agent,
-                openbad_pipeline::config::MergePolicy::Auto,
+                canonwright_pipeline::config::ReviewPolicy::Agent,
+                canonwright_pipeline::config::MergePolicy::Auto,
             ),
             None,
             &runner,
@@ -2709,8 +2715,8 @@ mod tests {
             "owner/repo#4",
             "https://github.com/owner/repo/pull/4",
             &review_and_merge_config(
-                openbad_pipeline::config::ReviewPolicy::None,
-                openbad_pipeline::config::MergePolicy::Auto,
+                canonwright_pipeline::config::ReviewPolicy::None,
+                canonwright_pipeline::config::MergePolicy::Auto,
             ),
             None,
             &runner,
@@ -2779,8 +2785,8 @@ mod tests {
             "owner/repo#4",
             "https://github.com/owner/repo/pull/4",
             &review_and_merge_config(
-                openbad_pipeline::config::ReviewPolicy::Agent,
-                openbad_pipeline::config::MergePolicy::None,
+                canonwright_pipeline::config::ReviewPolicy::Agent,
+                canonwright_pipeline::config::MergePolicy::None,
             ),
             None,
             &EditingReviewer {
@@ -2840,7 +2846,7 @@ mod tests {
         let execution = ExecutionConfig::default();
         assert_eq!(
             execution_root(&execution, Path::new("/repos/demo")),
-            PathBuf::from("/repos/.openbad-executors/demo"),
+            PathBuf::from("/repos/.canonwright-executors/demo"),
             "the default keeps worktrees beside the repository, not inside it"
         );
     }

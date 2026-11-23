@@ -31,9 +31,9 @@ function formatBytes(bytes: number | null): string {
 function outcomeMessage(outcome: InstallOutcome): string {
   switch (outcome.kind) {
     case "app_image_replaced":
-      return "Update installed. OpenBaD is restarting with the new version.";
+      return "Update installed. Canonwright is restarting with the new version.";
     case "package_installed":
-      return `The ${outcome.installer} package was installed. Restart OpenBaD to use the new version.`;
+      return `The ${outcome.installer} package was installed. Restart Canonwright to use the new version.`;
     case "installer_launched":
       return `The ${outcome.installer} installer was saved to ${outcome.path} and opened.`;
     case "installer_saved":
@@ -132,7 +132,7 @@ export default function UpdatePanel({
               role="status"
               className="flex items-center gap-2 text-[11px] text-obd-accent"
             >
-              <CheckCircle2 size={13} /> OpenBaD {status.latest} is up to date.
+              <CheckCircle2 size={13} /> Canonwright {status.latest} is up to date.
             </p>
           )}
           {status.kind === "no_release" && (
@@ -144,7 +144,7 @@ export default function UpdatePanel({
             <div className="space-y-2 rounded-lg border border-obd-accent/20 bg-obd-accent/[0.04] p-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-[12px] text-obd-accent">
-                  OpenBaD {status.latest} is available
+                  Canonwright {status.latest} is available
                 </p>
                 <span className="font-mono text-[10px] text-obd-subtle">
                   {status.asset.name}

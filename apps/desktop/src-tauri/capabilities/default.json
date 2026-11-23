@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default capability for the main OpenBaD window.",
+  "description": "Default capability for the main Canonwright window.",
   "windows": ["main"],
   "permissions": ["core:default", "dialog:default", "notification:default"]
 }

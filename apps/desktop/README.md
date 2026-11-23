@@ -1,6 +1,6 @@
-# OpenBaD Desktop App
+# Canonwright Desktop App
 
-Tauri v2 shell and React UI for OpenBaD Desktop.
+Tauri v2 shell and React UI for Canonwright Desktop.
 
 ## Layout
 
@@ -72,8 +72,8 @@ real Tauri binary through `tauri-driver` and `WebKitWebDriver`.
 ## Interface
 
 The workspace is organised around projects. Create one by entering a name;
-OpenBaD creates a single workspace under `~/OpenBaD/workspaces` (override with
-`OPENBAD_WORKSPACES_DIR`). Existing project directories remain supported. Each
+Canonwright creates a single workspace under `~/Canonwright/workspaces` (override with
+`CANONWRIGHT_WORKSPACES_DIR`). Existing project directories remain supported. Each
 project groups its sessions beneath it, and sessions can be renamed inline.
 
 A top application menu (File, Edit, View, Project, Help) owns project-wide
@@ -113,7 +113,7 @@ no fixed step budget; use Stop to end a run.
 
 The desktop build enables the `keyring` feature by default. Set
 `DEEPSEEK_API_KEY` as a fallback when no key is saved. Set
-`OPENBAD_DEEPSEEK_BASE_URL` to point the adapter at a mock or proxy.
+`CANONWRIGHT_DEEPSEEK_BASE_URL` to point the adapter at a mock or proxy.
 
 When the UI is opened in a browser without Tauri, invoke calls fail gracefully
 and the panels report that the backend is unavailable.

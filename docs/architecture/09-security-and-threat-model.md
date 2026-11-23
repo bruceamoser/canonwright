@@ -2,7 +2,7 @@
 
 ## 1. Scope
 
-OpenBaD sends repository content, tool output, and user messages to DeepSeek.
+Canonwright sends repository content, tool output, and user messages to DeepSeek.
 That is a deliberate architectural choice: the product is DeepSeek-first, not
 local-first. Security therefore has to protect both the local machine and the
 data sent to the provider.
@@ -34,7 +34,7 @@ This document covers:
 ```mermaid
 flowchart LR
     subgraph Trusted
-        App[OpenBaD core]
+        App[Canonwright core]
         Policy[Policy engine]
         Store[Local DB]
     end
@@ -197,11 +197,11 @@ proxied and checked at call time.
 ### 8.1 Validating the keychain
 
 The platform backend is compiled only with the `keyring` feature. The
-`openbad-governance` example performs a set/get/compare/delete round-trip and
+`canonwright-governance` example performs a set/get/compare/delete round-trip and
 never prints the secret value:
 
 ```bash
-cargo run -p openbad-governance --features keyring \
+cargo run -p canonwright-governance --features keyring \
   --example keychain_roundtrip
 ```
 
@@ -212,7 +212,7 @@ headless session can use:
 ```bash
 dbus-run-session -- bash -c '
   gnome-keyring-daemon --start --components=secrets
-  cargo run -p openbad-governance --features keyring \
+  cargo run -p canonwright-governance --features keyring \
     --example keychain_roundtrip
 '
 ```
@@ -221,16 +221,16 @@ Validate persistence across processes with a fixed reference:
 
 ```bash
 # Store and keep the value.
-cargo run -p openbad-governance --features keyring \
-  --example keychain_roundtrip -- --keep openbad/validation/persistence-test
+cargo run -p canonwright-governance --features keyring \
+  --example keychain_roundtrip -- --keep canonwright/validation/persistence-test
 
 # A separate process must still see it.
-cargo run -p openbad-governance --features keyring \
-  --example keychain_roundtrip -- --check openbad/validation/persistence-test
+cargo run -p canonwright-governance --features keyring \
+  --example keychain_roundtrip -- --check canonwright/validation/persistence-test
 
 # Clean up.
-cargo run -p openbad-governance --features keyring \
-  --example keychain_roundtrip -- --delete openbad/validation/persistence-test
+cargo run -p canonwright-governance --features keyring \
+  --example keychain_roundtrip -- --delete canonwright/validation/persistence-test
 ```
 
 Expected output is `present: <n> bytes`, then `deleted`, then `absent`.
@@ -241,7 +241,7 @@ in `providers`; it never contains the secret.
 
 ## 9. Data sent to DeepSeek
 
-OpenBaD minimizes and redacts, but it does send:
+Canonwright minimizes and redacts, but it does send:
 
 - The system prompt and tool schemas.
 - Conversation history and tool results.

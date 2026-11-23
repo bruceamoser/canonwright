@@ -28,7 +28,7 @@ data/
 backups/
 spill/
 checkpoints/
-.openbad/
+.canonwright/
 
 # Environment / secrets
 .env

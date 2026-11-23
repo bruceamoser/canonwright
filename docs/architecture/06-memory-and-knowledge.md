@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-OpenBaD remembers two kinds of things:
+Canonwright remembers two kinds of things:
 
 - **Cognitive memory** — what the user and agent have learned, decided, and
   prefer, with temporal decay and associative recall.

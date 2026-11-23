@@ -2,29 +2,30 @@
 resolver = "3"
 members = [
     "apps/desktop/src-tauri",
-    "crates/openbad-core",
-    "crates/openbad-store",
-    "crates/openbad-harness",
-    "crates/openbad-llm",
-    "crates/openbad-tools",
-    "crates/openbad-agent",
-    "crates/openbad-workspace",
-    "crates/openbad-index",
-    "crates/openbad-memory",
-    "crates/openbad-knowledge",
-    "crates/openbad-autonomic",
-    "crates/openbad-governance",
-    "crates/openbad-mcp",
-    "crates/openbad-update",
-    "crates/openbad-lsp",
-    "crates/openbad-terminal",
-    "crates/openbad-transfer",
-    "crates/openbad-vault",
-    "crates/openbad-pipeline",
+    "crates/canonwright-core",
+    "crates/canonwright-story",
+    "crates/canonwright-store",
+    "crates/canonwright-harness",
+    "crates/canonwright-llm",
+    "crates/canonwright-tools",
+    "crates/canonwright-agent",
+    "crates/canonwright-workspace",
+    "crates/canonwright-index",
+    "crates/canonwright-memory",
+    "crates/canonwright-knowledge",
+    "crates/canonwright-autonomic",
+    "crates/canonwright-governance",
+    "crates/canonwright-mcp",
+    "crates/canonwright-update",
+    "crates/canonwright-lsp",
+    "crates/canonwright-terminal",
+    "crates/canonwright-transfer",
+    "crates/canonwright-vault",
+    "crates/canonwright-pipeline",
 ]
 
 [workspace.package]
-version = "0.3.31"
+version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT"

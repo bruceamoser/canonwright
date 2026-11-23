@@ -2,9 +2,9 @@
 
 > **Status (2026-10-27):** Phases A–F implemented and merged (#838–#843). Open follow-ups are tracked in the change log rows and §10. This plan implements, rather than invents, capabilities already listed in the feature table: F-09, F-17, F-18, F-19, F-36, F-45, plus new F-54.
 
-**Review basis.** Three-way review of this repository, [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) at `0.2.1-rc.2` (`master`, `687f282e`), and VS Code at `main` (`7c4967fad97`). The question was narrow: *which turn and chat technology should OpenBaD adopt, and which user experience should it imitate?*
+**Review basis.** Three-way review of this repository, [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) at `0.2.1-rc.2` (`master`, `687f282e`), and VS Code at `main` (`7c4967fad97`). The question was narrow: *which turn and chat technology should Canonwright adopt, and which user experience should it imitate?*
 
-**Answer in one sentence.** Keep OpenBaD's cache-first, event-sourced engine and its Rust/Tauri implementation; adopt DSH's discipline of explicit turns, steps, attempts, inboxes, and fail-closed approvals; express the result through VS Code's interaction grammar — not its code.
+**Answer in one sentence.** Keep Canonwright's cache-first, event-sourced engine and its Rust/Tauri implementation; adopt DSH's discipline of explicit turns, steps, attempts, inboxes, and fail-closed approvals; express the result through VS Code's interaction grammar — not its code.
 
 ---
 
@@ -16,9 +16,9 @@ The engine declares more than it emits, and the UI shows less than the engine re
 
 | Observation | Evidence |
 | --- | --- |
-| `step/start`, `step/end`, and `assistant/attempt` are declared but never emitted. `session_turns.steps` only increments on `StepEnd`, so the projection is permanently zero. | `crates/openbad-core/src/event.rs:13`, `:19`; `crates/openbad-store/src/projections.rs:41` |
+| `step/start`, `step/end`, and `assistant/attempt` are declared but never emitted. `session_turns.steps` only increments on `StepEnd`, so the projection is permanently zero. | `crates/canonwright-core/src/event.rs:13`, `:19`; `crates/canonwright-store/src/projections.rs:41` |
 | No message is persisted until the whole run returns; a crash mid-turn loses every visible token. | `apps/desktop/src-tauri/src/lib.rs:4332`, `:4499`, `:4598` |
-| Approval is a session-wide boolean. Approving flips the session to full access and queues a synthetic "Continue and retry" message as a **new turn**. `ApprovalDecision` exists but is unused. | `crates/openbad-agent/src/lib.rs:129`, `:364`; `crates/openbad-governance/src/lib.rs:30`; `apps/desktop/ui/src/App.tsx:3770` |
+| Approval is a session-wide boolean. Approving flips the session to full access and queues a synthetic "Continue and retry" message as a **new turn**. `ApprovalDecision` exists but is unused. | `crates/canonwright-agent/src/lib.rs:129`, `:364`; `crates/canonwright-governance/src/lib.rs:30`; `apps/desktop/ui/src/App.tsx:3770` |
 | All tool activity renders as one collapsed element of raw text: no per-call status, duration, arguments, or inline result. | `apps/desktop/ui/src/App.tsx:3005`; `apps/desktop/ui/src/types.ts:72` |
 | File edits have no inline diff in the transcript; diffs live behind a separate command and artifacts. | `apps/desktop/src-tauri/src/lib.rs:4708` |
 | Each streamed delta copies the whole entry array, so a token re-renders the transcript. | `apps/desktop/ui/src/App.tsx:218`, `:1310` |
@@ -26,7 +26,7 @@ The engine declares more than it emits, and the UI shows less than the engine re
 
 ### 1.2 What already works and must not regress
 
-- **Cache-first discipline is real.** `SeriesGuard`/`RequestEnvelope` hash the system prompt, tool schemas, workspace, model, thinking mode, and reasoning effort; JSON is canonicalized before hashing. This is the constraint that decides what we may copy from other harnesses. See `crates/openbad-harness/src/envelope.rs` and `crates/openbad-harness/src/prompt.rs`.
+- **Cache-first discipline is real.** `SeriesGuard`/`RequestEnvelope` hash the system prompt, tool schemas, workspace, model, thinking mode, and reasoning effort; JSON is canonicalized before hashing. This is the constraint that decides what we may copy from other harnesses. See `crates/canonwright-harness/src/envelope.rs` and `crates/canonwright-harness/src/prompt.rs`.
 - **Append-only, single-writer SQLite with derivable projections.** Every write goes through one writer thread; projections can be rebuilt from the log.
 - **Reasoning and tool calls are already persisted** in assistant payloads and rehydrated into `ChatMessage` (`chat_message_from_session` in `apps/desktop/src-tauri/src/lib.rs`). The gap is typing, not storage.
 - **Steering and cancellation exist** (`SteeringInbox`, `AtomicBool` cancel) and are polled at step boundaries, inside the stream, and before each tool call.
@@ -35,7 +35,7 @@ The engine declares more than it emits, and the UI shows less than the engine re
 
 ### 1.3 Thesis
 
-DSH supplies the *state discipline*: turns, steps, attempts, an inbox, a fail-closed tool pipeline, and the rule "model-visible means logged." VS Code supplies the *interaction grammar*: inline approvals, reviewable edits, checkpoints, queue-versus-steer, legible progress, and accessible transcripts. OpenBaD supplies the *constraint*: the model-visible prefix is immutable and append-only, and every exception must be explicit, logged, and measured.
+DSH supplies the *state discipline*: turns, steps, attempts, an inbox, a fail-closed tool pipeline, and the rule "model-visible means logged." VS Code supplies the *interaction grammar*: inline approvals, reviewable edits, checkpoints, queue-versus-steer, legible progress, and accessible transcripts. Canonwright supplies the *constraint*: the model-visible prefix is immutable and append-only, and every exception must be explicit, logged, and measured.
 
 ---
 
@@ -66,7 +66,7 @@ DSH supplies the *state discipline*: turns, steps, attempts, an inbox, a fail-cl
 
 ### 3.1 From DSH: turn technology
 
-| Idea | DSH reference | What OpenBaD builds | Deliberately not ported |
+| Idea | DSH reference | What Canonwright builds | Deliberately not ported |
 | --- | --- | --- | --- |
 | Turn / step / attempt as durable units | `packages/core/agent-loop`, `docs/agent-lifecycle.md` | Emit the declared events; attempts are retries, not turns | Cordis waterfall events |
 | Durable log vs live coordination events | `packages/core/session`, `docs/event-producer-consumer.md` | Two domains over the existing `SessionEventKind` | Plugin-owned projections |
@@ -82,7 +82,7 @@ DSH supplies the *state discipline*: turns, steps, attempts, an inbox, a fail-cl
 
 ### 3.2 From VS Code: user experience
 
-| Move | VS Code reference | OpenBaD expression | Phase |
+| Move | VS Code reference | Canonwright expression | Phase |
 | --- | --- | --- | --- |
 | Per-tool approval card: allow once, allow for session, skip | `chatToolConfirmationSubPart.ts` | Inline card in the tool row, keyboard-acceptable | B |
 | Per-file edits with Keep/Undo and aggregate summary | `chatEditingActions.ts`, `chatChangesSummaryPart.ts` | Edit cards plus a changes rail | C |
@@ -445,11 +445,11 @@ Dependency: B may start in parallel with A once P9-01 lands. C depends on A and 
 
 | Date | Change |
 | --- | --- |
-| 2026-10-27 | Proposed after a three-way review of OpenBaD, DeepSeek Harness, and VS Code chat. |
+| 2026-10-27 | Proposed after a three-way review of Canonwright, DeepSeek Harness, and VS Code chat. |
 | 2026-10-27 | Phase A (#832) landed: step lifecycle events, atomic step settlement, interrupted anchors, crash repair, replay equivalence, unified inbox, and per-session concurrency. Prompt-queue consumption is wired with the composer work in P9-25 because the UI must own the queued entry. |
 | 2026-10-27 | Phase B (#833) landed: four-stage tool pipeline with live status, a fail-closed approval gate with per-call decisions and session/workspace scopes, policy presets persisted per session, and a bounded parallel tool pool. |
 | 2026-10-27 | Phase C (#834) landed: structured per-call tool cards, frame-batched streaming deltas, Retry/Edit on the last request, and a per-turn checkpoint count that opens the changes panel. Retry resends as a new turn; in-turn attempt reuse and branch forking are tracked for P9-16 follow-up. |
-| 2026-10-27 | Phase D (#835) landed: oversized tool output spills to `.openbad/spill` with a bounded preview, the transcript renders a live todo checklist, and the usage footer reports context share. Overflow recovery uses the existing over-budget compaction path; subagent calls render as tool cards while child-session navigation stays in the Agents panel. |
+| 2026-10-27 | Phase D (#835) landed: oversized tool output spills to `.canonwright/spill` with a bounded preview, the transcript renders a live todo checklist, and the usage footer reports context share. Overflow recovery uses the existing over-budget compaction path; subagent calls render as tool cards while child-session navigation stays in the Agents panel. |
 | 2026-10-27 | Phase E (#836) landed: Ask/Plan/Agent modes with policy and instruction overrides, model metadata, session running/approval dots, and a completion toast. Queue/steer was already implemented in the composer and is now the consumer of the queue; `Inbox::claim_prompt` remains available for a future engine-side scheduler. OS notifications and unread tracking remain open. |
 | 2026-10-27 | Phase F (#837) landed: polite live-region announcements, focus traps with auto-focus for approvals, a copyable linearized transcript (Alt+T, menu, shortcuts), design tokens with a system light preference, and an updated keyboard map. Remaining literals in older components still need token migration before light mode is complete. |
 | 2026-10-27 | Follow-up set opened so none of the deferred scope becomes silent debt: #845 (tool cards survive reload), #846 (bounded in-turn retry), #848 (forked edit-and-resend), #849 (OS notifications and unread), #851 (light-mode token migration), #850 (persisted workspace approvals). Subagent child-session navigation stays in the Agents panel by design. |
@@ -461,5 +461,5 @@ Dependency: B may start in parallel with A once P9-01 lands. C depends on A and 
 | 2026-10-28 | Close-out fixes: delegated tools now run under the parent's policy and approval gate. `SubagentSpec`'s flags collapse "ask" into "allow", so a child spawned while the parent was in *Ask before writes* could write without a prompt; `subagent_policy` narrows the parent policy instead of replacing it, the child shares `DesktopApprovals` and its pending map so a child's question lands in the same prompt, and `SubagentObserver` forwards the request and decision into the parent transcript with the child's title. That makes P9-22's "pending child approvals are visible from the parent" true while child navigation stays in the Agents panel. Also removed a stray *Turn finished* toast that fired when the app loaded a project, and a turn that fails off-screen now keeps its unread dot. |
 | 2026-10-28 | Fix: the read-before-overwrite guard forgot reads between turns. `read_paths` lives on the `ToolContext`, which `run_with_observer` builds per user message, so the documented "prior read in the session" was really "in the turn" — every new turn made the agent re-read a file before it could overwrite it, and a `write_file` after a read in the previous turn failed outright. A session-scoped record now remembers each read with the file's size and modification time, is shared across turns and with delegated children, and is only honoured while the file is unchanged, so an external edit still forces a re-read. A successful full-content write refreshes the record, since the agent authored what is now on disk. The per-turn set remains for the "holding N files this turn" accounting. |
 | 2026-10-28 | Fix: domain proxies hid their tool names. `exec_run`'s schema said only `{"tool": string}`, so a model that skipped `exec_list` guessed the shape (`{"shell": "bash"}`) or stretched one value across the JSON (`"tool": "run_command", "arguments": ...`), and answered `tool run_command "arguments": … is not in the exec domain` — a message that names neither the accepted tools nor the expected shape. The `_run` schema now carries an `enum` of that domain's tools, the description lists them and shows the shape, and the argument errors repeat both, so a malformed call corrects itself in one step instead of retrying blind. |
-| 2026-10-28 | Follow-up #871: the Workspace tab is a folder tree (folders first, indented, collapsible, search expands matches) instead of a flat file list. `ask_question` no longer queues into an inbox the user never sees: a `QuestionGate` blocks the call, the desktop host shows the question dialog, and the answer returns in the tool result for parent and delegated runs alike, while the exchange is still logged to `.openbad/questions.json` for Project → Questions. The settings dialog's close X moved to the standard top-right. The old queued-question surface was a design defect rather than an open question, so it is gone rather than tracked. |
+| 2026-10-28 | Follow-up #871: the Workspace tab is a folder tree (folders first, indented, collapsible, search expands matches) instead of a flat file list. `ask_question` no longer queues into an inbox the user never sees: a `QuestionGate` blocks the call, the desktop host shows the question dialog, and the answer returns in the tool result for parent and delegated runs alike, while the exchange is still logged to `.canonwright/questions.json` for Project → Questions. The settings dialog's close X moved to the standard top-right. The old queued-question surface was a design defect rather than an open question, so it is gone rather than tracked. |
 | 2026-10-28 | #849 verified on the desktop and closed: one notification when the window is unfocused, none when it is focused, the click lands on the finished session, and the unread marker survives a restart and clears on open. |

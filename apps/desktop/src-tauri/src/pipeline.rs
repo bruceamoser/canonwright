@@ -1,6 +1,6 @@
 //! The pipeline supervisor: one tick of poll → evaluate → admit.
 //!
-//! The decisions themselves live in `openbad-pipeline`; this is the plumbing that
+//! The decisions themselves live in `canonwright-pipeline`; this is the plumbing that
 //! feeds them and records what they said. It deliberately stops short of running
 //! an executor: a tick can create a ticket and say why, and the launch is a
 //! separate step with its own review.
@@ -14,15 +14,15 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
-use openbad_core::WorkspaceId;
-use openbad_pipeline::GitHubIdentity;
-use openbad_pipeline::config::{
+use canonwright_core::WorkspaceId;
+use canonwright_pipeline::GitHubIdentity;
+use canonwright_pipeline::config::{
     PipelineConfig, SourceConfig, load_pipeline_config, pipeline_config_path,
 };
-use openbad_pipeline::eval::{Decision, DecisionKind, EvalInput, evaluate};
-use openbad_pipeline::source::{GhCli, GitHubApi, GitHubSource};
-use openbad_store::Store;
-use openbad_store::pipeline::{NewAssignment, NewTicket, TicketRecord};
+use canonwright_pipeline::eval::{Decision, DecisionKind, EvalInput, evaluate};
+use canonwright_pipeline::source::{GhCli, GitHubApi, GitHubSource};
+use canonwright_store::Store;
+use canonwright_store::pipeline::{NewAssignment, NewTicket, TicketRecord};
 use serde::Serialize;
 use tauri::State;
 
@@ -303,7 +303,7 @@ impl Supervisor {
         &self,
         source: &SourceConfig,
         thread_key: &str,
-    ) -> Result<openbad_pipeline::eval::ThreadContext, String> {
+    ) -> Result<canonwright_pipeline::eval::ThreadContext, String> {
         let store = self
             .store
             .lock()
@@ -332,7 +332,7 @@ impl Supervisor {
     fn wake(
         &self,
         source: &SourceConfig,
-        trigger: &openbad_pipeline::trigger::Trigger,
+        trigger: &canonwright_pipeline::trigger::Trigger,
     ) -> Result<Option<TicketRecord>, String> {
         let store = self
             .store
@@ -351,11 +351,13 @@ impl Supervisor {
                 .pipeline_ticket_on_thread(self.workspace_id, &source.id, &trigger.thread.0)
                 .map_err(|error| error.to_string())?
             {
-                Some(ticket) if ticket.state == openbad_pipeline::ticket::TicketState::Ended => {
+                Some(ticket)
+                    if ticket.state == canonwright_pipeline::ticket::TicketState::Ended =>
+                {
                     store
                         .move_pipeline_ticket(
                             &ticket.id,
-                            openbad_pipeline::ticket::TicketState::Open,
+                            canonwright_pipeline::ticket::TicketState::Open,
                         )
                         .map_err(|error| error.to_string())?;
                     ticket
@@ -383,7 +385,7 @@ impl Supervisor {
     fn admit(
         &self,
         source: &SourceConfig,
-        trigger: &openbad_pipeline::trigger::Trigger,
+        trigger: &canonwright_pipeline::trigger::Trigger,
         decision: &Decision,
     ) -> Result<TicketRecord, String> {
         let mandate = decision
@@ -430,7 +432,7 @@ pub fn ticket_counts(
 /// (#958) and the stage list (#959) can render before anything runs.
 #[derive(Debug, Clone, Serialize)]
 pub struct PipelineStatus {
-    /// Whether the project has a `.openbad/pipeline.yaml` at all. A project
+    /// Whether the project has a `.canonwright/pipeline.yaml` at all. A project
     /// without one behaves exactly as it did before ADR-009.
     pub configured: bool,
     pub sources: Vec<SourceStatus>,
@@ -524,7 +526,7 @@ pub struct PipelineTicketRow {
     pub source_id: String,
     pub thread: String,
     pub state: &'static str,
-    pub stage: openbad_pipeline::stage::Stage,
+    pub stage: canonwright_pipeline::stage::Stage,
     pub needs_a_person: bool,
     /// The last report's first line, which is what a row can show.
     pub summary: Option<String>,
@@ -548,7 +550,7 @@ pub struct PipelineConfigFile {
     pub text: String,
 }
 
-/// Reads `.openbad/pipeline.yaml` verbatim, so the surface edits what is there.
+/// Reads `.canonwright/pipeline.yaml` verbatim, so the surface edits what is there.
 #[tauri::command]
 pub fn pipeline_config_file(project_path: String) -> Result<PipelineConfigFile, String> {
     let path = pipeline_config_path(&PathBuf::from(&project_path));
@@ -567,7 +569,7 @@ pub fn pipeline_config_file(project_path: String) -> Result<PipelineConfigFile, 
 /// polls nothing.
 #[tauri::command]
 pub fn pipeline_save_config(project_path: String, text: String) -> Result<(), String> {
-    use openbad_pipeline::config::parse_pipeline_config;
+    use canonwright_pipeline::config::parse_pipeline_config;
 
     parse_pipeline_config(&text)?;
     let path = pipeline_config_path(&PathBuf::from(&project_path));
@@ -595,8 +597,8 @@ pub(crate) fn github_identity(
         .and_then(Path::parent)
         .map(Path::to_path_buf)
         .unwrap_or_else(std::env::temp_dir);
-    openbad_pipeline::github::cached(
-        openbad_pipeline::gh_binary(),
+    canonwright_pipeline::github::cached(
+        canonwright_pipeline::gh_binary(),
         config.github.user.as_deref(),
         &data_dir,
     )
@@ -659,7 +661,7 @@ pub async fn pipeline_pull_requests(
             .map_err(|error| format!("store lock poisoned: {error}"))?;
         github_identity(&store, &project_path)?
     };
-    let binary = match openbad_pipeline::gh_binary() {
+    let binary = match canonwright_pipeline::gh_binary() {
         Some(binary) => binary,
         None => return Ok(Vec::new()),
     };
@@ -676,7 +678,7 @@ pub async fn pipeline_pull_requests(
         "--json",
         "number,url,state,mergeStateStatus",
     ]);
-    openbad_pipeline::github::apply(identity.as_ref(), &mut command);
+    canonwright_pipeline::github::apply(identity.as_ref(), &mut command);
     let output = command
         .output()
         .map_err(|error| format!("cannot run gh pr list: {error}"))?;
@@ -717,14 +719,14 @@ pub async fn pipeline_pull_requests(
 
 /// Whether a repository's branch protection is real enough to allow auto-merge.
 ///
-/// The rules live in `openbad-pipeline` so the panel and an agent asked to
+/// The rules live in `canonwright-pipeline` so the panel and an agent asked to
 /// configure the project get the same answer.
 #[tauri::command]
 pub async fn pipeline_guards(
     state: State<'_, AppState>,
     project_path: String,
     repository: String,
-) -> Result<openbad_pipeline::guards::Guards, String> {
+) -> Result<canonwright_pipeline::guards::Guards, String> {
     let identity = {
         let store = state
             .store
@@ -747,7 +749,7 @@ pub async fn pipeline_guards(
         .get(&format!("/repos/{repository}/branches/{branch}/protection"))
         .await
         .ok();
-    Ok(openbad_pipeline::guards::guards_from(
+    Ok(canonwright_pipeline::guards::guards_from(
         &branch,
         protection.as_ref(),
     ))
@@ -759,7 +761,7 @@ pub fn pipeline_tickets(
     state: State<'_, AppState>,
     project_path: String,
 ) -> Result<Vec<PipelineTicketRow>, String> {
-    use openbad_pipeline::stage::{StageInput, stage_of};
+    use canonwright_pipeline::stage::{StageInput, stage_of};
 
     let store = state
         .store
@@ -878,8 +880,8 @@ pub async fn pipeline_tick(
 mod tests {
     use super::*;
     use async_trait::async_trait;
-    use openbad_pipeline::error::SourceError;
-    use openbad_store::types::NewWorkspace;
+    use canonwright_pipeline::error::SourceError;
+    use canonwright_store::types::NewWorkspace;
     use uuid::Uuid;
 
     /// A GitHub that answers from a table of path prefixes, most specific first.
@@ -913,7 +915,7 @@ mod tests {
 
     fn project_with_source() -> tempfile::TempDir {
         let project = tempfile::tempdir().expect("project");
-        let path = project.path().join(".openbad/pipeline.yaml");
+        let path = project.path().join(".canonwright/pipeline.yaml");
         std::fs::create_dir_all(path.parent().expect("parent")).expect("dir");
         std::fs::write(
             &path,
@@ -1046,7 +1048,7 @@ mod tests {
     #[tokio::test]
     async fn a_disabled_source_is_not_polled() {
         let project = tempfile::tempdir().expect("project");
-        let path = project.path().join(".openbad/pipeline.yaml");
+        let path = project.path().join(".canonwright/pipeline.yaml");
         std::fs::create_dir_all(path.parent().expect("parent")).expect("dir");
         std::fs::write(
             &path,
@@ -1129,7 +1131,7 @@ mod tests {
             .expect("assignment");
         assert_eq!(
             assignment.state,
-            openbad_pipeline::ticket::AssignmentState::Pending,
+            canonwright_pipeline::ticket::AssignmentState::Pending,
             "the wake is a pending assignment the scheduler runs"
         );
     }
@@ -1156,7 +1158,7 @@ mod tests {
         {
             let store = store.lock().expect("lock");
             store
-                .move_pipeline_ticket(&ticket.id, openbad_pipeline::ticket::TicketState::Ended)
+                .move_pipeline_ticket(&ticket.id, canonwright_pipeline::ticket::TicketState::Ended)
                 .expect("end the ticket");
         }
 
@@ -1190,7 +1192,7 @@ mod tests {
                 .expect("ticket")
                 .expect("ticket")
                 .state,
-            openbad_pipeline::ticket::TicketState::Open,
+            canonwright_pipeline::ticket::TicketState::Open,
             "the ticket is open again under the mandate it already had"
         );
         assert_eq!(
@@ -1199,7 +1201,7 @@ mod tests {
                 .expect("assignment")
                 .expect("assignment")
                 .state,
-            openbad_pipeline::ticket::AssignmentState::Pending,
+            canonwright_pipeline::ticket::AssignmentState::Pending,
             "and it has a pending assignment the scheduler runs"
         );
     }
@@ -1207,7 +1209,7 @@ mod tests {
     #[tokio::test]
     async fn one_sources_message_does_not_stop_another_source_from_advancing() {
         let project = tempfile::tempdir().expect("project");
-        let path = project.path().join(".openbad/pipeline.yaml");
+        let path = project.path().join(".canonwright/pipeline.yaml");
         std::fs::create_dir_all(path.parent().expect("parent")).expect("dir");
         std::fs::write(
             &path,
@@ -1277,7 +1279,7 @@ mod tests {
     #[tokio::test]
     async fn one_source_failing_does_not_stop_the_others() {
         let project = tempfile::tempdir().expect("project");
-        let path = project.path().join(".openbad/pipeline.yaml");
+        let path = project.path().join(".canonwright/pipeline.yaml");
         std::fs::create_dir_all(path.parent().expect("parent")).expect("dir");
         std::fs::write(
             &path,
@@ -1325,7 +1327,7 @@ mod tests {
     #[test]
     fn status_keeps_a_disabled_source_so_its_position_survives_a_toggle() {
         let project = tempfile::tempdir().expect("project");
-        let path = project.path().join(".openbad/pipeline.yaml");
+        let path = project.path().join(".canonwright/pipeline.yaml");
         std::fs::create_dir_all(path.parent().expect("parent")).expect("dir");
         std::fs::write(
             &path,

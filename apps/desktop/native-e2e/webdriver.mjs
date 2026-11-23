@@ -23,14 +23,14 @@ export async function freePort() {
 
 export function resolveAppBinary() {
   const candidates = [
-    process.env.OPENBAD_APP_BINARY,
-    join(process.cwd(), "..", "..", "..", "target", "release", "openbad-desktop"),
-    join(process.cwd(), "..", "..", "..", "target", "debug", "openbad-desktop"),
+    process.env.CANONWRIGHT_APP_BINARY,
+    join(process.cwd(), "..", "..", "..", "target", "release", "canonwright-desktop"),
+    join(process.cwd(), "..", "..", "..", "target", "debug", "canonwright-desktop"),
   ].filter(Boolean);
   const found = candidates.find((candidate) => existsSync(candidate));
   if (!found) {
     throw new Error(
-      "OpenBaD app binary not found. Build it with `cd apps/desktop && ./ui/node_modules/.bin/tauri build --no-bundle` or set OPENBAD_APP_BINARY.",
+      "Canonwright app binary not found. Build it with `cd apps/desktop && ./ui/node_modules/.bin/tauri build --no-bundle` or set CANONWRIGHT_APP_BINARY.",
     );
   }
   return found;
@@ -133,7 +133,7 @@ export async function startMockDeepSeek() {
 }
 
 export async function makeFixture() {
-  const root = await mkdtemp(join(tmpdir(), "openbad-native-"));
+  const root = await mkdtemp(join(tmpdir(), "canonwright-native-"));
   const workspace = join(root, "workspace");
   await mkdir(workspace, { recursive: true });
   await writeFile(join(workspace, "Cargo.toml"), "[workspace]\nmembers = []\n");
@@ -141,7 +141,7 @@ export async function makeFixture() {
   return {
     root,
     workspace,
-    dbPath: join(root, "openbad.db"),
+    dbPath: join(root, "canonwright.db"),
     cleanup: () => rm(root, { recursive: true, force: true }),
   };
 }

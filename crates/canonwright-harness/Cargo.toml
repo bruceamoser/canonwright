@@ -1,0 +1,15 @@
+[package]
+name = "canonwright-harness"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+canonwright-core = { path = "../canonwright-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }
+blake3 = "1"

@@ -3,7 +3,7 @@
 > **The model-visible prefix is immutable and append-only. Volatile context
 > goes at the tail, never in the prefix.**
 
-This document defines how OpenBaD assembles requests, preserves provider prefix
+This document defines how Canonwright assembles requests, preserves provider prefix
 caches, measures cache hits, compacts context, and avoids the common behaviors
 that silently destroy cache reuse.
 
@@ -30,7 +30,7 @@ can request at runtime.
 
 ### 1.1 DeepSeek capability map
 
-| Capability | Use in OpenBaD |
+| Capability | Use in Canonwright |
 | --- | --- |
 | 1M context | Keep long, append-only histories; compact rarely |
 | 384K max output | Large patches, reviews, and generated docs when needed |
@@ -338,7 +338,7 @@ prefers paying one miss over spending tokens speculatively.
 A naive harness injects every MCP tool into the schema list. Connecting a new
 server then changes the schema hash and invalidates the entire prefix.
 
-OpenBaD uses **stable proxy tools**:
+Canonwright uses **stable proxy tools**:
 
 | Proxy tool | Schema | Dynamic behavior |
 | --- | --- | --- |

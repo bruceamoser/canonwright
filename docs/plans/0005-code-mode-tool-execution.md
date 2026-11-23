@@ -2,11 +2,11 @@
 
 > **Status (2026-10-28):** proposal. Nothing implemented. This plan exists because
 > the DeepSeek Harness review identified code-mode execution (PTC) as the one
-> capability in that harness with no OpenBaD equivalent, and it is too large to
+> capability in that harness with no Canonwright equivalent, and it is too large to
 > add incrementally without a decision on the runtime and the approval contract.
 
 **Question.** Should the model be able to write one small program that calls
-OpenBaD's tools in a loop, instead of issuing one tool call per step?
+Canonwright's tools in a loop, instead of issuing one tool call per step?
 
 **Answer in one sentence.** Yes, behind a setting, restricted at first to
 read-only bindings, because the win is real — a grep-then-read-twenty-files
@@ -18,7 +18,7 @@ not have and an approval contract that must not deadlock the turn.
 ## 1. What code mode is
 
 The model calls a single `code` tool with a program. The host runs the program
-in a sandboxed interpreter where a small set of OpenBaD tools are exposed as
+in a sandboxed interpreter where a small set of Canonwright tools are exposed as
 bindings:
 
 ```js

@@ -94,7 +94,7 @@ jobs:
             gh release edit "$TAG" --latest
           else
             gh release create "$TAG" release-assets/* \
-              --title "OpenBaD $TAG" \
+              --title "Canonwright $TAG" \
               --generate-notes \
               --latest
           fi

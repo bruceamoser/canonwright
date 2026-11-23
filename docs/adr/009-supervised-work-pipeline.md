@@ -5,7 +5,7 @@
 
 ## Context
 
-OpenBaD is turn-driven: a human types in the chat surface, a session runs, tools
+Canonwright is turn-driven: a human types in the chat surface, a session runs, tools
 execute, and everything that governs *whether work may happen* is per action —
 approvals, outside grants, access modes.
 
@@ -42,7 +42,7 @@ Accepted. Slices are tracked as separate issues and each lands on its own: sourc
 and read positions, admission and mandates, persistence, the assignment lifecycle,
 the real executor, pull-request subscriptions, and the needs-a-person surface.
 
-Add a **per-project supervised work pipeline** to OpenBaD. A project opts in;
+Add a **per-project supervised work pipeline** to Canonwright. A project opts in;
 projects that do not are unaffected and remain purely interactive.
 
 ### Domain
@@ -149,10 +149,10 @@ the Ticket as `failed` with the reason, rather than running unbounded.
 
 Tickets, assignments, reports, subscriptions and source read positions are rows
 keyed by `workspace_id` in the existing store. Pipeline configuration lives in
-`.openbad/pipeline.yaml` in the project. No new database.
+`.canonwright/pipeline.yaml` in the project. No new database.
 
 The decisions are split from the plumbing. State rules — admission, the ticket
-state machine, slots, budgets, stage — live in `openbad-pipeline` as pure
+state machine, slots, budgets, stage — live in `canonwright-pipeline` as pure
 functions, so they are testable without a database, a session, or a model. Launch
 and event streaming live in the desktop host, where the single turn entrypoint
 already exists, so there is one implementation of starting a turn rather than two

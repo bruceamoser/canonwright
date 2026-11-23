@@ -1,4 +1,4 @@
-# OpenBaD — Copilot Agent SOP
+# Canonwright — Copilot Agent SOP
 
 ## Workflow: Issue → Branch → PR → Merge
 
@@ -62,9 +62,9 @@
   ```
 
 - The release artifact is the Cargo workspace target:
-  `target/release/openbad-desktop`. Do not use `--debug`.
+  `target/release/canonwright-desktop`. Do not use `--debug`.
 - Verify the artifact is fresh before reporting completion:
-  `stat -c '%y %s' target/release/openbad-desktop`.
+  `stat -c '%y %s' target/release/canonwright-desktop`.
 - Bundles/installers are not produced by default. Do not tag, publish, or attach
   the binary to a GitHub release unless the human explicitly asks.
 
@@ -120,15 +120,15 @@
 - Real DeepSeek calls only in opt-in nightly jobs with a capped budget.
 
 ### File Structure
-- Rust crates: `crates/openbad-*`
+- Rust crates: `crates/canonwright-*`
 - Desktop app: `apps/desktop/src-tauri` and `apps/desktop/ui`
 - SQL migrations: `migrations/`
 - Cross-crate tests: `tests/`
 - Architecture docs: `docs/architecture/`
 - Plans: `docs/plans/`
 - ADRs: `docs/adr/`
-- Archived v0: `archive/openbad-v0/`
-- Release binary: `target/release/openbad-desktop`
+- Archived v0: `archive/canonwright-v0/`
+- Release binary: `target/release/canonwright-desktop`
 
 ### Commit Messages
 - Format: `#<issue>: <imperative verb> <what changed>`.

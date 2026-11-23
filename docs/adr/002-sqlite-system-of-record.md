@@ -5,7 +5,7 @@
 
 ## Context
 
-OpenBaD needs a durable store for sessions, events, memories, knowledge chunks,
+Canonwright needs a durable store for sessions, events, memories, knowledge chunks,
 usage, approvals, and audit records. The product is a desktop app and is
 DeepSeek-first, not local-first, so the store is a working store rather than a
 privacy boundary.

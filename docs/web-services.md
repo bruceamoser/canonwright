@@ -6,8 +6,8 @@ yourself.
 
 | Tool | Service | Default URL | Override |
 | --- | --- | --- | --- |
-| `web_search` | SearXNG | `http://127.0.0.1:8080` | `OPENBAD_SEARXNG_URL` |
-| `web_fetch` | Jina Reader | `http://127.0.0.1:3000` | `OPENBAD_JINA_READER_URL` |
+| `web_search` | SearXNG | `http://127.0.0.1:8080` | `CANONWRIGHT_SEARXNG_URL` |
+| `web_fetch` | Jina Reader | `http://127.0.0.1:3000` | `CANONWRIGHT_JINA_READER_URL` |
 
 `web_search` **requires** SearXNG. There is no built-in fallback search
 backend, so an unreachable or misconfigured instance fails with an actionable
@@ -35,7 +35,7 @@ the `json` output format `web_search` needs and turns off SearXNG's limiter.
 Verify:
 
 ```bash
-curl -s 'http://127.0.0.1:8080/search?q=openbad&format=json' | head -c 200
+curl -s 'http://127.0.0.1:8080/search?q=canonwright&format=json' | head -c 200
 curl -s 'http://127.0.0.1:3000/https://example.com' | head -20
 ```
 
@@ -59,7 +59,7 @@ variable change is needed.
 
 ## Configuration
 
-- `OPENBAD_SEARXNG_URL` and `OPENBAD_JINA_READER_URL` change the base URL the
+- `CANONWRIGHT_SEARXNG_URL` and `CANONWRIGHT_JINA_READER_URL` change the base URL the
   tools use. A trailing slash is optional.
 - `off`, `none`, `disabled`, or `direct` in either variable switches that
   service off. `web_search` then fails with a "switched off" error;
@@ -67,7 +67,7 @@ variable change is needed.
 - Custom ports: change the published port in
   [`docker-compose.yml`](../docker-compose.yml) and set the matching
   environment variable, for example
-  `OPENBAD_SEARXNG_URL=http://127.0.0.1:8888`.
+  `CANONWRIGHT_SEARXNG_URL=http://127.0.0.1:8888`.
 - Exposing the instance beyond loopback: give SearXNG a real
   `server.secret_key` in [`docker/searxng/settings.yml`](../docker/searxng/settings.yml)
   (or set `SEARXNG_SECRET`) first. The committed file ships a loopback-only

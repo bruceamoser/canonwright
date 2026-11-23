@@ -5,7 +5,7 @@
 
 ## Context
 
-OpenBaD Desktop needs a native desktop shell with:
+Canonwright Desktop needs a native desktop shell with:
 
 - A Rust core that owns the harness, tools, SQLite, and subprocesses.
 - A rich UI for chat, diffs, editors, memory graphs, and knowledge views.

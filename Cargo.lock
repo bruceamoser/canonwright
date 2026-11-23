@@ -505,6 +505,323 @@ dependencies = [
 ]
 
 [[package]]
+name = "canonwright-agent"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "canonwright-governance",
+ "canonwright-harness",
+ "canonwright-llm",
+ "canonwright-tools",
+ "canonwright-workspace",
+ "futures-util",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
+name = "canonwright-autonomic"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "canonwright-core"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "uuid",
+]
+
+[[package]]
+name = "canonwright-desktop"
+version = "0.1.0"
+dependencies = [
+ "arboard",
+ "async-trait",
+ "base64 0.22.1",
+ "blake3",
+ "calamine",
+ "canonwright-agent",
+ "canonwright-core",
+ "canonwright-governance",
+ "canonwright-harness",
+ "canonwright-index",
+ "canonwright-llm",
+ "canonwright-lsp",
+ "canonwright-mcp",
+ "canonwright-pipeline",
+ "canonwright-store",
+ "canonwright-terminal",
+ "canonwright-tools",
+ "canonwright-transfer",
+ "canonwright-update",
+ "canonwright-workspace",
+ "directories",
+ "glib",
+ "ignore",
+ "pdf-extract",
+ "png 0.18.1",
+ "quick-xml 0.39.4",
+ "reqwest 0.12.28",
+ "serde",
+ "serde_json",
+ "similar",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-notification",
+ "tempfile",
+ "tokio",
+ "uuid",
+ "zip 7.3.0",
+]
+
+[[package]]
+name = "canonwright-governance"
+version = "0.1.0"
+dependencies = [
+ "canonwright-core",
+ "keyring",
+ "serde",
+ "thiserror 2.0.21",
+ "uuid",
+ "zeroize",
+]
+
+[[package]]
+name = "canonwright-harness"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "canonwright-core",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "uuid",
+]
+
+[[package]]
+name = "canonwright-index"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "canonwright-core",
+ "canonwright-store",
+ "ignore",
+ "regex",
+ "serde",
+ "tempfile",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "canonwright-knowledge"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "uuid",
+]
+
+[[package]]
+name = "canonwright-llm"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "canonwright-core",
+ "canonwright-harness",
+ "chrono",
+ "futures-core",
+ "futures-util",
+ "reqwest 0.12.28",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
+name = "canonwright-lsp"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tempfile",
+ "thiserror 2.0.21",
+ "url",
+]
+
+[[package]]
+name = "canonwright-mcp"
+version = "0.1.0"
+dependencies = [
+ "directories",
+ "reqwest 0.12.28",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tempfile",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "canonwright-memory"
+version = "0.1.0"
+dependencies = [
+ "canonwright-core",
+ "serde",
+ "uuid",
+]
+
+[[package]]
+name = "canonwright-pipeline"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tokio",
+]
+
+[[package]]
+name = "canonwright-store"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "blake3",
+ "canonwright-core",
+ "canonwright-pipeline",
+ "directories",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "uuid",
+]
+
+[[package]]
+name = "canonwright-story"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "canonwright-terminal"
+version = "0.1.0"
+dependencies = [
+ "libc",
+ "portable-pty",
+ "tempfile",
+ "thiserror 2.0.21",
+ "uuid",
+]
+
+[[package]]
+name = "canonwright-tools"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "base64 0.22.1",
+ "blake3",
+ "canonwright-core",
+ "canonwright-governance",
+ "canonwright-pipeline",
+ "canonwright-story",
+ "canonwright-vault",
+ "canonwright-workspace",
+ "globset",
+ "ignore",
+ "libc",
+ "regex",
+ "reqwest 0.12.28",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "similar",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tokio",
+ "wait-timeout",
+ "zeroize",
+ "zip 2.6.1",
+]
+
+[[package]]
+name = "canonwright-transfer"
+version = "0.1.0"
+dependencies = [
+ "canonwright-core",
+ "canonwright-store",
+ "ignore",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "zip 7.3.0",
+]
+
+[[package]]
+name = "canonwright-update"
+version = "0.1.0"
+dependencies = [
+ "directories",
+ "reqwest 0.12.28",
+ "semver",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "canonwright-vault"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "chacha20poly1305",
+ "directories",
+ "getrandom 0.2.17",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "zeroize",
+]
+
+[[package]]
+name = "canonwright-workspace"
+version = "0.1.0"
+dependencies = [
+ "globset",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tempfile",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "cargo-platform"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3019,311 +3336,6 @@ name = "opaque-debug"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381"
-
-[[package]]
-name = "openbad-agent"
-version = "0.3.31"
-dependencies = [
- "async-trait",
- "bytes",
- "futures-util",
- "openbad-governance",
- "openbad-harness",
- "openbad-llm",
- "openbad-tools",
- "openbad-workspace",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.21",
- "tokio",
- "uuid",
-]
-
-[[package]]
-name = "openbad-autonomic"
-version = "0.3.31"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "openbad-core"
-version = "0.3.31"
-dependencies = [
- "serde",
- "serde_json",
- "thiserror 2.0.21",
- "uuid",
-]
-
-[[package]]
-name = "openbad-desktop"
-version = "0.3.31"
-dependencies = [
- "arboard",
- "async-trait",
- "base64 0.22.1",
- "blake3",
- "calamine",
- "directories",
- "glib",
- "ignore",
- "openbad-agent",
- "openbad-core",
- "openbad-governance",
- "openbad-harness",
- "openbad-index",
- "openbad-llm",
- "openbad-lsp",
- "openbad-mcp",
- "openbad-pipeline",
- "openbad-store",
- "openbad-terminal",
- "openbad-tools",
- "openbad-transfer",
- "openbad-update",
- "openbad-workspace",
- "pdf-extract",
- "png 0.18.1",
- "quick-xml 0.39.4",
- "reqwest 0.12.28",
- "serde",
- "serde_json",
- "similar",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-notification",
- "tempfile",
- "tokio",
- "uuid",
- "zip 7.3.0",
-]
-
-[[package]]
-name = "openbad-governance"
-version = "0.3.31"
-dependencies = [
- "keyring",
- "openbad-core",
- "serde",
- "thiserror 2.0.21",
- "uuid",
- "zeroize",
-]
-
-[[package]]
-name = "openbad-harness"
-version = "0.3.31"
-dependencies = [
- "blake3",
- "openbad-core",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
- "uuid",
-]
-
-[[package]]
-name = "openbad-index"
-version = "0.3.31"
-dependencies = [
- "blake3",
- "ignore",
- "openbad-core",
- "openbad-store",
- "regex",
- "serde",
- "tempfile",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "openbad-knowledge"
-version = "0.3.31"
-dependencies = [
- "serde",
- "uuid",
-]
-
-[[package]]
-name = "openbad-llm"
-version = "0.3.31"
-dependencies = [
- "async-trait",
- "bytes",
- "chrono",
- "futures-core",
- "futures-util",
- "openbad-core",
- "openbad-harness",
- "reqwest 0.12.28",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
- "tokio",
- "uuid",
-]
-
-[[package]]
-name = "openbad-lsp"
-version = "0.3.31"
-dependencies = [
- "serde",
- "serde_json",
- "serde_yaml",
- "tempfile",
- "thiserror 2.0.21",
- "url",
-]
-
-[[package]]
-name = "openbad-mcp"
-version = "0.3.31"
-dependencies = [
- "directories",
- "reqwest 0.12.28",
- "serde",
- "serde_json",
- "serde_yaml",
- "tempfile",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "openbad-memory"
-version = "0.3.31"
-dependencies = [
- "openbad-core",
- "serde",
- "uuid",
-]
-
-[[package]]
-name = "openbad-pipeline"
-version = "0.3.31"
-dependencies = [
- "async-trait",
- "serde",
- "serde_json",
- "serde_yaml",
- "tempfile",
- "thiserror 2.0.21",
- "tokio",
-]
-
-[[package]]
-name = "openbad-store"
-version = "0.3.31"
-dependencies = [
- "base64 0.22.1",
- "blake3",
- "directories",
- "openbad-core",
- "openbad-pipeline",
- "rusqlite",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.21",
- "uuid",
-]
-
-[[package]]
-name = "openbad-terminal"
-version = "0.3.31"
-dependencies = [
- "libc",
- "portable-pty",
- "tempfile",
- "thiserror 2.0.21",
- "uuid",
-]
-
-[[package]]
-name = "openbad-tools"
-version = "0.3.31"
-dependencies = [
- "async-trait",
- "base64 0.22.1",
- "blake3",
- "globset",
- "ignore",
- "libc",
- "openbad-core",
- "openbad-governance",
- "openbad-pipeline",
- "openbad-vault",
- "openbad-workspace",
- "regex",
- "reqwest 0.12.28",
- "serde",
- "serde_json",
- "serde_yaml",
- "similar",
- "tempfile",
- "thiserror 2.0.21",
- "tokio",
- "wait-timeout",
- "zeroize",
- "zip 2.6.1",
-]
-
-[[package]]
-name = "openbad-transfer"
-version = "0.3.31"
-dependencies = [
- "ignore",
- "openbad-core",
- "openbad-store",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.21",
- "zip 7.3.0",
-]
-
-[[package]]
-name = "openbad-update"
-version = "0.3.31"
-dependencies = [
- "directories",
- "reqwest 0.12.28",
- "semver",
- "serde",
- "serde_json",
- "sha2",
- "tempfile",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "openbad-vault"
-version = "0.3.31"
-dependencies = [
- "base64 0.22.1",
- "chacha20poly1305",
- "directories",
- "getrandom 0.2.17",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.21",
- "zeroize",
-]
-
-[[package]]
-name = "openbad-workspace"
-version = "0.3.31"
-dependencies = [
- "globset",
- "serde",
- "serde_json",
- "serde_yaml",
- "tempfile",
- "thiserror 2.0.21",
-]
 
 [[package]]
 name = "option-ext"

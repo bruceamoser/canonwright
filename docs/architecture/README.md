@@ -1,6 +1,10 @@
-# OpenBaD Desktop — Architecture Documentation
+# Canonwright — Architecture Documentation
 
-> A DeepSeek-first, cache-first AI coding harness for the desktop.
+> A narrative harness for long-form fiction, built on the runtime inherited
+> from OpenBaD.
+
+Documents 00–11 describe that inherited runtime and are accurate about it.
+Document 12 describes what Canonwright adds.
 
 ## Document index
 
@@ -18,6 +22,7 @@
 | 09 | [Security and Threat Model](09-security-and-threat-model.md) | Trust boundaries, prompt injection, sandboxing, secrets |
 | 10 | [Providers, Observability, and Performance](10-providers-observability-performance.md) | Model adapters, cost accounting, telemetry, benchmarks |
 | 11 | [Project Areas and the Split Workspace](11-project-areas-and-split-workspace.md) | Project-scoped repos, knowledge, RAG, memory, tools, artifacts |
+| 12 | [The Story State Graph](12-story-state-graph.md) | Narrative primitives, temporal projection, dirty state, tickets, scene briefs |
 
 Implementation planning lives in [`../plans/`](../plans/). Decisions live in
 [`../adr/`](../adr/). External evidence that informs a pending decision lives in

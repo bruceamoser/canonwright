@@ -6,7 +6,7 @@
 
 ## Context
 
-Early drafts framed OpenBaD as "local-first": all data stays on the machine and
+Early drafts framed Canonwright as "local-first": all data stays on the machine and
 network calls are minimized. The product goal is a powerful coding harness that
 leverages DeepSeek as much as possible. A strict local-first stance would:
 

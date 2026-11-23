@@ -2,7 +2,7 @@
 
 ## 1. Shell
 
-OpenBaD Desktop is a **Tauri v2** application:
+Canonwright Desktop is a **Tauri v2** application:
 
 - **Rust process** — owns the harness, store, tools, workspace, memory,
   knowledge, autonomic system, and governance.
@@ -19,7 +19,7 @@ than a command needs.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
-│ Menu bar: OpenBaD · File · Edit · View · Project · Help             │
+│ Menu bar: Canonwright · File · Edit · View · Project · Help             │
 ├─────────────────────────────────────────────────────────────────────┤
 │ Project header: project · path · session · model · access mode      │
 ├──────────┬───────────────────────────────────────┬──────────────────┤
@@ -341,21 +341,21 @@ number after a disconnect.
 
 ## 10. Project transfer
 
-Projects travel as a single `.openbad-project` zip bundle:
+Projects travel as a single `.canonwright-project` zip bundle:
 
-- `openbad-project.json` — format version, app version, project name and
+- `canonwright-project.json` — format version, app version, project name and
   original path (informational), export time, counts, and warnings.
 - `state/workspace.json` — sessions (events, message projections, turns),
   memories, knowledge documents and chunks, and file checkpoints, scoped to the
   project.
-- `workspace/...` — the workspace tree, including `.git` and `.openbad`.
+- `workspace/...` — the workspace tree, including `.git` and `.canonwright`.
   Rebuildable output (`node_modules`, `target`, virtualenvs, caches, coverage)
   and `.gitignore`d paths are skipped; symlinks are skipped with a warning.
 
 Reference folders are never bundled because their absolute paths are
 machine-specific. Secrets stay in the OS keychain: the API key must be entered
 again on the target machine, and global MCP definitions are not part of a
-project (only `.openbad/mcp.yaml` enablement names travel). The DeepSeek model
+project (only `.canonwright/mcp.yaml` enablement names travel). The DeepSeek model
 route is not exported; the target uses its own routing.
 
 - **Project → Export Project…** packs the active project to a chosen file via
@@ -378,11 +378,11 @@ route is not exported; the target uses its own routing.
 - **macOS:** `.dmg`, universal binary (aarch64 + x86_64).
 - **Windows:** `.msi`/`.exe` via WiX or NSIS.
 - **Signing:** platform code signing.
-- **Update source:** `bruceamoser/OpenBaD` GitHub releases by default. Override
-  with `OPENBAD_UPDATE_REPO`; point at a compatible API with
-  `OPENBAD_UPDATE_API`.
+- **Update source:** `bruceamoser/Canonwright` GitHub releases by default. Override
+  with `CANONWRIGHT_UPDATE_REPO`; point at a compatible API with
+  `CANONWRIGHT_UPDATE_API`.
 - **Check:** Settings → About (or Help → Check for Updates…) calls
-  `check_for_updates`. `openbad-update` reads the latest release, compares
+  `check_for_updates`. `canonwright-update` reads the latest release, compares
   semantic versions, and selects an asset for the current OS and architecture
   (`.deb`, then `.AppImage`/`.rpm` on Linux; `.msi`/`-setup.exe`; `.dmg`). A
   running AppImage is the exception: it prefers the AppImage asset so the
@@ -439,7 +439,7 @@ serves a mock DeepSeek SSE endpoint. The suite verifies project counts, the
 Agents area, a real chat round-trip, and both copy controls.
 
 CI installs `webkitgtk-webdriver` and `tauri-driver`, builds
-`target/debug/openbad-desktop`, and runs the suite under `xvfb-run`. Run it
+`target/debug/canonwright-desktop`, and runs the suite under `xvfb-run`. Run it
 locally with:
 
 ```bash
@@ -451,7 +451,7 @@ cd native-e2e && npm test
 
 Two records exist, for different questions.
 
-**What happened in a turn** lives in `openbad.db`. `session_events` holds the
+**What happened in a turn** lives in `canonwright.db`. `session_events` holds the
 user message, the assistant text and reasoning, every tool call with its exact
 arguments, every tool result with full content and duration, token usage, and
 provider errors verbatim, including the provider's `request_id`. Sessions point
@@ -466,11 +466,11 @@ scripts/diagnostics.py --list                     # sessions, with workspace roo
 scripts/diagnostics.py --session <id> --full      # the exchange, tool calls included
 ```
 
-**What happened before a session existed** lives in `openbad.log`, beside the
+**What happened before a session existed** lives in `canonwright.log`, beside the
 database. Startup writes the version, pid, and platform; a panic hook records
 the message and source location before the process dies. The file is capped at
 4 MiB with one rotation, so it cannot grow without bound, and it honors
-`OPENBAD_DB_PATH` so an isolated automation run logs beside its own database.
+`CANONWRIGHT_DB_PATH` so an isolated automation run logs beside its own database.
 Tail it with `scripts/diagnostics.py --log 50`.
 
 Neither record contains secrets: credentials are never written, and the reader
@@ -478,13 +478,13 @@ redacts anything that looks like one.
 
 How long those files live is a setting: **Settings → General → Limits → Log
 retention (days)**, default 5, clamped 1–365. It governs command logs and spill
-files; the audit trail and `openbad.log` rotate by size instead, keeping one
+files; the audit trail and `canonwright.log` rotate by size instead, keeping one
 archive each.
 
 ### Startup resilience
 
 Two ways the window used to die before it could draw, both recorded in
-`openbad.log` now:
+`canonwright.log` now:
 
 **GLib criticals.** GTK touches GSettings and the recent-files list while it
 opens the display, and a desktop that answers badly — a CIFS share that reports

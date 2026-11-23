@@ -2,7 +2,7 @@
 
 These tests drive the real desktop binary through the W3C WebDriver protocol.
 They use a temporary SQLite database, a temporary workspace, and a local mock
-DeepSeek SSE endpoint, so they do not touch your normal OpenBaD data or call a
+DeepSeek SSE endpoint, so they do not touch your normal Canonwright data or call a
 provider.
 
 ## Prerequisites
@@ -18,8 +18,8 @@ cd apps/desktop
 ./ui/node_modules/.bin/tauri build --no-bundle --debug
 ```
 
-If the binary is not at `target/debug/openbad-desktop`, set
-`OPENBAD_APP_BINARY`.
+If the binary is not at `target/debug/canonwright-desktop`, set
+`CANONWRIGHT_APP_BINARY`.
 
 ## Run
 

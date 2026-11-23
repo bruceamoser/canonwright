@@ -445,7 +445,7 @@ background re-embed into a new table and an atomic alias swap.
 
 ## 6. Knowledge library
 
-Runtime sidecars live under `.openbad/`: `audit.jsonl` (tool call records),
+Runtime sidecars live under `.canonwright/`: `audit.jsonl` (tool call records),
 `logs/` (full command output), `web-cache/` (fetched documents and index),
 `context.yaml`, `permissions.yaml`, `dead-ends.json`, `project.yaml`,
 `todos.json`, and `handoff.md`.
@@ -895,7 +895,7 @@ and retained indefinitely (tiny).
 
 ## 11. Migrations
 
-- Migrations live in `crates/openbad-store/migrations/NNNN_description.sql`.
+- Migrations live in `crates/canonwright-store/migrations/NNNN_description.sql`.
 - A small embedded runner applies them in order inside a transaction and
   records each version in `schema_migrations`.
 - Applied migrations are immutable. A fix is a new migration.
@@ -919,7 +919,7 @@ and retained indefinitely (tiny).
 | Engrams | Until forgotten/expired | Yes |
 
 Backups use SQLite's online backup API or `VACUUM INTO`, written to
-`<app_data>/backups/openbad-YYYYMMDD-HHMMSS.db`. Daily backups are kept for 7
+`<app_data>/backups/canonwright-YYYYMMDD-HHMMSS.db`. Daily backups are kept for 7
 days, weekly for 4 weeks. A backup is verified by opening it and running
 `PRAGMA integrity_check`.
 

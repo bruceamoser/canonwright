@@ -1,0 +1,29 @@
+[package]
+name = "canonwright-agent"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+async-trait = "0.1"
+canonwright-governance = { path = "../canonwright-governance" }
+canonwright-harness = { path = "../canonwright-harness" }
+canonwright-llm = { path = "../canonwright-llm" }
+canonwright-tools = { path = "../canonwright-tools" }
+canonwright-workspace = { path = "../canonwright-workspace" }
+futures-util = "0.3"
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { version = "1", features = ["time"] }
+uuid = { workspace = true }
+
+[dev-dependencies]
+canonwright-governance = { path = "../canonwright-governance", features = ["keyring"] }
+async-trait = "0.1"
+bytes = "1"
+futures-util = "0.3"
+tempfile = "3"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }

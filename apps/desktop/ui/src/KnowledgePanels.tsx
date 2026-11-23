@@ -499,7 +499,7 @@ export function KnowledgePanel({
       {printDocument !== null &&
         createPortal(
           <div className="knowledge-print">
-            <p className="knowledge-print-kicker">OpenBaD project knowledge</p>
+            <p className="knowledge-print-kicker">Canonwright project knowledge</p>
             <h1>{printDocument.summary.title}</h1>
             <p className="knowledge-print-meta">
               {printDocument.summary.kind} · {printDocument.summary.confidence}

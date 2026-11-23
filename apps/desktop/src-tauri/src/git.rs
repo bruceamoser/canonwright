@@ -897,8 +897,8 @@ mod tests {
         let output = git(repo, &["init", "-b", "main"]).expect("git init");
         assert!(output.status.success());
         for (key, value) in [
-            ("user.name", "OpenBaD Test"),
-            ("user.email", "test@openbad.local"),
+            ("user.name", "Canonwright Test"),
+            ("user.email", "test@canonwright.local"),
         ] {
             let output = git(repo, &["config", key, value]).expect("git config");
             assert!(output.status.success());

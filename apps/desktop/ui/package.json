@@ -1,7 +1,7 @@
 {
-  "name": "openbad-desktop-ui",
+  "name": "canonwright-desktop-ui",
   "private": true,
-  "version": "0.3.31",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

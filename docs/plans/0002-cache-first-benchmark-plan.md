@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-Prove that OpenBaD's prompt/runtime design actually produces high DeepSeek
+Prove that Canonwright's prompt/runtime design actually produces high DeepSeek
 prefix-cache hit rates, lower cost, and lower latency than a cache-naive
 harness. This plan defines fixtures, metrics, the comparison baseline, and CI
 gates.
@@ -38,7 +38,7 @@ A deliberately cache-unfriendly but otherwise equivalent harness:
 
 This is the counterfactual we must beat.
 
-### 3.2 OpenBaD
+### 3.2 Canonwright
 
 - Stable sections, canonical tool schemas.
 - Append-only history.
@@ -152,7 +152,7 @@ workspace refresh) and assert the reset reason.
 Run the same conversation through:
 
 - The naive harness (recorded request shape).
-- The OpenBaD harness.
+- The Canonwright harness.
 
 Compare:
 

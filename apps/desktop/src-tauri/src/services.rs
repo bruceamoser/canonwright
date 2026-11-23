@@ -1,7 +1,7 @@
 use std::process::Command;
 use std::time::Duration;
 
-use openbad_tools::web_services::{JINA_READER, SEARXNG, probe_tcp};
+use canonwright_tools::web_services::{JINA_READER, SEARXNG, probe_tcp};
 use serde::Serialize;
 
 /// A version banner should be immediate; anything slower is a hung binary.
@@ -41,7 +41,7 @@ const DEFINITIONS: &[Definition] = &[
         env_var: Some(SEARXNG.env_var),
         default_url: Some(SEARXNG.default_url),
         binary: None,
-        install_hint: "Start the local web services with `docker compose up -d searxng` from the repository root, or set OPENBAD_SEARXNG_URL to its base URL.",
+        install_hint: "Start the local web services with `docker compose up -d searxng` from the repository root, or set CANONWRIGHT_SEARXNG_URL to its base URL.",
     },
     Definition {
         id: "jina-reader",
@@ -51,17 +51,17 @@ const DEFINITIONS: &[Definition] = &[
         env_var: Some(JINA_READER.env_var),
         default_url: Some(JINA_READER.default_url),
         binary: None,
-        install_hint: "Start the local web services with `docker compose up -d jina-reader` from the repository root, or set OPENBAD_JINA_READER_URL.",
+        install_hint: "Start the local web services with `docker compose up -d jina-reader` from the repository root, or set CANONWRIGHT_JINA_READER_URL.",
     },
     Definition {
         id: "jupyter",
         name: "Jupyter",
         description: "Notebook server used for interactive analysis.",
         kind: "http",
-        env_var: Some("OPENBAD_JUPYTER_URL"),
+        env_var: Some("CANONWRIGHT_JUPYTER_URL"),
         default_url: Some("http://127.0.0.1:8888"),
         binary: None,
-        install_hint: "Install JupyterLab (`pip install jupyterlab`) and start it on port 8888, or set OPENBAD_JUPYTER_URL.",
+        install_hint: "Install JupyterLab (`pip install jupyterlab`) and start it on port 8888, or set CANONWRIGHT_JUPYTER_URL.",
     },
     Definition {
         id: "tesseract",

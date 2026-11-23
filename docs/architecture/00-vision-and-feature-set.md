@@ -1,8 +1,14 @@
+> **Status: inherited from OpenBaD and not yet rewritten.** This document
+> describes the coding harness Canonwright was copied from. The narrative product
+> is specified in [12 — The Story State Graph](12-story-state-graph.md) and
+> [ADR-010](../adr/010-copy-openbad-core-as-a-starting-point.md). Read the feature
+> tables below as a description of the inherited runtime, not of this product.
+
 # 00 — Vision and Feature Set
 
 ## 1. Product statement
 
-**OpenBaD Desktop is a DeepSeek-first AI coding harness that treats context as
+**Canonwright Desktop is a DeepSeek-first AI coding harness that treats context as
 a cache, not a scratchpad.**
 
 It runs as a desktop app, works inside a chosen repository, and combines four
@@ -26,7 +32,7 @@ durability, not a local-first ideology.
 
 ### What v0 got right
 
-OpenBaD v0 had a strong thesis: an agent should have fast instincts, deliberate
+Canonwright v0 had a strong thesis: an agent should have fast instincts, deliberate
 reasoning, memory that decays and consolidates, system awareness, and
 governance. Those ideas are still useful.
 
@@ -93,9 +99,9 @@ Priority: **P0** = MVP, **P1** = v1.0, **P2** = later. Phase refers to
 | F-03 | DeepSeek cache-hit accounting, cost ledger, and cache meter | DSH + DeepSeek | P0 | 2 |
 | F-04 | Token meter, per-node context pricing, and pressure gauge | DSH | P0 | 2 |
 | F-05 | Prefix-preserving retry, compaction, and summarization | DSH | P0 | 2 |
-| F-06 | Dual-process routing: reflex path vs. deliberate agent loop | OpenBaD | P1 | 3 |
+| F-06 | Dual-process routing: reflex path vs. deliberate agent loop | Canonwright | P1 | 3 |
 | F-07 | Evidence contract and deterministic evidence gate | Clarity | P0 | 3 |
-| F-08 | Bounded agent loop with cancellation, HITL, and budgets | DSH + OpenBaD | P0 | 3 |
+| F-08 | Bounded agent loop with cancellation, HITL, and budgets | DSH + Canonwright | P0 | 3 |
 | F-09 | Streaming responses, tool cards, and incremental transcripts | DSH | P0 | 3 |
 | F-10 | Session fork, resume, search, titles, and references | DSH | P1 | 4 |
 
@@ -116,15 +122,15 @@ Priority: **P0** = MVP, **P1** = v1.0, **P2** = later. Phase refers to
 | F-21 | MCP client for tools, resources, and prompts | DSH | P1 | 5 |
 | F-22 | Web search and fetch with citation capture | DSH + Clarity | P1 | 5 |
 | F-23 | Browser and computer use | DSH | P2 | 7 |
-| F-24 | Schedules, reminders, and recurring maintenance | DSH + OpenBaD | P2 | 6 |
+| F-24 | Schedules, reminders, and recurring maintenance | DSH + Canonwright | P2 | 6 |
 
 ### C. Memory and knowledge
 
 | ID | Feature | Source | Priority | Phase |
 | --- | --- | --- | --- | --- |
-| F-25 | Engram memory with ACT-R decay and Hebbian associations | Clarity + OpenBaD | P1 | 5 |
-| F-26 | Hybrid retrieval: FTS5 + vectors + associations + recency | Clarity + OpenBaD | P1 | 5 |
-| F-27 | Memory extraction, consolidation ("sleep"), and archival | Clarity + OpenBaD | P1 | 6 |
+| F-25 | Engram memory with ACT-R decay and Hebbian associations | Clarity + Canonwright | P1 | 5 |
+| F-26 | Hybrid retrieval: FTS5 + vectors + associations + recency | Clarity + Canonwright | P1 | 5 |
+| F-27 | Memory extraction, consolidation ("sleep"), and archival | Clarity + Canonwright | P1 | 6 |
 | F-28 | Knowledge library with ingestion, versions, chunks, and citations | Clarity | P1 | 5 |
 | F-29 | Workspace indexing and code-aware RAG | New | P0 | 4 |
 | F-30 | Operator profile and preferences (lightweight persona) | Clarity | P1 | 5 |
@@ -134,14 +140,14 @@ Priority: **P0** = MVP, **P1** = v1.0, **P2** = later. Phase refers to
 
 | ID | Feature | Source | Priority | Phase |
 | --- | --- | --- | --- | --- |
-| F-32 | Heartbeat scheduler for indexing, maintenance, and reminders | OpenBaD | P1 | 6 |
-| F-33 | Interoception ("Pulse"): system, context, and cost health | OpenBaD | P1 | 6 |
-| F-34 | Reflex hooks: format/lint/test after edits, command guards | OpenBaD | P2 | 6 |
-| F-35 | Immune guardrails: injection defense, secret scanning, redaction | OpenBaD + new | P0 | 3 |
+| F-32 | Heartbeat scheduler for indexing, maintenance, and reminders | Canonwright | P1 | 6 |
+| F-33 | Interoception ("Pulse"): system, context, and cost health | Canonwright | P1 | 6 |
+| F-34 | Reflex hooks: format/lint/test after edits, command guards | Canonwright | P2 | 6 |
+| F-35 | Immune guardrails: injection defense, secret scanning, redaction | Canonwright + new | P0 | 3 |
 | F-36 | Approval system with risk levels and workspace presets | DSH | P0 | 3 |
 | F-37 | Tamper-evident audit log | Clarity + new | P0 | 3 |
 | F-38 | Sandboxed execution with workspace confinement | DSH + new | P1 | 6 |
-| F-39 | Affective/endocrine modes (focus, careful, explore, budget) | OpenBaD | P2 | 7 |
+| F-39 | Affective/endocrine modes (focus, careful, explore, budget) | Canonwright | P2 | 7 |
 
 ### E. Platform
 
@@ -179,7 +185,7 @@ Priority: **P0** = MVP, **P1** = v1.0, **P2** = later. Phase refers to
 - **Persona** — reduced to an operator profile and preferences, with optional
   OCEAN traits.
 
-### From OpenBaD
+### From Canonwright
 
 - **Dual-process routing** — cheap reflex path for simple work, deliberate loop
   for multi-step tasks.
@@ -223,7 +229,7 @@ Priority: **P0** = MVP, **P1** = v1.0, **P2** = later. Phase refers to
 - The Python/LangGraph harness and enterprise admin console.
 - OCEAN as a full psychological simulation; it becomes optional profile data.
 
-### From OpenBaD
+### From Canonwright
 
 - MQTT, protobuf, systemd units, eBPF probes, and the multi-service topology.
 - The Python implementation and Svelte/TUI surfaces.

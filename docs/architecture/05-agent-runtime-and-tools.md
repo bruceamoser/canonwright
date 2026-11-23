@@ -50,7 +50,7 @@ Rules:
 
 ## 3. Routing
 
-OpenBaD uses a dual-process policy borrowed from OpenBaD v0 and refined into a
+Canonwright uses a dual-process policy borrowed from Canonwright v0 and refined into a
 routing table.
 
 ### 3.1 System 1 — reflex path
@@ -295,7 +295,7 @@ provider.
 The cap still applies to the facade surface. Keep the facade set small, and
 prefer adding capabilities to an existing domain over creating a new domain.
 
-LSP servers are configured in `.openbad/lsp.yaml`:
+LSP servers are configured in `.canonwright/lsp.yaml`:
 
 ```yaml
 servers:
@@ -335,7 +335,7 @@ Rules:
 - The agent resolves the effective risk of `<domain>_run` calls from the inner
   tool and refuses execute, network, or destructive tools before execution
   unless the session has command access. The denial carries
-  `openbad_approval` metadata; the desktop offers a sticky session approval
+  `canonwright_approval` metadata; the desktop offers a sticky session approval
   that switches the session to Full access and continues the task.
 - Mutating tools are serialized per workspace.
 - Read-only tools can run concurrently.
@@ -343,7 +343,7 @@ Rules:
 - Output is validated against `output_schema`; invalid output is a tool error.
 - Tool errors are returned as evidence with `is_error = true`, not panics.
 - Results above the 64 KiB model-facing cap are written under
-  `.openbad/spill/`; the model gets a head/tail excerpt plus `spilled_path`, and
+  `.canonwright/spill/`; the model gets a head/tail excerpt plus `spilled_path`, and
   `read_spill` pages through the file with `offset` and `max_bytes`. The internal
   extraction cap is 256 KiB.
 
@@ -376,7 +376,7 @@ Filesystem access outside the workspace is never inferred. When a read or
 write is denied with `outside the workspace`, the assistant calls
 `request_fs_access` with the absolute path, whether it needs write access, and
 a reason. The tool only records a request and returns
-`metadata.openbad_access_request`; it does not change policy. The human approves
+`metadata.canonwright_access_request`; it does not change policy. The human approves
 or denies it in the desktop prompt. Approval inserts a project-scoped grant in
 `outside_access_grants`, and later turns allow reads below that path (and
 writes when requested). Read-only grants cannot be used by write tools.
@@ -431,10 +431,10 @@ Implemented:
 | `glob_repo` | read | Find reference-folder files by glob |
 | `grep_repo` | read | Search reference-folder text; case-insensitive by default |
 | `read_repo_file` | read | UTF-8 file inside a read-only reference folder; reports total lines |
-| `context_rules` | write | List, pin, or exclude `.openbad/context.yaml` residency rules |
+| `context_rules` | write | List, pin, or exclude `.canonwright/context.yaml` residency rules |
 | `list_context_rules` / `context_map` | read | Audit pinned/excluded rules and files loaded this turn |
-| `ledger` | write/read | Claims, known unknowns, and ruled-out findings in `.openbad/*.json` |
-| `ask_question` / `list_questions` | write/read | Block on a structured human question, then read the log of `.openbad/questions.json` |
+| `ledger` | write/read | Claims, known unknowns, and ruled-out findings in `.canonwright/*.json` |
+| `ask_question` / `list_questions` | write/read | Block on a structured human question, then read the log of `.canonwright/questions.json` |
 | `canon` | write/read | Canon ledger, banned-phrase authoring/lint, and glossary lookup |
 | `write_skill` | write | Durable procedure with preconditions, steps, verification, and rollback |
 | `glossary_add` / `glossary_lookup` | write/read | Glossary terms, expansions, and aliases |
@@ -444,14 +444,14 @@ Implemented:
 | `stat_file` / `stat_repo_file` | read | Size, line count, mtime, and BLAKE3 hash without loading content |
 | `read_files` / `read_repo_files` | read | Batch reads with per-file errors and independent byte caps |
 | `outline` | read | Markdown/AsciiDoc headings, YAML identifiers, or code declarations with line numbers |
-| `delete_file` | write | Soft delete to `.openbad/trash`; hard delete requires `hard=true` |
-| `job_start` / `job_status` / `job_logs` / `job_stop` / `job_list` | command/read | Background commands with logs under `.openbad/jobs` |
+| `delete_file` | write | Soft delete to `.canonwright/trash`; hard delete requires `hard=true` |
+| `job_start` / `job_status` / `job_logs` / `job_stop` / `job_list` | command/read | Background commands with logs under `.canonwright/jobs` |
 | `archive_list` / `archive_read` | read | Inspect zip entries without extraction |
 | `diff_files` / `file_citation` | read | Cross-path diffs and stable `path@hash:line` citations |
 | `git_changes_since` | read | Commits and changed paths since a revision |
 | `registry_lookup` | read | crates.io/npm/PyPI version checks with network policy |
-| `undo_last` | write | Restore the most recent write/edit from `.openbad/undo` |
-| `instructions_for` | read | Load scoped AGENTS.md/CLAUDE.md/.openbad instructions root-first |
+| `undo_last` | write | Restore the most recent write/edit from `.canonwright/undo` |
+| `instructions_for` | read | Load scoped AGENTS.md/CLAUDE.md/.canonwright instructions root-first |
 | `scaffold_project` | write | Create a starter manifest, README, docs, knowledge, scratch, artifacts |
 | `workspace_gc` | write | Report or remove large generated files with confirmation |
 | `session_checkpoint` / `session_resume` | write/read | Capture or restore plan/todos/handoff/claims/audit summaries |
@@ -479,29 +479,29 @@ Implemented:
 | `git_worktree` | command | Add, list, and remove worktrees |
 | `repo_health` / `git_commit_context` | read | Ahead/behind, dirty state, and commit-message context |
 | `github` | command | Full GitHub surface through `gh`: status, repositories, branches and protection, issues, labels, milestones, pull requests, reviews and merges, Actions, releases, Pages, search, and generic `gh api`; destructive actions require `confirm=true` |
-| `pipeline` | read/write/command | Read, validate, or write `.openbad/pipeline.yaml`, and check the branch protection that gates auto-merge. The description carries the schema and the rules that change behaviour, the write path uses the loader's own parser, and `guards` names each missing setting instead of accepting a promise |
+| `pipeline` | read/write/command | Read, validate, or write `.canonwright/pipeline.yaml`, and check the branch protection that gates auto-merge. The description carries the schema and the rules that change behaviour, the write path uses the loader's own parser, and `guards` names each missing setting instead of accepting a promise |
 | `subagent` | execute | Spawn, list, wait for, inspect, or cancel a focused background worker. `spawn` returns immediately; `wait` blocks until a terminal status or timeout, and `status` returns the result and recent activity. Workers inherit the session access mode and cannot spawn further workers |
-| `team_task_create` / `team_task_list` / `team_task_update` / `team_task_get` | write/read/write/read | The shared board in `.openbad/team.json`: units of work with a state (`open`, `claimed`, `blocked`, `done`, `dropped`), an owner, and a result. A parent lays work out and names each task id in a subagent's instructions; the child claims it and records the outcome |
+| `team_task_create` / `team_task_list` / `team_task_update` / `team_task_get` | write/read/write/read | The shared board in `.canonwright/team.json`: units of work with a state (`open`, `claimed`, `blocked`, `done`, `dropped`), an owner, and a result. A parent lays work out and names each task id in a subagent's instructions; the child claims it and records the outcome |
 | `plugin_list` / `plugin_describe` | read | Discover installed and bundled plugins and their actions |
 | `plugin_call` / `plugin_test` | command | Run a plugin action or its declared test command with JSON stdin/stdout and evidence |
 | `write_plugin` / `plugin_install_builtin` | write | Scaffold a plugin or install the bundled AsciiDoc plugin |
 | `web_search` | read | Search through loopback SearXNG; ranked titles, URLs, and snippets |
 | `web_fetch` | read | Fetch http(s) docs, extract readable text, cache by hash, respect `network_hosts` |
 | `present_artifact` | read | Open a web page, image, Markdown, diff, or file beside chat |
-| `read_project_manifest` | read | Read `.openbad/project.yaml`: purpose, scope map, commands, invariants |
+| `read_project_manifest` | read | Read `.canonwright/project.yaml`: purpose, scope map, commands, invariants |
 | `classify_path` | read | Classify a path as authoritative, generated, historical, or external |
 | `run_task` | command | Run a named manifest command; requires Full access |
 | `list_recipes` | read | List verification recipes declared in the project manifest |
 | `run_recipe` | command | Run a lint/test/build/schema recipe; requires Full access |
 | `list_gates` / `run_gate` | read/command | Run an ordered verification gate with evidence |
-| `todo_write` | write | Replace the durable project todo list in `.openbad/todos.json` |
+| `todo_write` | write | Replace the durable project todo list in `.canonwright/todos.json` |
 | `todo_read` | read | Read the project todo list |
-| `create_goal` / `get_goal` / `update_goal` | write/read/write | The workspace's durable goal in `.openbad/goal.json`: one objective at a time, its progress notes, and its status (`active`, `paused`, `done`, `abandoned`). An open goal is re-read into every system prompt |
-| `write_handoff` | write | Write a handoff summary to `.openbad/handoff.md` |
+| `create_goal` / `get_goal` / `update_goal` | write/read/write | The workspace's durable goal in `.canonwright/goal.json`: one objective at a time, its progress notes, and its status (`active`, `paused`, `done`, `abandoned`). An open goal is re-read into every system prompt |
+| `write_handoff` | write | Write a handoff summary to `.canonwright/handoff.md` |
 
 The desktop implementation backs project tools with `StoreProjectAreas`, which
 implements `ProjectAreas` against the active workspace id. `present_artifact`
-returns `metadata.openbad_artifact`; the event stream carries that metadata to
+returns `metadata.canonwright_artifact`; the event stream carries that metadata to
 the UI, which opens the split workspace.
 
 Knowledge documents are typed (`note`, `decision`, `reference`, `gotcha`,
@@ -516,14 +516,14 @@ source hash. `list_knowledge` and `get_knowledge` flag a document as `STALE`
 when the source file's current hash differs from the captured hash, and a
 source that has disappeared is treated as stale.
 
-The project-model sidecars are `.openbad/canon.yaml` (canonical,
+The project-model sidecars are `.canonwright/canon.yaml` (canonical,
 superseded, disputed, unknown entries plus banned phrases),
-`.openbad/glossary.yaml`, and `.openbad/adr/`. `canon_lint` reports obsolete
+`.canonwright/glossary.yaml`, and `.canonwright/adr/`. `canon_lint` reports obsolete
 phrases with their canonical replacement and citation; `check_invariants` runs
-declared invariant checks and writes evidence under `.openbad/invariants/`.
+declared invariant checks and writes evidence under `.canonwright/invariants/`.
 
 Manifest `gates:` group recipes into named pre-flight checks. `run_gate`
-executes them in order and writes a JSON evidence file under `.openbad/gates/`.
+executes them in order and writes a JSON evidence file under `.canonwright/gates/`.
 When `prove_it: true`, the prompt requires every factual claim to cite an
 executed check or be labelled UNVERIFIED.
 
@@ -545,7 +545,7 @@ reach the full data. Silent truncation is a defect, not a policy.
   the turn continues. A truncated text answer is recorded with the point it
   stopped at, in the transcript and the next turn's history.
 - **Large tool output spills, it does not disappear.** `finish_result` writes
-  anything over the model budget to `.openbad/spill` and returns a path, so
+  anything over the model budget to `.canonwright/spill` and returns a path, so
   `mcp_call` and subagent reports keep their tail instead of a local cut.
 - **A cut document says how much is missing.** Attachment extraction and error
   previews state the included and total sizes, so neither the model nor the
@@ -573,7 +573,7 @@ says what was read.
 `write_file` and `edit_file` screen content for obvious secrets (private keys,
 cloud/API/GitHub/Slack tokens) before writing. `preview_write` lets the model
 show a diff first. `snapshot` action create copies the workspace (excluding `.git`,
-`target`, `node_modules`, `dist`, `.openbad`) under `.openbad/snapshots/`, and
+`target`, `node_modules`, `dist`, `.canonwright`) under `.canonwright/snapshots/`, and
 `assert_project` provides count, schema, and local-link checks for gates.
 
 `write_file` and `edit_file` run every manifest validator whose glob matches
@@ -619,18 +619,18 @@ change, and how to report them), `error-handling` (detect, retry, surface),
 `code-review` (what to look for in a diff and how to report a finding). A
 workspace skill with the same name overrides the built-in.
 
-`.openbad/context.yaml` declares `pinned` and `excluded` globs. Excluded paths
+`.canonwright/context.yaml` declares `pinned` and `excluded` globs. Excluded paths
 are refused by direct reads and filtered from list, grep, glob, symbol, and
 indexed-search results. `context_map` reports loaded files for the current turn,
 the rules, and ruled-out findings. Ruled-out paths and hypotheses live in
-`.openbad/dead-ends.json` and are injected into the system prompt.
+`.canonwright/dead-ends.json` and are injected into the system prompt.
 
-`.openbad/permissions.yaml` can restrict writes by glob (`allow_paths`,
+`.canonwright/permissions.yaml` can restrict writes by glob (`allow_paths`,
 `deny_paths`, `allow_writes: false`) and commands by class or substring
 (`command_classes`, `deny_command_patterns`, `allow_network`, `network_hosts`). Denials name the policy rule and
 apply to file operations, `run_command`, `run_task`, and `run_recipe`.
 
-Every write/edit records a bounded undo entry under `.openbad/undo`; `undo_last`
+Every write/edit records a bounded undo entry under `.canonwright/undo`; `undo_last`
 restores it. `instructions_for` discovers nested instruction files from the
 workspace root down to the target path.
 
@@ -641,23 +641,23 @@ searches that repo's ancestors for `AGENTS.md`. `references_to` provides a
 blast-radius preview and
 `golden` action compare/accept manages committed baselines.
 
-`plan_write` stores a draft in `.openbad/plan.json`; the prompt says not to
+`plan_write` stores a draft in `.canonwright/plan.json`; the prompt says not to
 execute it until a human approves it in Project → Plan. `plan_verify` runs a
 step's recipe/command and records pass/fail evidence. `ask_question` blocks the
 turn on a decision with optional choices instead of guessing or stalling: the
 desktop host shows the question dialog, and the chosen answer comes back in the
-tool result. The exchange is also appended to `.openbad/questions.json`, which
+tool result. The exchange is also appended to `.canonwright/questions.json`, which
 the Project → Questions panel lists as a log rather than an inbox.
 
-Every tool call appends a bounded JSONL record to `.openbad/audit.jsonl`:
+Every tool call appends a bounded JSONL record to `.canonwright/audit.jsonl`:
 timestamp, turn, tool, argument/result BLAKE3 digests and 500-character
 previews, error state, and duration. `run_command` tees its full output to
-`.openbad/logs/command-<timestamp>.log` and returns head/tail plus the log path,
+`.canonwright/logs/command-<timestamp>.log` and returns head/tail plus the log path,
 so large builds do not flood context.
 
 **Retention.** None of that bookkeeping grows without bound, and **age decides**:
 the window is a setting (Settings → General → Limits → *Log retention (days)*,
-default five, clamped to 1–365). `openbad_workspace::prune_directory` removes
+default five, clamped to 1–365). `canonwright_workspace::prune_directory` removes
 anything older than the window, and the file-count and byte ceilings exist only
 so one runaway day cannot fill a disk — they trim the newest first, so a busy day
 never shortens the window for an ordinary one. `rotate_file` renames a file to
@@ -666,10 +666,10 @@ always survives.
 
 | Location | Window | Ceiling |
 | --- | --- | --- |
-| `.openbad/logs` | the setting (default 5 days) | 4000 files, 256 MiB |
-| `.openbad/spill` | the setting (default 5 days) | 2000 files, 128 MiB |
-| `.openbad/audit.jsonl` | n/a — single append-only file | rotates at 8 MiB, one archive |
-| `openbad.log` | n/a — rotates by size | rotates at 4 MiB, one archive |
+| `.canonwright/logs` | the setting (default 5 days) | 4000 files, 256 MiB |
+| `.canonwright/spill` | the setting (default 5 days) | 2000 files, 128 MiB |
+| `.canonwright/audit.jsonl` | n/a — single append-only file | rotates at 8 MiB, one archive |
+| `canonwright.log` | n/a — rotates by size | rotates at 4 MiB, one archive |
 
 The setting reaches the tools as `ToolContext::log_retention_days`, set from
 `AgentConfig` by the host. The two ceilings are not settings: they are last-resort
@@ -678,7 +678,7 @@ guards, and changing them changes nothing until a single window exceeds them.
 Pruning is best effort: a directory that cannot be read is left alone, because
 tidying up must never fail the tool call that triggered it. A file stamped in the
 future is treated as fresh rather than deleted over a clock disagreement.
-`.openbad/undo` and the session database are recovery and product data, not
+`.canonwright/undo` and the session database are recovery and product data, not
 logs, and are deliberately outside this policy.
 
 Recipes and invariant checks may declare an absolute `cwd`; named tools pass
@@ -699,19 +699,19 @@ compares workspace or reference files; `file_citation` emits
 
 `web_fetch` requires Full access, enforces the `network_hosts` allowlist
 (including redirects), strips scripts/styles from HTML, and stores each body
-under `.openbad/web-cache` by BLAKE3 hash with URL, title, content type, and
+under `.canonwright/web-cache` by BLAKE3 hash with URL, title, content type, and
 fetch time. `prefer_cache` reuses a recent fetch instead of hitting the network.
 
 `web_search` queries a local SearXNG instance and returns ranked titles, URLs,
 and snippets. SearXNG is a hard dependency, not a suggestion: the base URL comes
-from `OPENBAD_SEARXNG_URL` (default `http://127.0.0.1:8080`), the instance must
+from `CANONWRIGHT_SEARXNG_URL` (default `http://127.0.0.1:8080`), the instance must
 enable the `json` format under `search.formats`, and there is no fallback
 backend. A loopback endpoint is probed with a short TCP connect before the
 request, so a stopped instance fails in milliseconds with an error that names
 the service, the URL, the environment variable, and the compose command instead
 of a raw transport error or a 15-second timeout. Remote endpoints skip the
 probe so an egress proxy stays usable. `web_fetch` prefers a local Jina Reader
-(`OPENBAD_JINA_READER_URL`, default `http://127.0.0.1:3000`) and falls back to
+(`CANONWRIGHT_JINA_READER_URL`, default `http://127.0.0.1:3000`) and falls back to
 direct HTTP when the reader is off or unreachable. Both services are provisioned
 by the repository-root `docker-compose.yml`; see
 [Local Web Services](../web-services.md) for the runbook.
@@ -719,7 +719,7 @@ by the repository-root `docker-compose.yml`; see
 `run_command` accepts `parse` to extract structured diagnostics for Rust,
 pytest, ESLint, and TypeScript; diagnostics are summarized in the result and
 returned in metadata. Long-running commands can use the `job_*` tools, which
-record PID and log files under `.openbad/jobs` and support explicit stop.
+record PID and log files under `.canonwright/jobs` and support explicit stop.
 
 `terminal` creates a real PTY-backed shell, keeps it alive across turns, and
 lets the model send input and drain incremental output. Sessions are keyed by a
@@ -763,7 +763,7 @@ was killed still hands back what it found. The default budget is 120 seconds and
 `timeout_seconds` raises it to 600; `run_tests` defaults to 300 and accepts up to
 3600, because a real suite is not a 30-second operation.
 
-File deletion is reversible by default: the file moves to `.openbad/trash` and
+File deletion is reversible by default: the file moves to `.canonwright/trash` and
 can be restored by name.
 
 `read_file` and `read_repo_file` return `total_lines`, `start_line`, `end_line`,
@@ -891,7 +891,7 @@ Rules:
 - Worker records live in the `subagents` table with status, step count, activity
   log, result, error, model, and timestamps. The activity log is capped at
   32 KB. Terminal records are pruned automatically after 60 seconds (override
-  with `OPENBAD_SUBAGENT_RETENTION_SECONDS`), so finished workers do not
+  with `CANONWRIGHT_SUBAGENT_RETENTION_SECONDS`), so finished workers do not
   accumulate in the project Agents area.
 - The project panel's Agents area lists workers, updates while one is running,
   opens a completed result as a Markdown artifact, and can cancel a running
@@ -954,16 +954,16 @@ Rules:
 - Skill scripts run with the same approval policy as shell tools.
 - Built-in skills cover GitHub workflows, releases and Pages, plugin
   development, and AsciiDoc rendering. They are always available.
-- Workspace skills (`.openbad/skills`, `.claude/skills`) override built-ins by
-  name; `.openbad` wins over `.claude`.
+- Workspace skills (`.canonwright/skills`, `.claude/skills`) override built-ins by
+  name; `.canonwright` wins over `.claude`.
 - A plugin may ship `SKILL.md`; it is indexed once the plugin is installed
-  under `.openbad/plugins/<name>/`.
+  under `.canonwright/plugins/<name>/`.
 - Skills cannot silently add tools; `allowed_tools` narrows the set.
 
 ### 11.1 Plugin runtime
 
 Plugins keep optional capabilities out of the core binary. A plugin lives in
-`.openbad/plugins/<name>/` and declares a `plugin.yaml`:
+`.canonwright/plugins/<name>/` and declares a `plugin.yaml`:
 
 ```yaml
 name: asciidoc
@@ -994,9 +994,9 @@ It prints one JSON object on stdout:
 
 `content`, `metadata`, and `is_error` are optional; non-JSON output is treated
 as text and stderr is appended to failures. Each run is recorded under
-`.openbad/plugin-runs/` with exit code, duration, and bounded stdout/stderr.
+`.canonwright/plugin-runs/` with exit code, duration, and bounded stdout/stderr.
 `plugin_call` and `plugin_test` require Full access, enforce the manifest
-timeout, and honor `.openbad/permissions.yaml`. `permissions: [destructive]`
+timeout, and honor `.canonwright/permissions.yaml`. `permissions: [destructive]`
 also requires `confirm=true`. `dry_run: true` returns the command and request
 without execution.
 
@@ -1072,7 +1072,7 @@ Rules:
 
 ### 13.1 Connector model
 
-OpenBaD keeps Clarity's typed connector idea but does not rebuild its bespoke
+Canonwright keeps Clarity's typed connector idea but does not rebuild its bespoke
 framework. There are two layers:
 
 1. **MCP-first** — third-party tools, resources, and prompts are integrated
@@ -1104,9 +1104,9 @@ Rules:
 ### 13.2 MCP
 
 MCP servers are defined once, globally, in the application config directory
-resolved by the `directories` crate (`~/.config/openbaddesktop/mcp.yaml` on
+resolved by the `directories` crate (`~/.config/canonwrightdesktop/mcp.yaml` on
 Linux; the equivalent application-config directory on macOS and Windows).
-`OPENBAD_MCP_CONFIG` overrides the path, which tests and headless hosts use:
+`CANONWRIGHT_MCP_CONFIG` overrides the path, which tests and headless hosts use:
 
 ```yaml
 servers:
@@ -1126,7 +1126,7 @@ servers:
 ```
 
 Each project only records which global servers it enables, in
-`.openbad/mcp.yaml`:
+`.canonwright/mcp.yaml`:
 
 ```yaml
 enabled: ["docs", "remote"]
@@ -1172,7 +1172,7 @@ enabled: ["docs", "remote"]
   down cleanly. Per-request timeouts are enforced.
 - Resources and prompts are not proxied yet.
 - Credentials live in the OS keychain or the server's environment; `env` values
-  are redacted from model-visible summaries, and `.openbad/` is gitignored so
+  are redacted from model-visible summaries, and `.canonwright/` is gitignored so
   local values do not reach version control.
 
 ## 14. Evidence gate
@@ -1237,7 +1237,7 @@ pub struct TurnBudget {
 
 ### Sources
 
-A project opts into the supervised pipeline (ADR-009) with `.openbad/pipeline.yaml`:
+A project opts into the supervised pipeline (ADR-009) with `.canonwright/pipeline.yaml`:
 
 ```yaml
 sources:
@@ -1246,7 +1246,7 @@ sources:
     enabled: true
     labels: ["agent:run"]        # an issue must carry one to be admitted
     allowed: ["bruceamoser"]     # who may originate work; enforced by Eval
-    bot_logins: ["openbad-bot"]  # the agent's own account, dropped on sight
+    bot_logins: ["canonwright-bot"]  # the agent's own account, dropped on sight
     known_bots: ["sweeper-bot"]  # bots that may propose work, never request it
     poll_interval_secs: 120
 execution:
@@ -1256,7 +1256,7 @@ execution:
     tokens: 0
 ```
 
-`openbad-pipeline` turns repository activity into immutable triggers with a
+`canonwright-pipeline` turns repository activity into immutable triggers with a
 persisted read position. Three decisions worth knowing:
 
 - **The label filter travels in the GitHub query**, not in a post-filter. Adding a
@@ -1284,7 +1284,7 @@ persisted read position. Three decisions worth knowing:
 
 ### Admission
 
-`openbad-pipeline::eval` decides what each trigger may do. It takes the source's
+`canonwright-pipeline::eval` decides what each trigger may do. It takes the source's
 policy, what is already on the thread, and the triggers as arguments, and holds no
 state, so the same inputs always give the same decisions and every rule is testable
 without a store. The gate is a first-match-wins rule table, not a model: "why was
@@ -1332,8 +1332,8 @@ is neutral, so a new admission is possible.
 ### Tickets, mandates, and reports
 
 A ticket is the durable unit of work an accept creates; migration `0019_pipeline`
-stores it. The state machine is in `openbad-pipeline::ticket` and the rows are in
-`openbad-store::pipeline`, so the rules are testable without a database and the
+stores it. The state machine is in `canonwright-pipeline::ticket` and the rows are in
+`canonwright-store::pipeline`, so the rules are testable without a database and the
 store enforces only what has to survive a crash.
 
 Two axes stay independent:
@@ -1370,7 +1370,7 @@ that silently reads as `open` would be delivered work it was never authorized fo
 
 ### Concurrency, budget, and recovery
 
-`openbad-pipeline::execution` holds the rules a host applies around a turn. None of
+`canonwright-pipeline::execution` holds the rules a host applies around a turn. None of
 them starts a process, so they are testable — including the cases that need a crash
 to reproduce — and the host only performs them.
 
@@ -1394,7 +1394,7 @@ to reproduce — and the host only performs them.
   would leave the ticket stuck forever.
 
 The loop itself is exercised end to end against a scripted executor in
-`crates/openbad-store/tests/pipeline_loop.rs`: admit, take a slot, launch, take
+`crates/canonwright-store/tests/pipeline_loop.rs`: admit, take a slot, launch, take
 reports, apply their effects. A unit test per rule cannot catch a slot released for
 a report that never ended its assignment.
 
@@ -1423,13 +1423,13 @@ instead of being read past.
 `pipeline_launch` takes a ticket to the point where a turn can run, and no further:
 
 - **One worktree, one branch, one session.** The names come from
-  `openbad-pipeline::execution::launch_plan`, not from the call site, so
+  `canonwright-pipeline::execution::launch_plan`, not from the call site, so
   `worker-<ticket>` and `worker/<ticket>` hold by construction. A ticket id becomes
   a path and a branch there, so anything that could leave the execution root is
   neutralized first.
 - **The execution root** is `execution.execution_root` (relative paths resolve
   against the project), defaulting to a sibling
-  `<parent>/.openbad-executors/<project>` — beside the repository, never inside it,
+  `<parent>/.canonwright-executors/<project>` — beside the repository, never inside it,
   so a worktree does not become untracked noise in the checkout its own agent reads.
 - **Prepare** is `execution.prepare`, run in the new worktree with the launch's
   variables and `PREPARE_TIMEOUT` (ten minutes). Its output goes to `prepare.log`
@@ -1538,10 +1538,10 @@ so instead of looking healthy. Nothing is admitted until a tick runs: a panel wi
 no tickets and no `pipeline:tick` has simply never polled.
 
 Polling runs `gh api`, and PR detection runs `gh pr list`. Both resolve the binary
-through `openbad_pipeline::gh_binary` rather than assuming `gh` is on `PATH`: a
+through `canonwright_pipeline::gh_binary` rather than assuming `gh` is on `PATH`: a
 desktop app inherits the session's `PATH`, which may omit a per-user install, and a
 spawn that fails is silent at both sites. The lookup checks `PATH` first and then
-the directories installers use, and `OPENBAD_GH` overrides it outright.
+the directories installers use, and `CANONWRIGHT_GH` overrides it outright.
 
 Every tick emits `pipeline:tick`; the runner emits `pipeline:progress` per step,
 tool call, and tool result. `pipeline_stop` sets the flag the observer polls, so a
@@ -1554,7 +1554,7 @@ records the URL on its report.
 
 ### Stage
 
-`openbad_pipeline::stage` derives a stage from rows, first match wins: an open
+`canonwright_pipeline::stage` derives a stage from rows, first match wins: an open
 attention outranks a review, a review outranks a block or a failure, and a ticket
 with no assignment or a pending one is `working/queued`. Nothing is inferred from
 report prose. `pipeline_tickets` returns each ticket with its stage for the panel,
@@ -1563,7 +1563,7 @@ from the same function, so the sidebar cannot drift from the panel.
 
 ### Setup
 
-The panel edits `.openbad/pipeline.yaml` verbatim and saves through
+The panel edits `.canonwright/pipeline.yaml` verbatim and saves through
 `pipeline_save_config`, which parses and validates before writing: a file that
 saves but does not load would leave a project that looks configured and silently
 polls nothing. `pipeline_guards` reads the repository's branch protection and names

@@ -1,8 +1,8 @@
-# Contributing to OpenBaD
+# Contributing to Canonwright
 
 ## Development Workflow
 
-OpenBaD uses a strict issue-driven workflow:
+Canonwright uses a strict issue-driven workflow:
 
 ```
 GitHub Issue → Feature Branch → Pull Request → Review → Squash Merge
@@ -26,8 +26,8 @@ build tools). The setup script and CI document the exact package list.
 ### Setup
 
 ```bash
-git clone https://github.com/bruceamoser/OpenBaD.git
-cd OpenBaD
+git clone https://github.com/bruceamoser/Canonwright.git
+cd Canonwright
 
 # Rust workspace
 cargo check --workspace
@@ -60,7 +60,7 @@ pnpm test
 
 ## Working on an Issue
 
-1. **Pick an issue** from the [issue tracker](https://github.com/bruceamoser/OpenBaD/issues).
+1. **Pick an issue** from the [issue tracker](https://github.com/bruceamoser/Canonwright/issues).
    Check priority labels (`P0` → `P3`) and dependency notes.
 2. **Create a branch:**
    ```bash

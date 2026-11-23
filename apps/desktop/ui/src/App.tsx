@@ -203,7 +203,7 @@ function clampNumber(
 
 function loadPreferences(): Preferences {
   try {
-    const raw = localStorage.getItem("openbad.preferences");
+    const raw = localStorage.getItem("canonwright.preferences");
     if (raw !== null) {
       const parsed = JSON.parse(raw) as Partial<Preferences>;
       return {
@@ -900,7 +900,7 @@ export default function App() {
   useEffect(() => {
     try {
       localStorage.setItem(
-        "openbad.preferences",
+        "canonwright.preferences",
         JSON.stringify({
           model,
           thinking,
@@ -1105,7 +1105,7 @@ export default function App() {
     try {
       const destination = await pickSaveFile(
         "Export project",
-        `${activeProject.name}.openbad-project`,
+        `${activeProject.name}.canonwright-project`,
       );
       if (destination === null) {
         return;
@@ -2235,7 +2235,7 @@ export default function App() {
     if (activeProject === null) {
       return;
     }
-    if (!window.confirm(`Remove project "${activeProject.name}" from OpenBaD?`)) {
+    if (!window.confirm(`Remove project "${activeProject.name}" from Canonwright?`)) {
       return;
     }
     try {
@@ -2353,7 +2353,7 @@ export default function App() {
           onSelect: () => openSettings("model"),
         },
         { label: "separator", separator: true },
-        { label: "Quit OpenBaD", onSelect: () => void quitApp() },
+        { label: "Quit Canonwright", onSelect: () => void quitApp() },
       ],
     },
     {
@@ -2517,7 +2517,7 @@ export default function App() {
           onSelect: () => setShortcutsOpen(true),
         },
         {
-          label: "About OpenBaD",
+          label: "About Canonwright",
           onSelect: () => openSettings("about"),
         },
       ],
@@ -2564,7 +2564,7 @@ export default function App() {
               OB
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[13px] font-semibold tracking-tight">OpenBaD</p>
+              <p className="truncate text-[13px] font-semibold tracking-tight">Canonwright</p>
               <p className="truncate text-[10px] text-obd-subtle">coding harness</p>
             </div>
             <button
@@ -3295,7 +3295,7 @@ export default function App() {
               <div>
                 <h2 className="text-[14px] font-medium">New project</h2>
                 <p className="mt-0.5 text-[11px] text-obd-subtle">
-                  A project owns one workspace. Name it and OpenBaD creates the
+                  A project owns one workspace. Name it and Canonwright creates the
                   folder for you.
                 </p>
               </div>
@@ -3844,7 +3844,7 @@ const MessageCard = memo(function MessageCard({
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 text-[10px] text-obd-subtle">
-          <span className="font-medium text-obd-muted">OpenBaD</span>
+          <span className="font-medium text-obd-muted">Canonwright</span>
           {entry.status !== undefined && <span>· {entry.status}</span>}
           {running && entry.startedAt !== undefined && nowMs !== undefined && (
             <span className="font-mono text-obd-subtle" data-testid="turn-running">
@@ -4180,7 +4180,7 @@ function SettingsDialog({
             <div className="max-w-md space-y-4">
               <Section
                 title="Notifications"
-                description="System notifications for work that finishes while OpenBaD is in the background."
+                description="System notifications for work that finishes while Canonwright is in the background."
               >
                 <label className="flex items-start justify-between gap-3 text-[12px] text-obd-body">
                   <span className="min-w-0">
@@ -4511,7 +4511,7 @@ function SettingsDialog({
 
           {tab === "about" && (
             <div className="max-w-md space-y-3">
-              <Section title="OpenBaD Desktop" description="A DeepSeek-first coding harness.">
+              <Section title="Canonwright Desktop" description="A DeepSeek-first coding harness.">
                 <div className="space-y-1 font-mono text-[11px] text-obd-muted">
                   <p>version {foundation.kind === "ready" ? foundation.foundation.app_version : "—"}</p>
                   <p>schema {foundation.kind === "ready" ? foundation.foundation.doctor.schema_version : "—"}</p>
@@ -4669,7 +4669,7 @@ function Section({
 
 function rememberedProjectPath(): string | null {
   try {
-    return localStorage.getItem("openbad.activeProjectPath");
+    return localStorage.getItem("canonwright.activeProjectPath");
   } catch {
     return null;
   }
@@ -4677,7 +4677,7 @@ function rememberedProjectPath(): string | null {
 
 function rememberProjectPath(path: string): void {
   try {
-    localStorage.setItem("openbad.activeProjectPath", path);
+    localStorage.setItem("canonwright.activeProjectPath", path);
   } catch {
     // Storage is optional in hardened webviews.
   }
@@ -4770,7 +4770,7 @@ function artifactRecord(metadata: unknown): Record<string, unknown> | null {
   if (typeof metadata !== "object" || metadata === null) {
     return null;
   }
-  const value = (metadata as Record<string, unknown>).openbad_artifact;
+  const value = (metadata as Record<string, unknown>).canonwright_artifact;
   if (typeof value !== "object" || value === null) {
     return null;
   }
@@ -4843,7 +4843,7 @@ function accessRequestFromMetadata(metadata: unknown): OutsideAccessRequest | nu
   if (typeof metadata !== "object" || metadata === null) {
     return null;
   }
-  const value = (metadata as Record<string, unknown>).openbad_access_request;
+  const value = (metadata as Record<string, unknown>).canonwright_access_request;
   if (typeof value !== "object" || value === null) {
     return null;
   }
@@ -4862,7 +4862,7 @@ function toolApprovalFromMetadata(metadata: unknown): ToolApprovalRequest | null
   if (typeof metadata !== "object" || metadata === null) {
     return null;
   }
-  const value = (metadata as Record<string, unknown>).openbad_approval;
+  const value = (metadata as Record<string, unknown>).canonwright_approval;
   if (typeof value !== "object" || value === null) {
     return null;
   }
@@ -5252,7 +5252,7 @@ function AccessRequestDialog({
           <div>
             <h2 className="text-[14px] font-medium">Allow access outside the workspace?</h2>
             <p className="mt-1 text-[11px] leading-5 text-obd-subtle">
-              OpenBaD asked for {request.write ? "read and write" : "read-only"} access.
+              Canonwright asked for {request.write ? "read and write" : "read-only"} access.
               The grant applies to this project until you revoke it.
               {request.write &&
                 " Write access also requires the session access mode to be Can edit or Full access."}

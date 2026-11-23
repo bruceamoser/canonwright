@@ -1,6 +1,6 @@
 //! A bounded log file beside the database.
 //!
-//! The session log in `openbad.db` explains a finished turn, but it cannot
+//! The session log in `canonwright.db` explains a finished turn, but it cannot
 //! explain a failure that happens before a session exists: a panic in startup,
 //! a store that will not open, a crash in the window. This module records those.
 
@@ -15,19 +15,19 @@ const MAX_BYTES: u64 = 4 * 1024 * 1024;
 
 /// The directory holding the database and the log.
 ///
-/// Honors `OPENBAD_DB_PATH` so an isolated automation run also gets an isolated
+/// Honors `CANONWRIGHT_DB_PATH` so an isolated automation run also gets an isolated
 /// log next to its database, instead of writing into the user's data directory.
 pub fn data_dir() -> Option<PathBuf> {
-    if let Some(path) = std::env::var_os("OPENBAD_DB_PATH") {
+    if let Some(path) = std::env::var_os("CANONWRIGHT_DB_PATH") {
         let path = PathBuf::from(path);
         return path.parent().map(Path::to_path_buf);
     }
-    directories::ProjectDirs::from("com", "OpenBaD", "OpenBaD Desktop")
+    directories::ProjectDirs::from("com", "Canonwright", "Canonwright Desktop")
         .map(|directories| directories.data_dir().to_path_buf())
 }
 
 pub fn log_path() -> Option<PathBuf> {
-    data_dir().map(|directory| directory.join("openbad.log"))
+    data_dir().map(|directory| directory.join("canonwright.log"))
 }
 
 /// Append one line. Never panics and never fails the caller: logging that can
@@ -39,7 +39,7 @@ pub fn record(level: &str, message: &str) {
     if let Some(parent) = path.parent() {
         let _ = fs::create_dir_all(parent);
     }
-    openbad_workspace::rotate_file(&path, MAX_BYTES);
+    canonwright_workspace::rotate_file(&path, MAX_BYTES);
     let Ok(mut file) = OpenOptions::new().create(true).append(true).open(&path) else {
         return;
     };
@@ -53,7 +53,7 @@ pub fn init() -> Option<PathBuf> {
     record(
         "INFO",
         &format!(
-            "start openbad-desktop {} pid {} on {}",
+            "start canonwright-desktop {} pid {} on {}",
             env!("CARGO_PKG_VERSION"),
             std::process::id(),
             std::env::consts::OS
@@ -162,12 +162,12 @@ pub fn early_exit_for(arguments: &[String]) -> Option<i32> {
     for argument in arguments {
         match argument.as_str() {
             "--version" | "-V" => {
-                println!("openbad-desktop {}", env!("CARGO_PKG_VERSION"));
+                println!("canonwright-desktop {}", env!("CARGO_PKG_VERSION"));
                 return Some(0);
             }
             "--help" | "-h" => {
                 println!(
-                    "openbad-desktop {}\n\nUsage: openbad-desktop [--version] [--help]\n\nWith no flag, opens the desktop application.",
+                    "canonwright-desktop {}\n\nUsage: canonwright-desktop [--version] [--help]\n\nWith no flag, opens the desktop application.",
                     env!("CARGO_PKG_VERSION")
                 );
                 return Some(0);
@@ -193,17 +193,17 @@ mod tests {
         assert!(stamp.ends_with('Z'), "{stamp}");
     }
 
-    // One test owns OPENBAD_DB_PATH: two setting it in parallel would race. It
+    // One test owns CANONWRIGHT_DB_PATH: two setting it in parallel would race. It
     // also proves the crash behind the core dumps cannot recur — a critical that
     // GLib considered fatal used to abort the process, and would abort this test
     // binary if the narrowing were removed.
     #[test]
     fn startup_panics_and_fatal_criticals_all_reach_the_log() {
         let directory = tempfile::tempdir().expect("directory");
-        let database = directory.path().join("openbad.db");
+        let database = directory.path().join("canonwright.db");
         // SAFETY: no other test in this binary reads the variable, and this test
         // is the only one that sets it.
-        unsafe { std::env::set_var("OPENBAD_DB_PATH", &database) };
+        unsafe { std::env::set_var("CANONWRIGHT_DB_PATH", &database) };
         let path = init().expect("log path");
         init_glib_logging();
         record("INFO", "diagnostics test line");
@@ -212,10 +212,10 @@ mod tests {
         assert!(panicked.is_err(), "the panic unwound");
 
         #[cfg(target_os = "linux")]
-        glib::g_critical!("openbad-test", "a critical the window must survive");
+        glib::g_critical!("canonwright-test", "a critical the window must survive");
 
         let written = fs::read_to_string(&path).expect("log file");
-        assert!(written.contains("start openbad-desktop"), "{written}");
+        assert!(written.contains("start canonwright-desktop"), "{written}");
         assert!(written.contains("diagnostics test line"), "{written}");
         assert!(
             written.contains("PANIC the hook records this at"),
@@ -226,6 +226,6 @@ mod tests {
             written.contains("a critical the window must survive"),
             "the critical was logged instead of aborting: {written}"
         );
-        unsafe { std::env::remove_var("OPENBAD_DB_PATH") };
+        unsafe { std::env::remove_var("CANONWRIGHT_DB_PATH") };
     }
 }

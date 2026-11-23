@@ -31,10 +31,10 @@ accounting that 0001 does not address.
 The tool surface is **capped at 128**. This is enforced in code but absent from
 every architecture document:
 
-- `ToolRegistry::with_builtin_tools()` (`crates/openbad-tools/src/lib.rs:992`)
+- `ToolRegistry::with_builtin_tools()` (`crates/canonwright-tools/src/lib.rs:992`)
   registers **exactly 128** tools — counted, not estimated.
 - The guard test `every_builtin_has_a_schema`
-  (`crates/openbad-tools/src/lib.rs:15281`) asserts `definitions.len() <= 128`.
+  (`crates/canonwright-tools/src/lib.rs:15281`) asserts `definitions.len() <= 128`.
 
 **There is zero headroom.** Every capability added must be paid for by removing,
 merging, or re-architecting something else. Any proposal that ignores this is
@@ -81,7 +81,7 @@ Follow these or the addition will cost more than it returns.
 ### 4.1 Use a capability seam
 
 Domain crates never depend on infrastructure. Add a trait in
-`crates/openbad-tools/src/lib.rs`, expose it on `ToolContext` as
+`crates/canonwright-tools/src/lib.rs`, expose it on `ToolContext` as
 `Option<Arc<dyn Trait>>`, and implement it in the host
 (`apps/desktop/src-tauri/src/lib.rs`).
 
@@ -96,7 +96,7 @@ Existing precedents — copy this shape:
 | `WorkspaceSearch` | `lib.rs:761` |
 
 Mock implementations (for example `MockSubagents` at
-`crates/openbad-tools/src/lib.rs:15145`) keep the tool layer testable without a
+`crates/canonwright-tools/src/lib.rs:15145`) keep the tool layer testable without a
 host.
 
 ### 4.2 Prefer stable proxy tools over static schemas
@@ -160,10 +160,10 @@ command and parsing stderr by hand.
 
 | ID | Task | Slots | Acceptance |
 | --- | --- | --- | --- |
-| W0-01 | Merge `record_claim`/`list_claims`, `record_unknown`/`list_unknowns`, `record_dead_end`/`list_dead_ends` into one `ledger` tool with `kind` + `action` | +3 | All three ledgers still readable via `ledger(action=list, kind=...)`; existing `.openbad/*.json` formats unchanged |
+| W0-01 | Merge `record_claim`/`list_claims`, `record_unknown`/`list_unknowns`, `record_dead_end`/`list_dead_ends` into one `ledger` tool with `kind` + `action` | +3 | All three ledgers still readable via `ledger(action=list, kind=...)`; existing `.canonwright/*.json` formats unchanged |
 | W0-02 | Merge `snapshot_create`/`list`/`restore` into `snapshot`, and `golden_compare`/`accept` into `golden` | +3 | Snapshot round-trip and golden diff tests pass |
 | W0-03 | Merge `canon_add`/`query`/`lint`/`ban` and `glossary_add`/`lookup` into `canon` | +3 | Canon lint still scans banned phrases; superseded entries still excluded |
-| W0-04 | Merge `pin_context`/`exclude_context`/`list_context_rules` into `context_rules` | +2 | `.openbad/context.yaml` round-trips; pinned/excluded rules still visible in `context_map` |
+| W0-04 | Merge `pin_context`/`exclude_context`/`list_context_rules` into `context_rules` | +2 | `.canonwright/context.yaml` round-trips; pinned/excluded rules still visible in `context_map` |
 | W0-05 | Document the 128 limit in architecture doc 05 | 0 | Doc states the limit and the proxy-tool policy |
 
 ### Notes
@@ -213,7 +213,7 @@ Design points worth taking from `dsh` verbatim:
 
 | ID | Task | Acceptance |
 | --- | --- | --- |
-| A-01 | New crate `crates/openbad-lsp`; add to workspace members | `cargo check -p openbad-lsp` succeeds |
+| A-01 | New crate `crates/canonwright-lsp`; add to workspace members | `cargo check -p canonwright-lsp` succeeds |
 | A-02 | `LspService` trait + `ToolContext.lsp` seam | Tool compiles with `lsp: None` and returns a clear error |
 | A-03 | `lsp` tool: schema, arg parsing, coordinate conversion | Unit tests for UTF-16 one-based ↔ zero-based |
 | A-04 | Host impl: stdio server manager, lifecycle, restart | Rust/TS/Python smoke tests (P4-03 criterion) |
@@ -239,7 +239,7 @@ Design points worth taking from `dsh` verbatim:
 **Goal:** connect any MCP server and gain its tools without changing the request
 prefix hash — the single largest capability-per-slot win available.
 
-`crates/openbad-mcp/src/lib.rs` is currently a stub: `McpServerConfig` and
+`crates/canonwright-mcp/src/lib.rs` is currently a stub: `McpServerConfig` and
 `McpTransport` only. No JSON-RPC client, no lifecycle, no bridging, and no `mcp`
 tool is registered.
 

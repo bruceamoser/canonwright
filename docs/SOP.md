@@ -1,6 +1,6 @@
-# OpenBaD project SOP
+# Canonwright project SOP
 
-Applies to all changes in `/home/bmoser/repos/OpenBaD`.
+Applies to all changes in `/home/bmoser/repos/Canonwright`.
 
 ## 1. Intake
 
@@ -13,7 +13,7 @@ Applies to all changes in `/home/bmoser/repos/OpenBaD`.
 1. Fetch and fast-forward `main` before branching.
 2. Create a branch from `main`: `feat/issue-<number>-<short-slug>` or `fix/issue-<number>-<short-slug>`.
 3. One issue per branch. If two issues are inseparable, combine them into one issue instead of mixing branches.
-4. For parallel work, use separate git worktrees under `workspaces/openbad/wt-issue-<number>` so branches never share a dirty tree.
+4. For parallel work, use separate git worktrees under `workspaces/canonwright/wt-issue-<number>` so branches never share a dirty tree.
 
 ## 3. Work
 
@@ -21,9 +21,9 @@ Applies to all changes in `/home/bmoser/repos/OpenBaD`.
 2. Keep the diff scoped to the issue. Refactors needed for the issue are acceptable; unrelated cleanups are not.
 3. Add or update tests for behavior changes.
 4. Run the relevant checks while working:
-   - `cargo test -p openbad-tools`
-   - `cargo test -p openbad-store`
-   - `cargo test -p openbad-desktop`
+   - `cargo test -p canonwright-tools`
+   - `cargo test -p canonwright-store`
+   - `cargo test -p canonwright-desktop`
    - `pnpm --dir apps/desktop/ui typecheck`
    - `pnpm --dir apps/desktop/ui build`
 5. Update the plan document as items complete; note partial work explicitly.
@@ -89,11 +89,11 @@ unreadable smudge, and the white sheet behind it renders as a square blob.
    - `cd apps/desktop && ./ui/node_modules/.bin/tauri build --no-bundle --config '{"build":{"beforeBuildCommand":""}}'`
 
    This is a compile smoke check only. **Do not install, copy, or run the built
-   binary on the local machine.** A local run of `target/release/openbad-desktop`
+   binary on the local machine.** A local run of `target/release/canonwright-desktop`
    proves nothing about the shipped artifact and skips the path users actually
    take.
 5. Verify the release through the updater, not by deploying locally.
-   `openbad-update` reads `repos/<repo>/releases/latest` and installs the
+   `canonwright-update` reads `repos/<repo>/releases/latest` and installs the
    platform asset, so only a published release is testable:
    - The version bump triggers the **Bundles** workflow on `main`, which builds
      the Linux, macOS, and Windows bundles for that commit. It runs before you

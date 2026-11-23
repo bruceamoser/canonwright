@@ -53,7 +53,7 @@ export default function AppMenuBar({ menus }: { menus: AppMenu[] }) {
           OB
         </div>
         <span className="text-[10px] font-medium tracking-tight text-obd-muted">
-          OpenBaD
+          Canonwright
         </span>
       </div>
 

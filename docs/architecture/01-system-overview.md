@@ -2,7 +2,7 @@
 
 ## 1. Scope
 
-This document describes the runtime shape of OpenBaD Desktop: the major
+This document describes the runtime shape of Canonwright Desktop: the major
 components, how they communicate, the lifecycle of a turn, and the rules that
 keep the system coherent. Detailed designs live in the referenced documents.
 
@@ -115,7 +115,7 @@ Rules:
 - **Domain crates do not depend on infrastructure crates.** They depend on
   traits (`SessionStore`, `ModelProvider`, `ToolHost`, `Clock`, `FileSystem`).
 - **The harness never constructs raw SQL.** It uses repositories and
-  projections from `openbad-store`.
+  projections from `canonwright-store`.
 - **Tools never write directly to the session log.** They return a result; the
   agent loop validates, wraps it as evidence, and appends the event.
 
@@ -126,21 +126,21 @@ Rules:
 | Desktop shell | Window, menus, tray, shortcuts, updater | `apps/desktop` |
 | UI | Chat, diff, plan, memory, knowledge, settings | `apps/desktop/ui` |
 | Command bridge | Typed Tauri commands and event streams | `apps/desktop/src-tauri` |
-| Session store | Event log, projections, migrations | `openbad-store` |
-| Prompt assembler | Ordered sections, hashes, request envelopes | `openbad-harness` |
-| Agent loop | Turn/step state machine, routing, retries, budgets | `openbad-harness` |
-| Context manager | Token meter, compaction, spill, pruning | `openbad-harness` |
-| Tool registry | Schemas, policy, execution pipeline | `openbad-tools` |
-| Built-in tools | FS, search, shell, tests, Git, LSP, web | `openbad-tools` |
-| Workspace service | Files, watcher, index, Git, LSP, PTY | `openbad-workspace` |
-| Memory engine | Engrams, ACT-R, associations, retrieval | `openbad-memory` |
-| Knowledge engine | Library, ingestion, chunking, embeddings | `openbad-knowledge` |
-| Autonomic service | Heartbeat, jobs, schedules, pulse | `openbad-autonomic` |
-| Governance | Policy, approvals, audit, redaction | `openbad-governance` |
-| LLM adapters | DeepSeek, OpenAI-compatible, Anthropic, local | `openbad-llm` |
-| MCP client | Server lifecycle, tools/resources/prompts | `openbad-mcp` |
-| Updates | Release checks, download verification, installer handoff | `openbad-update` |
-| Core types | IDs, events, config, errors, clock | `openbad-core` |
+| Session store | Event log, projections, migrations | `canonwright-store` |
+| Prompt assembler | Ordered sections, hashes, request envelopes | `canonwright-harness` |
+| Agent loop | Turn/step state machine, routing, retries, budgets | `canonwright-harness` |
+| Context manager | Token meter, compaction, spill, pruning | `canonwright-harness` |
+| Tool registry | Schemas, policy, execution pipeline | `canonwright-tools` |
+| Built-in tools | FS, search, shell, tests, Git, LSP, web | `canonwright-tools` |
+| Workspace service | Files, watcher, index, Git, LSP, PTY | `canonwright-workspace` |
+| Memory engine | Engrams, ACT-R, associations, retrieval | `canonwright-memory` |
+| Knowledge engine | Library, ingestion, chunking, embeddings | `canonwright-knowledge` |
+| Autonomic service | Heartbeat, jobs, schedules, pulse | `canonwright-autonomic` |
+| Governance | Policy, approvals, audit, redaction | `canonwright-governance` |
+| LLM adapters | DeepSeek, OpenAI-compatible, Anthropic, local | `canonwright-llm` |
+| MCP client | Server lifecycle, tools/resources/prompts | `canonwright-mcp` |
+| Updates | Release checks, download verification, installer handoff | `canonwright-update` |
+| Core types | IDs, events, config, errors, clock | `canonwright-core` |
 
 ## 5. Runtime topology
 
@@ -148,7 +148,7 @@ The desktop app is a **single process** with supervised subsystems:
 
 ```mermaid
 flowchart TB
-    subgraph Process["openbad-desktop process"]
+    subgraph Process["canonwright-desktop process"]
         TauriMain[Tauri main thread<br/>window + menus]
         Tokio[Tokio runtime]
         StoreActor[Store actor<br/>single writer + read pool]

@@ -415,7 +415,7 @@ export default function PipelinePanel({
             <p className="mb-1 font-medium text-obd-body">
               This project has no pipeline
             </p>
-            Add <code className="text-obd-body">.openbad/pipeline.yaml</code> to
+            Add <code className="text-obd-body">.canonwright/pipeline.yaml</code> to
             listen to a repository. A project without one behaves exactly as it
             did before:
             <pre className="mt-2 overflow-x-auto rounded bg-obd-raised p-2 text-[10px] text-obd-body">{`sources:
@@ -488,7 +488,7 @@ execution:
           <section className="rounded-lg border border-obd-line bg-obd-raised p-2.5">
             <div className="mb-1.5 flex items-center justify-between">
               <p className="text-[10px] uppercase tracking-[0.16em] text-obd-subtle">
-                .openbad/pipeline.yaml
+                .canonwright/pipeline.yaml
               </p>
               <button
                 type="button"

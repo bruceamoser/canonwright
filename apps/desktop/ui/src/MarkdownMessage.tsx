@@ -97,7 +97,7 @@ function MermaidDiagram({ chart }: { chart: string }) {
     const timer = window.setTimeout(async () => {
       try {
         const mermaid = await loadMermaid(scheme);
-        const renderId = `openbad-mermaid-${idBase}-${sequence.current++}`;
+        const renderId = `canonwright-mermaid-${idBase}-${sequence.current++}`;
         const result = await mermaid.render(renderId, source);
         if (!cancelled) {
           setSvg(result.svg);
