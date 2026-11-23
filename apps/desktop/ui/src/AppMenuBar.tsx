@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Check } from "lucide-react";
+import { Check, Monitor, Moon, Sun } from "lucide-react";
+
+import { useTheme } from "./theme";
 
 export type AppMenuItem = {
   label: string;
@@ -17,6 +19,7 @@ export type AppMenu = {
 
 export default function AppMenuBar({ menus }: { menus: AppMenu[] }) {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const theme = useTheme();
   const container = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -59,6 +62,23 @@ export default function AppMenuBar({ menus }: { menus: AppMenu[] }) {
           Canonwright
         </span>
       </div>
+
+      <button
+        type="button"
+        onClick={theme.cycle}
+        title={`Theme: ${theme.choice} — click for the next`}
+        aria-label={`Theme: ${theme.choice}`}
+        className="ml-auto mr-1 flex items-center gap-1 rounded px-1.5 py-1 text-[10px] text-obd-subtle hover:bg-obd-raised hover:text-obd-body"
+      >
+        {theme.choice === "system" ? (
+          <Monitor size={12} />
+        ) : theme.choice === "light" ? (
+          <Sun size={12} />
+        ) : (
+          <Moon size={12} />
+        )}
+        <span className="capitalize">{theme.choice}</span>
+      </button>
 
       {menus.map((menu) => {
         const open = openMenu === menu.label;

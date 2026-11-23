@@ -53,8 +53,9 @@
   color: var(--obd-text);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
+/* The theme is chosen, not only inherited: `data-theme` on <html> wins, and
+   theme.ts sets it from the stored choice (system, light or dark). */
+:root[data-theme="light"] {
     color-scheme: light;
 
     --obd-bg: #f8fafc;
@@ -83,7 +84,6 @@
     --obd-on-warning: #ffffff;
     --obd-on-danger: #ffffff;
     --obd-on-info: #ffffff;
-  }
 }
 
 /* Expose the tokens to Tailwind so `bg-obd-surface`, `text-obd-muted`,
