@@ -147,6 +147,20 @@ desktop app is still the inherited shell.
 
 ## Build & run
 
+The desktop shell opens on the product's own screens — sign-in, the project
+list, and creating a project — and only hands over to the project views once a
+project is opened.
+
+If port 5173 is in use, run the dev server elsewhere:
+
+```sh
+cd apps/desktop
+./ui/node_modules/.bin/tauri dev \
+  --config '{"build":{"devUrl":"http://127.0.0.1:9173","beforeDevCommand":"pnpm dev --port 9173 --strictPort"}}'
+```
+
+## Build & run
+
 ```sh
 cargo check --workspace --exclude canonwright-desktop
 cargo test -p canonwright-story -p canonwright-manuscript -p canonwright-tools

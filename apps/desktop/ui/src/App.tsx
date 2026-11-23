@@ -101,6 +101,7 @@ import {
   workspacesDirectory as fetchWorkspacesDirectory,
   workspaceIndexStatus as fetchIndexStatus,
 } from "./backend";
+import ProductShell from "./product/ProductShell";
 import AppMenuBar from "./AppMenuBar";
 import type { AppMenu } from "./AppMenuBar";
 import type { GithubStatus, IntakeScript } from "./types";
@@ -469,6 +470,9 @@ export default function App() {
   const [preferences] = useState(loadPreferences);
   const [foundation, setFoundation] = useState<FoundationState>({ kind: "loading" });
   const [projects, setProjects] = useState<WorkspaceSummary[]>([]);
+  // The product shell owns everything until a project is opened. Without this,
+  // a restored session would drop the writer straight into a project.
+  const [enteredProject, setEnteredProject] = useState(false);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [workspacePath, setWorkspacePath] = useState("");
   const [entries, setEntries] = useState<ChatEntry[]>([]);
@@ -1055,6 +1059,7 @@ export default function App() {
       };
       followRef.current = pendingScrollRestoreRef.current.follow;
       visibleRunRef.current = run === undefined ? null : project.path;
+      setEnteredProject(true);
       setActiveProjectId(project.id);
       setWorkspacePath(project.path);
       setProjectNameDraft(project.name);
@@ -2695,6 +2700,18 @@ export default function App() {
     },
     { disabled: workspacePath.length === 0 },
   );
+
+  if (!enteredProject) {
+    return (
+      <ProductShell
+        projects={projects}
+        onOpen={(project) => selectProject(project)}
+        onProjectsChanged={() => {
+          void loadProjects();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-[var(--obd-bg)] text-[var(--obd-text)]">
