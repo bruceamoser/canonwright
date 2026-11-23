@@ -85,6 +85,13 @@ jobs:
           sha256sum * > SHA256SUMS
           cat SHA256SUMS
 
+      # Only for CHANGELOG.md: the artifacts came from the bundles run, not from
+      # a build here. Without this the notes step has no file to read.
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: CHANGELOG.md
+          sparse-checkout-cone-mode: false
+
       - name: Take the notes from CHANGELOG.md
         env:
           TAG: ${{ inputs.tag || github.ref_name }}
@@ -92,6 +99,10 @@ jobs:
           set -euo pipefail
           version="${TAG#v}"
           # The section for this version: from its heading to the next one.
+          if [ ! -f CHANGELOG.md ]; then
+            echo "::error::CHANGELOG.md is not in the checkout; release notes cannot be read"
+            exit 1
+          fi
           awk -v v="$version" '
             $0 == "## " v { found = 1; next }
             found && /^## / { exit }
