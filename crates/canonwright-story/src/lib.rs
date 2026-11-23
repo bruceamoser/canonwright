@@ -41,7 +41,7 @@
 //! story.scenes.push(Scene {
 //!     id: SceneId::new("s1").unwrap(),
 //!     index: 1,
-//!     pov: CharacterId::new("mara").unwrap(),
+//!     pov: Some(CharacterId::new("mara").unwrap()),
 //!     status: SceneStatus::Canon,
 //!     ..Scene::default()
 //! });
@@ -61,6 +61,7 @@ pub mod ids;
 pub mod intake;
 pub mod lint;
 pub mod model;
+pub mod rules;
 pub mod state;
 pub mod ticket;
 
@@ -93,13 +94,14 @@ pub mod prelude {
     pub use crate::delta::{Change, SceneChange, SceneDelta};
     pub use crate::error::StoryError;
     pub use crate::ids::{
-        CharacterId, FactId, FactionId, RuleId, SceneId, TargetRef, ThreadId, TicketId,
+        CharacterId, EntityId, FactId, FactionId, RuleId, SceneId, TargetRef, ThreadId, TicketId,
     };
     pub use crate::model::{
         Axis, CausalKind, CausalLink, Character, Fact, Faction, Posture, Relationship,
         RelationshipEdge, Rule, RuleKind, Scene, SceneStatus, Story, StoryMeta, Thread, ThreadKind,
-        VoiceProfile,
+        VoiceProfile, WorkKind,
     };
+    pub use crate::rules::{Entity, EntityKind, Reference};
     pub use crate::state::{StoryState, ThreadStatus};
     pub use crate::ticket::{Claim, Severity, Substantiation, Ticket, TicketCode};
 }
@@ -114,6 +116,7 @@ impl Default for Story {
             rules: Default::default(),
             facts: Default::default(),
             threads: Default::default(),
+            entities: Default::default(),
             scenes: Vec::new(),
         }
     }
@@ -126,7 +129,7 @@ impl Default for Scene {
             index: 0,
             title: String::new(),
             summary: String::new(),
-            pov: CharacterId::new("nobody").expect("literal is a valid slug"),
+            pov: None,
             location: String::new(),
             present: Vec::new(),
             status: SceneStatus::Planned,

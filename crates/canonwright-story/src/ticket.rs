@@ -32,6 +32,8 @@ pub enum TicketCode {
     ContinuityBreak,
     /// A thread paid off twice, or paid off before it is planted.
     ThreadAlreadyPaidOff,
+    /// A rules entry without the numbers a table would need.
+    IncompleteEntity,
 }
 
 impl TicketCode {
@@ -50,6 +52,7 @@ impl TicketCode {
             Self::OnTheNose => "ON_THE_NOSE",
             Self::ContinuityBreak => "CONTINUITY_BREAK",
             Self::ThreadAlreadyPaidOff => "THREAD_ALREADY_PAID_OFF",
+            Self::IncompleteEntity => "INCOMPLETE_ENTITY",
         }
     }
 
@@ -66,6 +69,7 @@ impl TicketCode {
             Self::RuleViolation | Self::ContinuityBreak => "world",
             Self::OnTheNose | Self::VoiceDrift => "subtext",
             Self::ThreadAlreadyPaidOff => "plot",
+            Self::IncompleteEntity => "rules",
         }
     }
 
@@ -73,6 +77,7 @@ impl TicketCode {
     pub fn default_severity(self) -> Severity {
         match self {
             Self::VoiceDrift | Self::NoValueShift | Self::OnTheNose => Severity::Advisory,
+            Self::IncompleteEntity => Severity::Warning,
             Self::DanglingSetup | Self::PassiveProtagonist | Self::ContinuityBreak => {
                 Severity::Warning
             }

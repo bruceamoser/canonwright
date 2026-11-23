@@ -188,7 +188,7 @@ fn the_central_question_becomes_a_thread_once_a_scene_exists() {
     story.scenes.push(Scene {
         id: SceneId::new("s1").expect("slug"),
         index: 1,
-        pov: CharacterId::new("narrator").expect("slug"),
+        pov: Some(CharacterId::new("narrator").expect("slug")),
         ..Scene::default()
     });
     story.characters.insert(

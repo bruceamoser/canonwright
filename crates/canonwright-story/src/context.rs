@@ -66,7 +66,11 @@ impl Story {
             .keys()
             .filter(|fact| !state.known_to_reader.contains(fact))
             .count();
-        let pov_knowledge = state.character(&target.pov).knowledge;
+        let pov_knowledge = target
+            .pov
+            .as_ref()
+            .map(|pov| state.character(pov).knowledge)
+            .unwrap_or_default();
         let unknown_to_pov = self
             .facts
             .keys()
@@ -102,9 +106,12 @@ impl Story {
             target.title.as_str()
         };
         out.push_str(&format!("# Scene {} — {title}\n\n", target.index));
+        let pov_line = match &target.pov {
+            Some(pov) => self.character_label(pov),
+            None => "(none — this unit is not a narrative scene)".to_owned(),
+        };
         out.push_str(&format!(
-            "- Point of view: {}\n- Location: {}\n- Status: {}\n",
-            self.character_label(&target.pov),
+            "- Point of view: {pov_line}\n- Location: {}\n- Status: {}\n",
             or_unknown(&target.location),
             target.status.name()
         ));
@@ -140,11 +147,13 @@ impl Story {
 
         out.push_str("\n## Present\n\n");
         let mut present: Vec<CharacterId> = target.present.clone();
-        if !present.contains(&target.pov) {
-            present.insert(0, target.pov.clone());
+        if let Some(pov) = &target.pov {
+            if !present.contains(pov) {
+                present.insert(0, pov.clone());
+            }
         }
         for id in &present {
-            self.render_character(&mut out, id, &target.pov, state);
+            self.render_character(&mut out, id, target.pov.as_ref(), state);
         }
 
         let open: Vec<(&ThreadId, &crate::model::Thread)> = self
@@ -185,7 +194,7 @@ impl Story {
         &self,
         out: &mut String,
         id: &CharacterId,
-        pov: &CharacterId,
+        pov: Option<&CharacterId>,
         state: &StoryState,
     ) {
         let Some(character) = self.characters.get(id) else {
@@ -193,7 +202,7 @@ impl Story {
             return;
         };
         let current = state.character(id);
-        let marker = if id == pov { " (POV)" } else { "" };
+        let marker = if pov == Some(id) { " (POV)" } else { "" };
         out.push_str(&format!(
             "\n### {}{marker}\n\n",
             or_unknown(&character.name)

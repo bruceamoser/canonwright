@@ -538,9 +538,10 @@ export async function pickManuscript(): Promise<string | null> {
 export async function storyIntake(
   mode: "new" | "existing",
   manuscript?: string,
+  kind?: "narrative" | "rules" | "hybrid",
 ): Promise<IntakeScript> {
   if (isTauri) {
-    return invoke<IntakeScript>("story_intake", { mode, manuscript });
+    return invoke<IntakeScript>("story_intake", { mode, manuscript, kind });
   }
   return {
     mode: mode === "existing" ? "imported" : "new",

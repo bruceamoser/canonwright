@@ -25,7 +25,7 @@ fn scene(id: &str, index: u32, status: SceneStatus) -> Scene {
         id: sid(id),
         index,
         title: format!("Scene {index}"),
-        pov: cid("mara"),
+        pov: Some(cid("mara")),
         present: vec![cid("mara")],
         status,
         value_start: "safe".to_owned(),

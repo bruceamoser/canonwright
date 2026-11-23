@@ -113,6 +113,7 @@ story_id!(RuleId);
 story_id!(FactId);
 story_id!(SceneId);
 story_id!(ThreadId);
+story_id!(EntityId);
 story_id!(TicketId);
 
 /// Anything a directed relationship edge can point at.

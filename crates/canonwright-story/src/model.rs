@@ -34,6 +34,9 @@ pub struct Story {
     pub facts: BTreeMap<FactId, Fact>,
     #[serde(default)]
     pub threads: BTreeMap<ThreadId, Thread>,
+    /// Rules content. Empty for a novel, load-bearing for a rulebook.
+    #[serde(default)]
+    pub entities: BTreeMap<crate::ids::EntityId, crate::rules::Entity>,
     #[serde(default)]
     pub scenes: Vec<Scene>,
 }
@@ -65,6 +68,41 @@ pub struct StoryMeta {
     /// new manuscript has no scene to plant the thread in yet.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub premise: Option<String>,
+    /// Novel, rulebook, or a book that is both (a campaign setting, say).
+    #[serde(default)]
+    pub kind: WorkKind,
+    /// The game system a rules book is written for.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub system: Option<String>,
+}
+
+/// What kind of book this is, which decides which checks apply.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum WorkKind {
+    #[default]
+    Narrative,
+    Rules,
+    Hybrid,
+}
+
+impl WorkKind {
+    /// Narrative linting (value shifts, point of view, causal links) only makes
+    /// sense for prose. Applying it to a rulebook produces noise, and noise is
+    /// how a linter gets switched off.
+    #[must_use]
+    pub fn lints_as_narrative(self) -> bool {
+        !matches!(self, Self::Rules)
+    }
+
+    #[must_use]
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Narrative => "narrative",
+            Self::Rules => "rules",
+            Self::Hybrid => "hybrid",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
@@ -353,7 +391,10 @@ pub struct Scene {
     pub title: String,
     #[serde(default)]
     pub summary: String,
-    pub pov: CharacterId,
+    /// Absent for a unit that is not a narrative scene — a rulebook chapter,
+    /// a procedure, a table.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pov: Option<CharacterId>,
     #[serde(default)]
     pub location: String,
     #[serde(default)]

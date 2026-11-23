@@ -42,8 +42,10 @@ impl Story {
             if seen_index.insert(scene.index, scene).is_some() {
                 errors.push(StoryError::DuplicateSceneIndex(scene.index));
             }
-            if !self.characters.contains_key(&scene.pov) {
-                errors.push(unknown("character", scene.pov.as_str()));
+            if let Some(pov) = &scene.pov {
+                if !self.characters.contains_key(pov) {
+                    errors.push(unknown("character", pov.as_str()));
+                }
             }
             for character in &scene.present {
                 if !self.characters.contains_key(character) {
@@ -63,6 +65,14 @@ impl Story {
                 }
             }
             self.check_delta(scene, &mut errors);
+        }
+
+        for entity in self.entities.values() {
+            for reference in &entity.references {
+                if !self.resolves(&reference.to) {
+                    errors.push(unknown("reference", &reference.to));
+                }
+            }
         }
 
         for (id, thread) in &self.threads {
@@ -142,9 +152,39 @@ impl Story {
     /// Everything here is advisory. A reviewer that can block a commit is a
     /// reviewer the author learns to route around, and the interesting fiction
     /// is usually the scene that trips a warning.
+    /// Does a cross-reference point at something that exists?
+    ///
+    /// Ids can name an entity, a rule, a thread or a scene — the four things a
+    /// rulebook or a novel actually cites.
+    #[must_use]
+    pub fn resolves(&self, id: &str) -> bool {
+        if let Ok(entity) = crate::ids::EntityId::new(id) {
+            if self.entities.contains_key(&entity) {
+                return true;
+            }
+        }
+        if let Ok(rule) = crate::ids::RuleId::new(id) {
+            if self.rules.contains_key(&rule) {
+                return true;
+            }
+        }
+        if let Ok(thread) = crate::ids::ThreadId::new(id) {
+            if self.threads.contains_key(&thread) {
+                return true;
+            }
+        }
+        self.scenes.iter().any(|scene| scene.id.as_str() == id)
+    }
+
     #[must_use]
     pub fn lint(&self) -> Vec<Ticket> {
         let mut tickets = Vec::new();
+        if !self.meta.kind.lints_as_narrative() {
+            // A rulebook is not a story. Narrative checks here would be noise,
+            // and noise is how a linter gets switched off.
+            tickets.extend(self.entity_tickets());
+            return tickets;
+        }
         let mut traces: BTreeMap<ThreadId, ThreadTrace> = BTreeMap::new();
         let mut state = self.base_state();
         let mut highest: Option<u32> = None;
@@ -288,6 +328,7 @@ impl Story {
             }
         }
 
+        tickets.extend(self.entity_tickets());
         tickets.sort_by(|a, b| {
             self.scene(&a.scene)
                 .map(|scene| scene.index)
@@ -295,6 +336,31 @@ impl Story {
                 .then_with(|| a.severity.cmp(&b.severity))
                 .then_with(|| a.code.cmp(&b.code))
         });
+        tickets
+    }
+
+    /// Findings that apply to rules content in any kind of book.
+    #[must_use]
+    pub fn entity_tickets(&self) -> Vec<Ticket> {
+        let mut tickets = Vec::new();
+        for (id, entity) in &self.entities {
+            if entity.is_incomplete() {
+                tickets.push(
+                    Ticket::new(
+                        TicketCode::IncompleteEntity,
+                        self.ordered_scenes().first().map_or_else(
+                            || crate::ids::SceneId::new("s1").expect("literal"),
+                            |scene| scene.id.clone(),
+                        ),
+                        format!(
+                            "{} `{id}` has no fields and no summary; a table cannot use it",
+                            entity.kind.name()
+                        ),
+                    )
+                    .about(id.to_string()),
+                );
+            }
+        }
         tickets
     }
 

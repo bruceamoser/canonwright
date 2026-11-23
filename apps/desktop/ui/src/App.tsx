@@ -549,6 +549,7 @@ export default function App() {
   const [githubCode, setGithubCode] = useState<string | null>(null);
   const [githubBusy, setGithubBusy] = useState(false);
   const [projectRepo, setProjectRepo] = useState<string | null>(null);
+  const [projectKind, setProjectKind] = useState<"narrative" | "rules">("narrative");
   const [workspacesDir, setWorkspacesDir] = useState("");
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [sessionTitleDraft, setSessionTitleDraft] = useState("");
@@ -2319,6 +2320,7 @@ export default function App() {
         const script = await storyIntake(
           projectMode,
           projectMode === "existing" ? projectManuscript ?? undefined : undefined,
+          projectKind,
         );
         if (cancelled) {
           return;
@@ -2338,7 +2340,7 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [projectDialogOpen, projectMode, projectManuscript]);
+  }, [projectDialogOpen, projectKind, projectMode, projectManuscript]);
 
   useEffect(() => {
     if (!projectDialogOpen) {
@@ -2398,6 +2400,7 @@ export default function App() {
     try {
       const project = await createStoredProject(name, {
         mode: projectMode,
+        kind: projectKind,
         repo: projectMode === "github" ? projectRepo ?? undefined : undefined,
         manuscript:
           projectMode === "existing" ? projectManuscript ?? undefined : undefined,
@@ -2420,6 +2423,7 @@ export default function App() {
     newProjectName,
     projectAnswers,
     projectManuscript,
+    projectKind,
     projectMode,
     projectRepo,
     selectProject,
@@ -3473,6 +3477,34 @@ export default function App() {
                   ? `${workspacesDir}/${projectSlugPreview(newProjectName)}`
                   : "Resolving the default workspaces directory…"}
               </p>
+            </div>
+
+            <div className="mt-4">
+              <p className="text-[10px] uppercase tracking-wider text-obd-subtle">
+                What are you writing
+              </p>
+              <div className="mt-1 grid grid-cols-2 gap-2">
+                {(
+                  [
+                    ["narrative", "A novel", "Scenes, viewpoint, continuity."],
+                    ["rules", "A rulebook", "Rules, entities, cross-references."],
+                  ] as const
+                ).map(([value, label, hint]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setProjectKind(value)}
+                    className={`rounded-md border px-2.5 py-2 text-left text-[11px] ${
+                      projectKind === value
+                        ? "border-obd-accent/50 bg-obd-accent/10 text-obd-text"
+                        : "border-obd-line bg-obd-inset text-obd-muted hover:bg-obd-raised"
+                    }`}
+                  >
+                    <span className="block font-medium">{label}</span>
+                    <span className="mt-0.5 block text-[10px] text-obd-subtle">{hint}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="mt-4">

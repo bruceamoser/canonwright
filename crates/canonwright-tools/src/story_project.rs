@@ -8,6 +8,7 @@ use async_trait::async_trait;
 use canonwright_governance::RiskLevel;
 use canonwright_manuscript::{Scaffold, read, scaffold, segment};
 use canonwright_story::intake::Intake;
+use canonwright_story::model::WorkKind;
 use canonwright_story::prelude::*;
 use serde_json::{Value, json};
 
@@ -56,6 +57,11 @@ impl Tool for StoryStartTool {
                 "overwrite": {
                     "type": "boolean",
                     "description": "Replace an existing story file. Defaults to false: an import never silently clobbers a story."
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": ["narrative", "rules", "hybrid"],
+                    "description": "What kind of book this is. A novel, a rulebook, or a book that is both."
                 },
                 "answers": {
                     "type": "object",
@@ -116,14 +122,26 @@ impl Tool for StoryStartTool {
             .map_err(|error| ToolError::InvalidArgument(error.to_string()))?;
 
         let answers = read_answers(&arguments)?;
+        let kind = parse_kind(&arguments)?;
 
         match mode {
-            "new" => start_blank(&arguments, context, &out, title, pov, answers),
-            "existing" => start_from_document(&arguments, context, &out, title, pov, answers),
+            "new" => start_blank(&arguments, context, &out, title, pov, answers, kind),
+            "existing" => start_from_document(&arguments, context, &out, title, pov, answers, kind),
             other => Err(ToolError::InvalidArgument(format!(
                 "mode must be \"new\" or \"existing\", not {other:?}"
             ))),
         }
+    }
+}
+
+fn parse_kind(arguments: &Value) -> Result<WorkKind, ToolError> {
+    match arguments.get("kind").and_then(Value::as_str) {
+        None | Some("narrative") | Some("novel") => Ok(WorkKind::Narrative),
+        Some("rules") | Some("rulebook") => Ok(WorkKind::Rules),
+        Some("hybrid") => Ok(WorkKind::Hybrid),
+        Some(other) => Err(ToolError::InvalidArgument(format!(
+            "kind must be \"narrative\", \"rules\" or \"hybrid\", not {other:?}"
+        ))),
     }
 }
 
@@ -150,11 +168,16 @@ fn start_blank(
     title: Option<String>,
     pov: Option<CharacterId>,
     answers: Vec<(String, String)>,
+    kind: WorkKind,
 ) -> Result<ToolResult, ToolError> {
     let mut story = Story::default();
     story.meta.title = title.unwrap_or_else(|| "Untitled".to_owned());
 
-    let mut intake = Intake::new_manuscript();
+    let mut intake = if matches!(kind, WorkKind::Rules) {
+        Intake::new_rules()
+    } else {
+        Intake::new_manuscript()
+    };
     for (id, value) in &answers {
         intake
             .answer(id, value.clone())
@@ -202,6 +225,7 @@ fn start_from_document(
     title: Option<String>,
     pov: Option<CharacterId>,
     answers: Vec<(String, String)>,
+    kind: WorkKind,
 ) -> Result<ToolResult, ToolError> {
     let raw = arguments
         .get("path")
@@ -259,7 +283,7 @@ fn start_from_document(
 
     // The document already answered what it can; these are the answers the
     // writer supplied on top, and the inference pass fills the rest.
-    let mut intake = Intake::from_document(&document_text(&document), None);
+    let mut intake = Intake::from_document_kind(&document_text(&document), None, kind);
     for (id, value) in &answers {
         intake
             .answer(id, value.clone())
@@ -378,6 +402,11 @@ impl Tool for StoryIntakeTool {
                 "title": {
                     "type": "string",
                     "description": "Title to use instead of the document's own."
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": ["narrative", "rules", "hybrid"],
+                    "description": "Novel, rulebook, or both. Decides which questions are asked."
                 }
             },
             "required": ["mode"],
@@ -395,8 +424,10 @@ impl Tool for StoryIntakeTool {
             .and_then(Value::as_str)
             .unwrap_or("new");
         let title = arguments.get("title").and_then(Value::as_str);
+        let kind = parse_kind(&arguments)?;
 
         let intake = match mode {
+            "new" if matches!(kind, WorkKind::Rules) => Intake::new_rules(),
             "new" => Intake::new_manuscript(),
             "existing" => {
                 let raw = arguments
@@ -410,7 +441,7 @@ impl Tool for StoryIntakeTool {
                 let manuscript = resolve(context, raw)?;
                 let document =
                     read(&manuscript).map_err(|error| ToolError::Failed(error.to_string()))?;
-                let mut intake = Intake::from_document(&document_text(&document), title);
+                let mut intake = Intake::from_document_kind(&document_text(&document), title, kind);
                 intake.derived.push(canonwright_story::intake::Derived {
                     label: "scenes detected".to_owned(),
                     value: segment(&document).len().to_string(),

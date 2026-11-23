@@ -4767,16 +4767,30 @@ fn find_manuscript(root: &Path) -> Option<PathBuf> {
 /// The deterministic intake script, so the UI renders one source of truth
 /// rather than a second copy of the questions in TypeScript.
 #[tauri::command]
-fn story_intake(mode: String, manuscript: Option<String>) -> Result<serde_json::Value, String> {
-    let intake = build_intake(&mode, manuscript.as_deref(), None)?;
+fn story_intake(
+    mode: String,
+    manuscript: Option<String>,
+    kind: Option<String>,
+) -> Result<serde_json::Value, String> {
+    let intake = build_intake(&mode, manuscript.as_deref(), None, kind.as_deref())?;
     serde_json::to_value(&intake).map_err(|error| error.to_string())
+}
+
+fn work_kind(raw: Option<&str>) -> canonwright_story::model::WorkKind {
+    match raw {
+        Some("rules") | Some("rulebook") => canonwright_story::model::WorkKind::Rules,
+        Some("hybrid") => canonwright_story::model::WorkKind::Hybrid,
+        _ => canonwright_story::model::WorkKind::Narrative,
+    }
 }
 
 fn build_intake(
     mode: &str,
     manuscript: Option<&str>,
     title: Option<&str>,
+    kind: Option<&str>,
 ) -> Result<canonwright_story::intake::Intake, String> {
+    let kind = work_kind(kind);
     match mode {
         "existing" => {
             let path = manuscript
@@ -4789,15 +4803,19 @@ fn build_intake(
                 .map(|block| block.text.as_str())
                 .collect::<Vec<_>>()
                 .join("\n\n");
-            let mut intake = canonwright_story::intake::Intake::from_document(
+            let mut intake = canonwright_story::intake::Intake::from_document_kind(
                 &text,
                 title.or(document.title.as_deref()),
+                kind,
             );
             intake.derived.push(canonwright_story::intake::Derived {
                 label: "scenes detected".to_owned(),
                 value: canonwright_manuscript::segment(&document).len().to_string(),
             });
             Ok(intake)
+        }
+        "new" if matches!(kind, canonwright_story::model::WorkKind::Rules) => {
+            Ok(canonwright_story::intake::Intake::new_rules())
         }
         "new" => Ok(canonwright_story::intake::Intake::new_manuscript()),
         other => Err(format!(
@@ -4844,6 +4862,7 @@ fn start_story_in(
         }
     };
 
+    let kind = work_kind(request.kind.as_deref());
     let mut intake = match &document {
         Some(document) => {
             let text = document
@@ -4852,7 +4871,14 @@ fn start_story_in(
                 .map(|block| block.text.as_str())
                 .collect::<Vec<_>>()
                 .join("\n\n");
-            canonwright_story::intake::Intake::from_document(&text, document.title.as_deref())
+            canonwright_story::intake::Intake::from_document_kind(
+                &text,
+                document.title.as_deref(),
+                kind,
+            )
+        }
+        None if matches!(kind, canonwright_story::model::WorkKind::Rules) => {
+            canonwright_story::intake::Intake::new_rules()
         }
         None => canonwright_story::intake::Intake::new_manuscript(),
     };
@@ -4888,6 +4914,9 @@ fn start_story_in(
 #[derive(Debug, Default, serde::Deserialize)]
 struct StoryStartRequest {
     mode: String,
+    /// "narrative", "rules" or "hybrid".
+    #[serde(default)]
+    kind: Option<String>,
     #[serde(default)]
     repo: Option<String>,
     #[serde(default)]

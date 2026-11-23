@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::StoryError;
 use crate::ids::{CharacterId, RuleId, ThreadId};
-use crate::model::{Character, Rule, RuleKind, Story, Thread, ThreadKind};
+use crate::model::{Character, Rule, RuleKind, Story, Thread, ThreadKind, WorkKind};
 
 /// Which door the writer came in by. It decides the question list, and nothing
 /// else: a story is a story whether it was typed here or imported.
@@ -106,6 +106,9 @@ pub struct Derived {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Intake {
     pub mode: Mode,
+    /// Novel or rulebook. Decides which questions are asked and where the
+    /// answers land.
+    pub kind: WorkKind,
     pub questions: Vec<Question>,
     pub answers: BTreeMap<String, Answer>,
     pub derived: Vec<Derived>,
@@ -203,11 +206,88 @@ const SCRIPT: &[(&str, Section, &str, &str, &str, bool)] = &[
     ),
 ];
 
+/// The fixed interview for a rules book. Order is part of the contract.
+///
+/// Fewer questions than a novel, and different ones: a rulebook is not asked
+/// what its protagonist wants, it is asked how uncertainty is resolved.
+const SCRIPT_RULES: &[(&str, Section, &str, &str, &str, bool)] = &[
+    (
+        "title",
+        Section::Identity,
+        "What is this book called?",
+        "The title on the cover and the repository.",
+        "text",
+        true,
+    ),
+    (
+        "author",
+        Section::Identity,
+        "Who is writing it?",
+        "Credited on the title page.",
+        "text",
+        false,
+    ),
+    (
+        "system",
+        Section::Identity,
+        "What game or system is this book for?",
+        "A system you publish, or one you are writing for. Leave blank for a system-agnostic book.",
+        "text",
+        false,
+    ),
+    (
+        "genre",
+        Section::Identity,
+        "What kind of game is it?",
+        "A shelf, not a cage.",
+        "choice:fantasy,science fiction,horror,modern,historical,generic,other",
+        false,
+    ),
+    (
+        "tone",
+        Section::Voice,
+        "What is the tone at the table?",
+        "Heroic, grim, pulpy, cosy. It guides every example the book will write.",
+        "text",
+        false,
+    ),
+    (
+        "core_mechanic",
+        Section::Stakes,
+        "How does a player resolve something uncertain?",
+        "The core resolution rule: roll this, compare to that. It becomes a hard rule the reviewers check against.",
+        "text",
+        false,
+    ),
+    (
+        "dice",
+        Section::Stakes,
+        "What do they roll?",
+        "Notation as the table says it: d20 plus modifiers, a pool of d6, a deck.",
+        "text",
+        false,
+    ),
+    (
+        "balance_rule",
+        Section::Stakes,
+        "What stops a character growing without limit?",
+        "The cap that keeps the maths honest. It becomes a hard rule, so a later chapter cannot quietly exceed it.",
+        "text",
+        false,
+    ),
+];
+
 impl Intake {
     /// The interview for a blank manuscript.
     #[must_use]
     pub fn new_manuscript() -> Self {
-        Self::build(Mode::New, BTreeMap::new(), Vec::new())
+        Self::build(Mode::New, WorkKind::Narrative, BTreeMap::new(), Vec::new())
+    }
+
+    /// The interview for a blank rules book.
+    #[must_use]
+    pub fn new_rules() -> Self {
+        Self::build(Mode::New, WorkKind::Rules, BTreeMap::new(), Vec::new())
     }
 
     /// The interview for a draft that already exists.
@@ -217,6 +297,12 @@ impl Intake {
     /// the rule of the world — is still asked.
     #[must_use]
     pub fn from_document(text: &str, title: Option<&str>) -> Self {
+        Self::from_document_kind(text, title, WorkKind::Narrative)
+    }
+
+    /// The interview for an imported draft of a given kind.
+    #[must_use]
+    pub fn from_document_kind(text: &str, title: Option<&str>, kind: WorkKind) -> Self {
         let mut answers = BTreeMap::new();
         let mut derived = Vec::new();
 
@@ -262,11 +348,21 @@ impl Intake {
             });
         }
 
-        Self::build(Mode::Imported, answers, derived)
+        Self::build(Mode::Imported, kind, answers, derived)
     }
 
-    fn build(mode: Mode, answers: BTreeMap<String, Answer>, derived: Vec<Derived>) -> Self {
-        let questions = SCRIPT
+    fn build(
+        mode: Mode,
+        kind: WorkKind,
+        answers: BTreeMap<String, Answer>,
+        derived: Vec<Derived>,
+    ) -> Self {
+        let script = if matches!(kind, WorkKind::Rules) {
+            SCRIPT_RULES
+        } else {
+            SCRIPT
+        };
+        let questions = script
             .iter()
             .map(|(id, section, prompt, help, kind, required)| Question {
                 id: (*id).to_owned(),
@@ -280,6 +376,7 @@ impl Intake {
             .collect();
         Self {
             mode,
+            kind,
             questions,
             answers,
             derived,
@@ -347,6 +444,7 @@ impl Intake {
     /// Missing answers are not an error: an intake that can only be completed
     /// would be a form, and a writer with half an idea must be able to start.
     pub fn apply(&self, story: &mut Story) {
+        story.meta.kind = self.kind;
         if let Some(title) = self.value("title") {
             story.meta.title = title.to_owned();
         }
@@ -364,6 +462,11 @@ impl Intake {
         }
         if let Some(tense) = self.value("tense") {
             story.meta.tense = Some(tense.to_owned());
+        }
+
+        if matches!(self.kind, WorkKind::Rules) {
+            self.apply_rules(story);
+            return;
         }
 
         let protagonist = self.value("protagonist").and_then(|name| {
@@ -517,5 +620,32 @@ pub fn infer_tense(text: &str) -> Option<&'static str> {
         Some("present")
     } else {
         None
+    }
+}
+
+impl Intake {
+    /// Where a rulebook's answers land: the system name, and the three rules a
+    /// book cannot afford to contradict later.
+    fn apply_rules(&self, story: &mut Story) {
+        if let Some(system) = self.value("system") {
+            story.meta.system = Some(system.to_owned());
+        }
+        for (answer, id) in [
+            ("core_mechanic", "core-resolution"),
+            ("dice", "dice"),
+            ("balance_rule", "balance-cap"),
+        ] {
+            let Some(statement) = self.value(answer) else {
+                continue;
+            };
+            let Ok(id) = RuleId::new(id) else {
+                continue;
+            };
+            story.rules.entry(id).or_insert(Rule {
+                kind: RuleKind::Hard,
+                statement: statement.to_owned(),
+                scope: Some("system".to_owned()),
+            });
+        }
     }
 }

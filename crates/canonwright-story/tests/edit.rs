@@ -17,7 +17,7 @@ fn scene(id: &str, index: u32, status: SceneStatus) -> Scene {
         id: sid(id),
         index,
         title: format!("Scene {index}"),
-        pov: cid("mara"),
+        pov: Some(cid("mara")),
         present: vec![cid("mara")],
         status,
         value_start: "safe".to_owned(),
@@ -107,7 +107,7 @@ fn an_invalid_scene_is_rejected_and_leaves_the_story_untouched() {
     let mut story = reviewed();
     let before = story.clone();
     let mut broken = scene("s9", 9, SceneStatus::Drafted);
-    broken.pov = cid("nobody");
+    broken.pov = Some(cid("nobody"));
 
     let outcome = story.write_scene(broken);
     assert!(!outcome.accepted);

@@ -221,7 +221,7 @@ pub fn scaffold(story: &mut Story, segments: &[Segment]) -> Scaffold {
             index,
             title: segment.title.clone().unwrap_or_default(),
             summary: opening(&segment.body, 240),
-            pov: pov.clone(),
+            pov: Some(pov.clone()),
             location: String::new(),
             present: vec![pov.clone()],
             status: SceneStatus::Drafted,
