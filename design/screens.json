@@ -1246,7 +1246,7 @@
  {
   "command": "page.add",
   "params": {
-   "name": "03 New story \u2014 interview"
+   "name": "03 Project setup"
   }
  },
  {
@@ -1262,7 +1262,7 @@
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "03 New story \u2014 interview / background",
+   "name": "03 Project setup / background",
    "props": {
     "fill": "#F7F3FF"
    }
@@ -1342,7 +1342,7 @@
  {
   "command": "text.create",
   "params": {
-   "text": "New story \u00b7 The interview",
+   "text": "New project \u00b7 setup",
    "x": 134,
    "y": 15,
    "props": {
@@ -1350,7 +1350,7 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "New story \u00b7 The intervie"
+   "name": "New project \u00b7 setup"
   }
  },
  {
@@ -1398,122 +1398,9 @@
   }
  },
  {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 0,
-   "y": 44,
-   "width": 260,
-   "height": 856,
-   "name": "rail",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 0
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 260,
-   "y": 44,
-   "width": 1,
-   "height": 856,
-   "name": "rect",
-   "props": {
-    "fill": "#E2DAF0",
-    "cornerRadius": 0
-   }
-  }
- },
- {
   "command": "text.create",
   "params": {
-   "text": "NEW STORY",
-   "x": 32,
-   "y": 92,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "NEW STORY"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "\u2713  What you are writing",
-   "x": 44,
-   "y": 130,
-   "props": {
-    "fontSize": 12,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "\u2713  What you are writing"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "\u2713  Where it starts",
-   "x": 44,
-   "y": 174,
-   "props": {
-    "fontSize": 12,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "\u2713  Where it starts"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 20,
-   "y": 210,
-   "width": 220,
-   "height": 34,
-   "name": "rect",
-   "props": {
-    "fill": "#F1ECFB",
-    "cornerRadius": 8
-   }
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 20,
-   "y": 210,
-   "width": 3,
-   "height": 34,
-   "name": "rect",
-   "props": {
-    "fill": "#8058C5",
-    "cornerRadius": 2
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "3   The interview",
-   "x": 44,
-   "y": 218,
-   "props": {
-    "fontSize": 12,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A",
-    "fontStyle": "Bold"
-   },
-   "name": "3   The interview"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "The interview",
+   "text": "Set up the project",
    "x": 320,
    "y": 104,
    "props": {
@@ -1522,13 +1409,13 @@
     "fill": "#25243A",
     "fontStyle": "Bold"
    },
-   "name": "The interview"
+   "name": "Set up the project"
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "Eleven questions. Only the title is required \u2014 a writer with half an idea must be",
+   "text": "Five things, all of them about the project rather than the book. Once this is",
    "x": 320,
    "y": 142,
    "props": {
@@ -1536,13 +1423,13 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Eleven questions. Only t"
+   "name": "Five things, all of them"
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "able to start. Anything marked \"from draft\" was read out of the file you chose.",
+   "text": "done the collaborator opens the manuscript and starts asking about the story.",
    "x": 320,
    "y": 160,
    "props": {
@@ -1550,21 +1437,21 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "able to start. Anything "
+   "name": "done the collaborator op"
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "IDENTITY",
+   "text": "PROJECT",
    "x": 320,
-   "y": 206,
+   "y": 208,
    "props": {
     "fontSize": 9,
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "IDENTITY"
+   "name": "PROJECT"
   }
  },
  {
@@ -1572,7 +1459,7 @@
   "params": {
    "text": "Title *",
    "x": 320,
-   "y": 228,
+   "y": 230,
    "props": {
     "fontSize": 10,
     "fontFamily": "DejaVu Sans",
@@ -1585,7 +1472,7 @@
   "command": "shape.rectangle",
   "params": {
    "x": 320,
-   "y": 243,
+   "y": 245,
    "width": 330,
    "height": 30,
    "name": "rect",
@@ -1602,7 +1489,7 @@
   "params": {
    "text": "The Salt Road",
    "x": 329,
-   "y": 252,
+   "y": 254,
    "props": {
     "fontSize": 11,
     "fontFamily": "DejaVu Sans",
@@ -1617,7 +1504,7 @@
   "params": {
    "text": "Author",
    "x": 676,
-   "y": 228,
+   "y": 230,
    "props": {
     "fontSize": 10,
     "fontFamily": "DejaVu Sans",
@@ -1630,7 +1517,7 @@
   "command": "shape.rectangle",
   "params": {
    "x": 676,
-   "y": 243,
+   "y": 245,
    "width": 330,
    "height": 30,
    "name": "rect",
@@ -1647,7 +1534,7 @@
   "params": {
    "text": "Bruce Amoser",
    "x": 685,
-   "y": 252,
+   "y": 254,
    "props": {
     "fontSize": 11,
     "fontFamily": "DejaVu Sans",
@@ -1660,9 +1547,130 @@
  {
   "command": "text.create",
   "params": {
+   "text": "Workspace",
+   "x": 1032,
+   "y": 230,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "Workspace"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1032,
+   "y": 245,
+   "width": 300,
+   "height": 30,
+   "name": "rect",
+   "props": {
+    "fill": "#FFFFFF",
+    "cornerRadius": 6,
+    "stroke": "#E2DAF0",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "~/Canonwright/the-salt-road",
+   "x": 1041,
+   "y": 254,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A"
+   },
+   "name": "~/Canonwright/the-salt-r",
+   "width": 282
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "SHAPE",
+   "x": 320,
+   "y": 306,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "SHAPE"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 320,
+   "y": 328,
+   "width": 86,
+   "height": 20,
+   "name": "rect",
+   "props": {
+    "fill": "#F1ECFB",
+    "cornerRadius": 10,
+    "stroke": "#E2DAF0",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Novel",
+   "x": 329,
+   "y": 333,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#8058C5"
+   },
+   "name": "Novel",
+   "width": 74
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 416,
+   "y": 328,
+   "width": 136,
+   "height": 20,
+   "name": "rect",
+   "props": {
+    "fill": "#F1ECFB",
+    "cornerRadius": 10,
+    "stroke": "#E2DAF0",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "third limited \u00b7 past",
+   "x": 425,
+   "y": 333,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "third limited \u00b7 past",
+   "width": 124
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
    "text": "Genre",
    "x": 320,
-   "y": 300,
+   "y": 360,
    "props": {
     "fontSize": 10,
     "fontFamily": "DejaVu Sans",
@@ -1675,7 +1683,7 @@
   "command": "shape.rectangle",
   "params": {
    "x": 320,
-   "y": 315,
+   "y": 375,
    "width": 330,
    "height": 30,
    "name": "rect",
@@ -1692,7 +1700,7 @@
   "params": {
    "text": "Fantasy",
    "x": 329,
-   "y": 324,
+   "y": 384,
    "props": {
     "fontSize": 11,
     "fontFamily": "DejaVu Sans",
@@ -1705,22 +1713,22 @@
  {
   "command": "text.create",
   "params": {
-   "text": "Logline",
+   "text": "Roughly how long?",
    "x": 676,
-   "y": 300,
+   "y": 360,
    "props": {
     "fontSize": 10,
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Logline"
+   "name": "Roughly how long?"
   }
  },
  {
   "command": "shape.rectangle",
   "params": {
    "x": 676,
-   "y": 315,
+   "y": 375,
    "width": 330,
    "height": 30,
    "name": "rect",
@@ -1735,57 +1743,88 @@
  {
   "command": "text.create",
   "params": {
-   "text": "A caravan master learns who sold her the truce.",
+   "text": "80,000 words",
    "x": 685,
-   "y": 324,
+   "y": 384,
    "props": {
     "fontSize": 11,
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "A caravan master learns ",
+   "name": "80,000 words",
    "width": 312
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "VOICE",
+   "text": "WHERE IT STARTS",
    "x": 320,
-   "y": 380,
+   "y": 436,
    "props": {
     "fontSize": 9,
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "VOICE"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Point of view",
-   "x": 320,
-   "y": 402,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "Point of view"
+   "name": "WHERE IT STARTS"
   }
  },
  {
   "command": "shape.rectangle",
   "params": {
    "x": 320,
-   "y": 417,
-   "width": 330,
-   "height": 30,
+   "y": 458,
+   "width": 320,
+   "height": 62,
    "name": "rect",
    "props": {
     "fill": "#FFFFFF",
-    "cornerRadius": 6,
+    "cornerRadius": 10,
+    "stroke": "#8058C5",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Blank manuscript",
+   "x": 340,
+   "y": 470,
+   "props": {
+    "fontSize": 12,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#25243A",
+    "fontStyle": "Bold"
+   },
+   "name": "Blank manuscript"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "The collaborator proposes the cast with you.",
+   "x": 340,
+   "y": 490,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#6F6885"
+   },
+   "name": "The collaborator propose"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 668,
+   "y": 458,
+   "width": 320,
+   "height": 62,
+   "name": "rect",
+   "props": {
+    "fill": "#FFFFFF",
+    "cornerRadius": 10,
     "stroke": "#E2DAF0",
     "strokeWeight": 1
    }
@@ -1794,70 +1833,38 @@
  {
   "command": "text.create",
   "params": {
-   "text": "Third limited",
-   "x": 329,
-   "y": 426,
+   "text": "Import a draft",
+   "x": 688,
+   "y": 470,
    "props": {
-    "fontSize": 11,
+    "fontSize": 12,
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Third limited",
-   "width": 312
+   "name": "Import a draft"
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "Tense",
-   "x": 676,
-   "y": 402,
+   "text": ".md, .docx, .epub, .pdf \u2014 or a GitHub repo",
+   "x": 688,
+   "y": 490,
    "props": {
     "fontSize": 10,
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Tense"
+   "name": ".md, .docx, .epub, .pdf "
   }
  },
  {
   "command": "shape.rectangle",
   "params": {
-   "x": 676,
-   "y": 417,
-   "width": 330,
-   "height": 30,
-   "name": "rect",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 6,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Past",
-   "x": 685,
-   "y": 426,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A"
-   },
-   "name": "Past",
-   "width": 312
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1016,
-   "y": 414,
-   "width": 76,
-   "height": 20,
+   "x": 320,
+   "y": 556,
+   "width": 970,
+   "height": 96,
    "name": "rect",
    "props": {
     "fill": "#F1ECFB",
@@ -1870,400 +1877,60 @@
  {
   "command": "text.create",
   "params": {
-   "text": "from draft",
-   "x": 1025,
-   "y": 419,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#8058C5"
-   },
-   "name": "from draft",
-   "width": 64
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "CAST",
-   "x": 320,
-   "y": 482,
+   "text": "NOT ASKED HERE",
+   "x": 340,
+   "y": 570,
    "props": {
     "fontSize": 9,
     "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
+    "fill": "#9A6B12"
    },
-   "name": "CAST"
+   "name": "NOT ASKED HERE"
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "Protagonist",
-   "x": 320,
-   "y": 504,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "Protagonist"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 320,
-   "y": 519,
-   "width": 330,
-   "height": 30,
-   "name": "rect",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 6,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Mara Vale",
-   "x": 329,
-   "y": 528,
+   "text": "Who the protagonist is. What they want. The rules of the world. The classes,",
+   "x": 340,
+   "y": 590,
    "props": {
     "fontSize": 11,
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Mara Vale",
-   "width": 312
+   "name": "Who the protagonist is. ",
+   "width": 920
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "What do they want?",
-   "x": 676,
-   "y": 504,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "What do they want?"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 676,
-   "y": 519,
-   "width": 330,
-   "height": 30,
-   "name": "rect",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 6,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Get the salt carts through the ford.",
-   "x": 685,
-   "y": 528,
+   "text": "ancestries, items or monsters. The book's theme. That is the work \u2014 the collaborator",
+   "x": 340,
+   "y": 608,
    "props": {
     "fontSize": 11,
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Get the salt carts throu",
-   "width": 312
+   "name": "ancestries, items or mon",
+   "width": 920
   }
  },
  {
   "command": "text.create",
   "params": {
-   "text": "What do they need that they would deny?",
-   "x": 320,
-   "y": 576,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "What do they need that t"
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 320,
-   "y": 591,
-   "width": 686,
-   "height": 30,
-   "name": "rect",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 6,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Admit she left the valley out of fear.",
-   "x": 329,
-   "y": 600,
+   "text": "will propose it with you, in the manuscript, one conversation at a time.",
+   "x": 340,
+   "y": 626,
    "props": {
     "fontSize": 11,
     "fontFamily": "DejaVu Sans",
     "fill": "#25243A"
    },
-   "name": "Admit she left the valle",
-   "width": 668
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "STAKES",
-   "x": 320,
-   "y": 656,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "STAKES"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "The question that keeps the reader turning",
-   "x": 320,
-   "y": 678,
-   "props": {
-    "fontSize": 10,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "The question that keeps "
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 320,
-   "y": 693,
-   "width": 686,
-   "height": 30,
-   "name": "rect",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 6,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Who burned the ford \u2014 and who profited?",
-   "x": 329,
-   "y": 702,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A"
-   },
-   "name": "Who burned the ford \u2014 an",
-   "width": 668
-  }
- },
- {
-  "command": "shape.rectangle",
-  "params": {
-   "x": 1050,
-   "y": 206,
-   "width": 320,
-   "height": 300,
-   "name": "rect",
-   "props": {
-    "fill": "#FFFFFF",
-    "cornerRadius": 12,
-    "stroke": "#E2DAF0",
-    "strokeWeight": 1
-   }
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Canonwright will create",
-   "x": 1074,
-   "y": 228,
-   "props": {
-    "fontSize": 12,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A",
-    "fontStyle": "Bold"
-   },
-   "name": "Canonwright will create"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Kind",
-   "x": 1074,
-   "y": 262,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "Kind"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Novel",
-   "x": 1074,
-   "y": 276,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A"
-   },
-   "name": "Novel",
-   "width": 270
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Scenes",
-   "x": 1074,
-   "y": 302,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "Scenes"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "0 \u2014 you write the first",
-   "x": 1074,
-   "y": 316,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A"
-   },
-   "name": "0 \u2014 you write the first",
-   "width": 270
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Rules",
-   "x": 1074,
-   "y": 342,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "Rules"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "1 hard rule",
-   "x": 1074,
-   "y": 356,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A"
-   },
-   "name": "1 hard rule",
-   "width": 270
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Thread",
-   "x": 1074,
-   "y": 382,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "Thread"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "The ford, planted in scene 1",
-   "x": 1074,
-   "y": 396,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A"
-   },
-   "name": "The ford, planted in sce",
-   "width": 270
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "Workspace",
-   "x": 1074,
-   "y": 422,
-   "props": {
-    "fontSize": 9,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#6F6885"
-   },
-   "name": "Workspace"
-  }
- },
- {
-  "command": "text.create",
-  "params": {
-   "text": "~/Canonwright/workspaces/the-salt-road",
-   "x": 1074,
-   "y": 436,
-   "props": {
-    "fontSize": 11,
-    "fontFamily": "DejaVu Sans",
-    "fill": "#25243A"
-   },
-   "name": "~/Canonwright/workspaces",
-   "width": 270
+   "name": "will propose it with you",
+   "width": 920
   }
  },
  {
@@ -2285,7 +1952,7 @@
  {
   "command": "text.create",
   "params": {
-   "text": "Skip the rest",
+   "text": "Cancel",
    "x": 356,
    "y": 819,
    "props": {
@@ -2293,7 +1960,7 @@
     "fontFamily": "DejaVu Sans",
     "fill": "#6F6885"
    },
-   "name": "Skip the rest"
+   "name": "Cancel"
   }
  },
  {
@@ -2314,7 +1981,7 @@
   "command": "text.create",
   "params": {
    "text": "Create the project",
-   "x": 1084,
+   "x": 1078,
    "y": 819,
    "props": {
     "fontSize": 13,
@@ -2328,7 +1995,7 @@
  {
   "command": "page.add",
   "params": {
-   "name": "04 Workspace \u2014 novel"
+   "name": "04 First session \u2014 collaborator"
   }
  },
  {
@@ -2344,7 +2011,1009 @@
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "04 Workspace \u2014 novel / background",
+   "name": "04 First session \u2014 collaborator / background",
+   "props": {
+    "fill": "#14161C"
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1440,
+   "height": 44,
+   "name": "titlebar",
+   "props": {
+    "fill": "#1B1F27",
+    "cornerRadius": 0
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 43,
+   "width": 1440,
+   "height": 1,
+   "name": "titlebar rule",
+   "props": {
+    "fill": "#2E3542",
+    "cornerRadius": 0
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 16,
+   "y": 12,
+   "width": 20,
+   "height": 20,
+   "name": "mark",
+   "props": {
+    "fill": "#8058C5",
+    "cornerRadius": 6
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Canonwright",
+   "x": 44,
+   "y": 15,
+   "props": {
+    "fontSize": 12,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9",
+    "fontStyle": "Bold"
+   },
+   "name": "Canonwright"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 120,
+   "y": 13,
+   "width": 1,
+   "height": 18,
+   "name": "rect",
+   "props": {
+    "fill": "#2E3542",
+    "cornerRadius": 0
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "The Salt Road",
+   "x": 134,
+   "y": 15,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "The Salt Road"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1336,
+   "y": 12,
+   "width": 44,
+   "height": 20,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 10,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1336,
+   "y": 12,
+   "width": 22,
+   "height": 20,
+   "name": "theme knob",
+   "props": {
+    "fill": "#8058C5",
+    "cornerRadius": 10
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Settings",
+   "x": 1392,
+   "y": 15,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Settings"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 44,
+   "width": 300,
+   "height": 856,
+   "name": "rail",
+   "props": {
+    "fill": "#1B1F27",
+    "cornerRadius": 0
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 300,
+   "y": 44,
+   "width": 1,
+   "height": 856,
+   "name": "rect",
+   "props": {
+    "fill": "#2E3542",
+    "cornerRadius": 0
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "THE SALT ROAD",
+   "x": 24,
+   "y": 68,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "THE SALT ROAD"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Novel \u00b7 third limited \u00b7 past",
+   "x": 24,
+   "y": 88,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Novel \u00b7 third limited \u00b7 "
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "CANON",
+   "x": 24,
+   "y": 128,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "CANON"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "0 characters",
+   "x": 24,
+   "y": 148,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "0 characters"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "0 facts",
+   "x": 24,
+   "y": 168,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "0 facts"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "0 threads",
+   "x": 24,
+   "y": 188,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "0 threads"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "MANUSCRIPT",
+   "x": 24,
+   "y": 228,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "MANUSCRIPT"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "0 scenes",
+   "x": 24,
+   "y": 248,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "0 scenes"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "PROPOSED",
+   "x": 24,
+   "y": 288,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "PROPOSED"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "3 characters",
+   "x": 24,
+   "y": 308,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#C5A7FF"
+   },
+   "name": "3 characters"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "1 rule",
+   "x": 24,
+   "y": 328,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#C5A7FF"
+   },
+   "name": "1 rule"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "WRITERS' ROOM",
+   "x": 336,
+   "y": 74,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "WRITERS' ROOM"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 336,
+   "y": 96,
+   "width": 760,
+   "height": 236,
+   "name": "rect",
+   "props": {
+    "fill": "#1B1F27",
+    "cornerRadius": 12,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Collaborator",
+   "x": 358,
+   "y": 112,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#C5A7FF",
+    "fontStyle": "Bold"
+   },
+   "name": "Collaborator"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "The project is set up, so let me start rather than ask you to.",
+   "x": 358,
+   "y": 134,
+   "props": {
+    "fontSize": 12,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "The project is set up, s",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Here is the shape I would propose for a third-limited fantasy about a",
+   "x": 358,
+   "y": 158,
+   "props": {
+    "fontSize": 12,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Here is the shape I woul",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "closed road:",
+   "x": 358,
+   "y": 176,
+   "props": {
+    "fontSize": 12,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "closed road:",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "\u00b7 Mara Vale, a caravan master. Wants the salt through the ford;",
+   "x": 358,
+   "y": 202,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#CFC9DE"
+   },
+   "name": "\u00b7 Mara Vale, a caravan m",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "  needs to admit she left the valley out of fear.",
+   "x": 358,
+   "y": 220,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#CFC9DE"
+   },
+   "name": "  needs to admit she lef",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "\u00b7 Harek, the ford warden, who is being paid to keep it shut.",
+   "x": 358,
+   "y": 238,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#CFC9DE"
+   },
+   "name": "\u00b7 Harek, the ford warden",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "\u00b7 Ilse, the duke's factor, counting salt she has no writ for.",
+   "x": 358,
+   "y": 256,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#CFC9DE"
+   },
+   "name": "\u00b7 Ilse, the duke's facto",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "A hard rule: no salt crosses the ford without the duke's seal.",
+   "x": 358,
+   "y": 282,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#CFC9DE"
+   },
+   "name": "A hard rule: no salt cro",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Say what to change, or ask me to go further before I plant scene one.",
+   "x": 358,
+   "y": 306,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Say what to change, or a",
+   "width": 720
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 700,
+   "y": 296,
+   "width": 108,
+   "height": 22,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 11,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Accept all three",
+   "x": 710,
+   "y": 301,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#C5A7FF"
+   },
+   "name": "Accept all three"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 816,
+   "y": 296,
+   "width": 108,
+   "height": 22,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 11,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Edit one",
+   "x": 826,
+   "y": 301,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Edit one"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 932,
+   "y": 296,
+   "width": 108,
+   "height": 22,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 11,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Start over",
+   "x": 942,
+   "y": 301,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Start over"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 336,
+   "y": 360,
+   "width": 760,
+   "height": 54,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 12,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Mara is good. Make Harek her brother and give him the better reason.",
+   "x": 358,
+   "y": 376,
+   "props": {
+    "fontSize": 12,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Mara is good. Make Harek",
+   "width": 720
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 336,
+   "y": 446,
+   "width": 760,
+   "height": 150,
+   "name": "rect",
+   "props": {
+    "fill": "#1B1F27",
+    "cornerRadius": 12,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Collaborator",
+   "x": 358,
+   "y": 462,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#C5A7FF",
+    "fontStyle": "Bold"
+   },
+   "name": "Collaborator"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Brother changes the first scene: the ford is a family argument before it is",
+   "x": 358,
+   "y": 484,
+   "props": {
+    "fontSize": 12,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "Brother changes the firs",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "a political one. I have added the relationship and one fact \u2014 Harek is owed",
+   "x": 358,
+   "y": 502,
+   "props": {
+    "fontSize": 12,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "a political one. I have ",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "money he cannot repay \u2014 and left the reason open.",
+   "x": 358,
+   "y": 520,
+   "props": {
+    "fontSize": 12,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#F2EFF9"
+   },
+   "name": "money he cannot repay \u2014 ",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Two ways to open: the ford already shut, or shut while she watches.",
+   "x": 358,
+   "y": 548,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Two ways to open: the fo",
+   "width": 720
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "I would take the second \u2014 the reader sees who closes it.",
+   "x": 358,
+   "y": 566,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "I would take the second ",
+   "width": 720
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 336,
+   "y": 620,
+   "width": 760,
+   "height": 90,
+   "name": "rect",
+   "props": {
+    "fill": "#1B1F27",
+    "cornerRadius": 12,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Tell me who burned the ford, or let me draft scene one and find out.",
+   "x": 358,
+   "y": 638,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Tell me who burned the f",
+   "width": 720
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 336,
+   "y": 724,
+   "width": 760,
+   "height": 40,
+   "name": "rect",
+   "props": {
+    "fill": "#232833",
+    "cornerRadius": 10,
+    "stroke": "#2E3542",
+    "strokeWeight": 1
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Reply, or press \u2318K for a command\u2026",
+   "x": 350,
+   "y": 736,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Reply, or press \u2318K for a"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 44,
+   "width": 304,
+   "height": 856,
+   "name": "canon",
+   "props": {
+    "fill": "#1B1F27",
+    "cornerRadius": 0
+   }
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1136,
+   "y": 44,
+   "width": 1,
+   "height": 856,
+   "name": "rect",
+   "props": {
+    "fill": "#2E3542",
+    "cornerRadius": 0
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "PROPOSED CANON",
+   "x": 1160,
+   "y": 68,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "PROPOSED CANON"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Mara Vale",
+   "x": 1160,
+   "y": 96,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans Mono",
+    "fill": "#F2EFF9"
+   },
+   "name": "Mara Vale"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "proposed",
+   "x": 1160,
+   "y": 113,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#C5A7FF"
+   },
+   "name": "proposed"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Harek",
+   "x": 1160,
+   "y": 136,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans Mono",
+    "fill": "#F2EFF9"
+   },
+   "name": "Harek"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "proposed",
+   "x": 1160,
+   "y": 153,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#C5A7FF"
+   },
+   "name": "proposed"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Ilse",
+   "x": 1160,
+   "y": 176,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans Mono",
+    "fill": "#F2EFF9"
+   },
+   "name": "Ilse"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "proposed",
+   "x": 1160,
+   "y": 193,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#C5A7FF"
+   },
+   "name": "proposed"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "no-salt-unsealed",
+   "x": 1160,
+   "y": 216,
+   "props": {
+    "fontSize": 11,
+    "fontFamily": "DejaVu Sans Mono",
+    "fill": "#F2EFF9"
+   },
+   "name": "no-salt-unsealed"
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "proposed",
+   "x": 1160,
+   "y": 233,
+   "props": {
+    "fontSize": 9,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#C5A7FF"
+   },
+   "name": "proposed"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 1160,
+   "y": 280,
+   "width": 256,
+   "height": 1,
+   "name": "rect",
+   "props": {
+    "fill": "#2E3542",
+    "cornerRadius": 0
+   }
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Nothing is canon until you accept it.",
+   "x": 1160,
+   "y": 296,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Nothing is canon until y",
+   "width": 240
+  }
+ },
+ {
+  "command": "text.create",
+  "params": {
+   "text": "Accepted proposals become the graph the reviewers check against.",
+   "x": 1160,
+   "y": 330,
+   "props": {
+    "fontSize": 10,
+    "fontFamily": "DejaVu Sans",
+    "fill": "#9A93AD"
+   },
+   "name": "Accepted proposals becom",
+   "width": 240
+  }
+ },
+ {
+  "command": "page.add",
+  "params": {
+   "name": "05 Workspace \u2014 novel"
+  }
+ },
+ {
+  "command": "page.setBackground",
+  "params": {
+   "color": "#14161C"
+  }
+ },
+ {
+  "command": "shape.rectangle",
+  "params": {
+   "x": 0,
+   "y": 0,
+   "width": 1440,
+   "height": 900,
+   "name": "05 Workspace \u2014 novel / background",
    "props": {
     "fill": "#14161C"
    }
@@ -3452,7 +4121,7 @@
  {
   "command": "page.add",
   "params": {
-   "name": "05 Workspace \u2014 rulebook"
+   "name": "06 Workspace \u2014 rulebook"
   }
  },
  {
@@ -3468,7 +4137,7 @@
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "05 Workspace \u2014 rulebook / background",
+   "name": "06 Workspace \u2014 rulebook / background",
    "props": {
     "fill": "#F7F3FF"
    }
@@ -4406,7 +5075,7 @@
  {
   "command": "page.add",
   "params": {
-   "name": "06 Source control"
+   "name": "07 Source control"
   }
  },
  {
@@ -4422,7 +5091,7 @@
    "y": 0,
    "width": 1440,
    "height": 900,
-   "name": "06 Source control / background",
+   "name": "07 Source control / background",
    "props": {
     "fill": "#14161C"
    }

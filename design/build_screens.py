@@ -17,12 +17,12 @@ MONO = "DejaVu Sans Mono"
 
 DARK = dict(
     bg="#14161C", surface="#1B1F27", raised="#232833", line="#2E3542",
-    text="#F2EFF9", muted="#9A93AD", accent="#C5A7FF", accent2="#8058C5",
+    text="#F2EFF9", body="#CFC9DE", muted="#9A93AD", accent="#C5A7FF", accent2="#8058C5",
     ink="#25243A", good="#7BD88F", bad="#FF8A8A", warn="#F2C879",
 )
 LIGHT = dict(
     bg="#F7F3FF", surface="#FFFFFF", raised="#F1ECFB", line="#E2DAF0",
-    text="#25243A", muted="#6F6885", accent="#8058C5", accent2="#C5A7FF",
+    text="#25243A", body="#4A4360", muted="#6F6885", accent="#8058C5", accent2="#C5A7FF",
     ink="#25243A", good="#3F8F55", bad="#B4443C", warn="#9A6B12",
 )
 
@@ -189,70 +189,132 @@ def step_one():
     text(960, 819, "Cancel", 12, p["muted"])
 
 
-# ---------------------------------------------------- 3. the interview (form)
-def interview():
+# ---------------------------------------------------------- 3. project setup
+def project_setup():
+    """Setup only. Everything here configures the project; none of it is content."""
     p = LIGHT
-    page("03 New story — interview", p)
-    window_chrome(p, "New story · The interview")
+    page("03 Project setup", p)
+    window_chrome(p, "New project · setup")
 
-    rect(0, 44, 260, 856, p["surface"], name="rail")
-    rect(260, 44, 1, 856, p["line"])
-    text(32, 92, "NEW STORY", 10, p["muted"])
-    for i, label in enumerate(["What you are writing", "Where it starts", "The interview"]):
-        y = 130 + i * 44
-        if i == 2:
-            rect(20, y - 8, 220, 34, p["raised"], radius=8)
-            rect(20, y - 8, 3, 34, p["accent"], radius=2)
-            text(44, y, f"{i+1}   {label}", 12, p["text"], bold=True)
-        else:
-            text(44, y, f"✓  {label}", 12, p["muted"])
+    text(320, 104, "Set up the project", 26, p["text"], bold=True)
+    text(320, 142, "Five things, all of them about the project rather than the book. Once this is", 12, p["muted"])
+    text(320, 160, "done the collaborator opens the manuscript and starts asking about the story.", 12, p["muted"])
 
-    text(320, 104, "The interview", 26, p["text"], bold=True)
-    text(320, 142, "Eleven questions. Only the title is required — a writer with half an idea must be", 12, p["muted"])
-    text(320, 160, "able to start. Anything marked \"from draft\" was read out of the file you chose.", 12, p["muted"])
+    text(320, 208, "PROJECT", 9, p["muted"])
+    field(320, 230, 330, "Title *", "The Salt Road", p)
+    field(676, 230, 330, "Author", "Bruce Amoser", p)
+    field(1032, 230, 300, "Workspace", "~/Canonwright/the-salt-road", p)
 
-    text(320, 206, "IDENTITY", 9, p["muted"])
-    field(320, 228, 330, "Title *", "The Salt Road", p)
-    field(676, 228, 330, "Author", "Bruce Amoser", p)
-    field(320, 300, 330, "Genre", "Fantasy", p)
-    field(676, 300, 330, "Logline", "A caravan master learns who sold her the truce.", p)
+    text(320, 306, "SHAPE", 9, p["muted"])
+    # kind is already chosen on the previous screen; show it as a settled chip
+    chip(320, 328, "Novel", p, "accent", w=86)
+    chip(416, 328, "third limited · past", p, "muted", w=136)
+    field(320, 360, 330, "Genre", "Fantasy", p)
+    field(676, 360, 330, "Roughly how long?", "80,000 words", p)
 
-    text(320, 380, "VOICE", 9, p["muted"])
-    field(320, 402, 330, "Point of view", "Third limited", p)
-    field(676, 402, 330, "Tense", "Past", p)
-    chip(1016, 414, "from draft", p, "accent", w=76)
+    text(320, 436, "WHERE IT STARTS", 9, p["muted"])
+    rect(320, 458, 320, 62, p["surface"], radius=10, stroke=p["accent"])
+    text(340, 470, "Blank manuscript", 12, p["text"], bold=True)
+    text(340, 490, "The collaborator proposes the cast with you.", 10, p["muted"])
+    rect(668, 458, 320, 62, p["surface"], radius=10, stroke=p["line"])
+    text(688, 470, "Import a draft", 12, p["text"])
+    text(688, 490, ".md, .docx, .epub, .pdf — or a GitHub repo", 10, p["muted"])
 
-    text(320, 482, "CAST", 9, p["muted"])
-    field(320, 504, 330, "Protagonist", "Mara Vale", p)
-    field(676, 504, 330, "What do they want?", "Get the salt carts through the ford.", p)
-    field(320, 576, 686, "What do they need that they would deny?", "Admit she left the valley out of fear.", p)
-
-    text(320, 656, "STAKES", 9, p["muted"])
-    field(320, 678, 686, "The question that keeps the reader turning", "Who burned the ford — and who profited?", p)
-
-    # summary card
-    rect(1050, 206, 320, 300, p["surface"], radius=12, stroke=p["line"])
-    text(1074, 228, "Canonwright will create", 12, p["text"], bold=True)
-    for i, (k, v) in enumerate([
-        ("Kind", "Novel"),
-        ("Scenes", "0 — you write the first"),
-        ("Rules", "1 hard rule"),
-        ("Thread", "The ford, planted in scene 1"),
-        ("Workspace", "~/Canonwright/workspaces/the-salt-road"),
-    ]):
-        text(1074, 262 + i * 40, k, 9, p["muted"])
-        text(1074, 276 + i * 40, v, 11, p["text"], width=270)
+    rect(320, 556, 970, 96, p["raised"], radius=10, stroke=p["line"])
+    text(340, 570, "NOT ASKED HERE", 9, p["warn"])
+    text(340, 590, "Who the protagonist is. What they want. The rules of the world. The classes,", 11, p["text"], width=920)
+    text(340, 608, "ancestries, items or monsters. The book's theme. That is the work — the collaborator", 11, p["text"], width=920)
+    text(340, 626, "will propose it with you, in the manuscript, one conversation at a time.", 11, p["text"], width=920)
 
     rect(320, 806, 200, 38, p["surface"], radius=8, stroke=p["line"])
-    text(356, 819, "Skip the rest", 12, p["muted"])
+    text(356, 819, "Cancel", 12, p["muted"])
     rect(1030, 806, 260, 38, p["accent"], radius=8)
-    text(1084, 819, "Create the project", 13, "#FFFFFF", bold=True)
+    text(1078, 819, "Create the project", 13, "#FFFFFF", bold=True)
+
+
+# ------------------------------------------- 3b. first session — collaborator opens
+def collaborating():
+    """The product's real first move: proposals and questions, in prose, in chat."""
+    p = DARK
+    page("04 First session — collaborator", p)
+    window_chrome(p, "The Salt Road")
+
+    rect(0, 44, 300, 856, p["surface"], name="rail")
+    rect(300, 44, 1, 856, p["line"])
+    text(24, 68, "THE SALT ROAD", 9, p["muted"])
+    text(24, 88, "Novel · third limited · past", 10, p["muted"])
+    text(24, 128, "CANON", 9, p["muted"])
+    text(24, 148, "0 characters", 10, p["muted"])
+    text(24, 168, "0 facts", 10, p["muted"])
+    text(24, 188, "0 threads", 10, p["muted"])
+    text(24, 228, "MANUSCRIPT", 9, p["muted"])
+    text(24, 248, "0 scenes", 10, p["muted"])
+    text(24, 288, "PROPOSED", 9, p["muted"])
+    text(24, 308, "3 characters", 10, p["accent"])
+    text(24, 328, "1 rule", 10, p["accent"])
+
+    # conversation
+    text(336, 74, "WRITERS' ROOM", 9, p["muted"])
+
+    rect(336, 96, 760, 236, p["surface"], radius=12, stroke=p["line"])
+    text(358, 112, "Collaborator", 11, p["accent"], bold=True)
+    text(358, 134, "The project is set up, so let me start rather than ask you to.", 12, p["text"], width=720)
+    text(358, 158, "Here is the shape I would propose for a third-limited fantasy about a", 12, p["text"], width=720)
+    text(358, 176, "closed road:", 12, p["text"], width=720)
+
+    text(358, 202, "· Mara Vale, a caravan master. Wants the salt through the ford;", 11, p["body"], width=720)
+    text(358, 220, "  needs to admit she left the valley out of fear.", 11, p["body"], width=720)
+    text(358, 238, "· Harek, the ford warden, who is being paid to keep it shut.", 11, p["body"], width=720)
+    text(358, 256, "· Ilse, the duke's factor, counting salt she has no writ for.", 11, p["body"], width=720)
+    text(358, 282, "A hard rule: no salt crosses the ford without the duke's seal.", 11, p["body"], width=720)
+    text(358, 306, "Say what to change, or ask me to go further before I plant scene one.", 11, p["muted"], width=720)
+
+    # Per-proposal actions stay inside the message, clear of the canon panel.
+    for i, (label, tone) in enumerate([
+        ("Accept all three", "accent"), ("Edit one", "muted"), ("Start over", "muted"),
+    ]):
+        x = 700 + i * 116
+        rect(x, 296, 108, 22, p["raised"], radius=11, stroke=p["line"])
+        text(x + 10, 301, label, 9, p[tone])
+
+    # the author's turn
+    rect(336, 360, 760, 54, p["raised"], radius=12, stroke=p["line"])
+    text(358, 376, "Mara is good. Make Harek her brother and give him the better reason.", 12, p["text"], width=720)
+
+    # next proposals
+    rect(336, 446, 760, 150, p["surface"], radius=12, stroke=p["line"])
+    text(358, 462, "Collaborator", 11, p["accent"], bold=True)
+    text(358, 484, "Brother changes the first scene: the ford is a family argument before it is", 12, p["text"], width=720)
+    text(358, 502, "a political one. I have added the relationship and one fact — Harek is owed", 12, p["text"], width=720)
+    text(358, 520, "money he cannot repay — and left the reason open.", 12, p["text"], width=720)
+    text(358, 548, "Two ways to open: the ford already shut, or shut while she watches.", 11, p["muted"], width=720)
+    text(358, 566, "I would take the second — the reader sees who closes it.", 11, p["muted"], width=720)
+
+    rect(336, 620, 760, 90, p["surface"], radius=12, stroke=p["line"])
+    text(358, 638, "Tell me who burned the ford, or let me draft scene one and find out.", 11, p["muted"], width=720)
+    rect(336, 724, 760, 40, p["raised"], radius=10, stroke=p["line"])
+    text(350, 736, "Reply, or press ⌘K for a command…", 11, p["muted"])
+
+    # right: what the collaborator is holding
+    rect(1136, 44, 304, 856, p["surface"], name="canon")
+    rect(1136, 44, 1, 856, p["line"])
+    text(1160, 68, "PROPOSED CANON", 9, p["muted"])
+    for i, (name, state) in enumerate([
+        ("Mara Vale", "proposed"), ("Harek", "proposed"),
+        ("Ilse", "proposed"), ("no-salt-unsealed", "proposed"),
+    ]):
+        y = 96 + i * 40
+        text(1160, y, name, 11, p["text"], mono=True)
+        text(1160, y + 17, state, 9, p["accent"])
+    rect(1160, 280, 256, 1, p["line"])
+    text(1160, 296, "Nothing is canon until you accept it.", 10, p["muted"], width=240)
+    text(1160, 330, "Accepted proposals become the graph the reviewers check against.", 10, p["muted"], width=240)
 
 
 # --------------------------------------------------------- 4. novel workspace
 def novel_workspace():
     p = DARK
-    page("04 Workspace — novel", p)
+    page("05 Workspace — novel", p)
     window_chrome(p, "The Salt Road · Novel")
 
     # left rail: scenes
@@ -328,7 +390,7 @@ def novel_workspace():
 # ------------------------------------------------------- 5. rulebook workspace
 def rulebook_workspace():
     p = LIGHT
-    page("05 Workspace — rulebook", p)
+    page("06 Workspace — rulebook", p)
     window_chrome(p, "Deeds of Legend · Rulebook")
 
     rect(0, 44, 296, 856, p["surface"], name="chapters")
@@ -402,7 +464,7 @@ def rulebook_workspace():
 # ------------------------------------------------------------ 6. source control
 def source_control():
     p = DARK
-    page("06 Source control", p)
+    page("07 Source control", p)
     window_chrome(p, "The Salt Road · Source")
 
     rect(0, 44, 1440, 40, p["surface"], name="tabs")
@@ -490,7 +552,8 @@ def source_control():
 
 welcome()
 step_one()
-interview()
+project_setup()
+collaborating()
 novel_workspace()
 rulebook_workspace()
 source_control()

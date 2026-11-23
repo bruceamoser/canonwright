@@ -11,8 +11,9 @@
         font: 14px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
       }
       h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
-      p.lede { color: #9a93ad; margin: 0 0 24px; max-width: 70ch; }
-      .grid { display: grid; gap: 28px; }
+      p.lede { color: #9a93ad; margin: 0 0 8px; max-width: 74ch; }
+      p.rule { color: #c5a7ff; margin: 0 0 28px; max-width: 74ch; font-size: 13px; }
+      .grid { display: grid; gap: 32px; }
       figure { margin: 0; }
       a { color: #c5a7ff; text-decoration: none; }
       img {
@@ -30,7 +31,12 @@
       First draft, built in FigCraft through its MCP server. Source of truth is
       <code>canonwright-ux.figcraft</code>; these PNGs are exports. Regenerate with
       <code>python3 build_screens.py &amp;&amp; python3 build_document.py</code>.
-      Click any screen to open it full size.
+    </p>
+    <p class="rule">
+      The split that matters: <strong>project creation configures the project</strong>
+      (five clicks), then <strong>the collaborator starts the book</strong> by proposing
+      content and asking about it in conversation. The writer is never asked to type in
+      their cast, classes or ancestries — producing those is the reason the product exists.
     </p>
     <div class="grid">
       <figure>
@@ -39,23 +45,33 @@
       </figure>
       <figure>
         <a href="screens/02-new-story---what.png"><img src="screens/02-new-story---what.png" alt="What are you writing" /></a>
-        <figcaption><strong>02 · New story — what</strong> — novel or rulebook, decided before anything else, because it changes the questions and the checks.</figcaption>
+        <figcaption><strong>02 · New story — what</strong> — novel or rulebook, first, because it decides the checks that run and the shape of the workspace.</figcaption>
       </figure>
       <figure>
-        <a href="screens/03-new-story---interview.png"><img src="screens/03-new-story---interview.png" alt="The interview" /></a>
-        <figcaption><strong>03 · New story — interview</strong> — a form, not a chat. Labelled fields, “from draft” badges on what the import inferred, and a live summary of what will be created.</figcaption>
+        <a href="screens/03-project-setup.png"><img src="screens/03-project-setup.png" alt="Project setup" /></a>
+        <figcaption>
+          <strong>03 · Project setup</strong> — five things, all about the project: title, author, genre, rough length, where it starts.
+          The panel marked “not asked here” is the point: no protagonist, no world rules, no classes, no theme.
+        </figcaption>
       </figure>
       <figure>
-        <a href="screens/04-workspace---novel.png"><img src="screens/04-workspace---novel.png" alt="Novel workspace" /></a>
-        <figcaption><strong>04 · Workspace — novel</strong> — scenes, the scene itself, and continuity side by side. Dark theme.</figcaption>
+        <a href="screens/04-first-session---collaborator.png"><img src="screens/04-first-session---collaborator.png" alt="First session" /></a>
+        <figcaption>
+          <strong>04 · First session — the collaborator opens</strong> — the product's real first move. It proposes a cast and a hard rule,
+          the writer pushes back (“make Harek her brother”), and it answers with the consequence. Proposals sit in a canon panel until accepted.
+        </figcaption>
       </figure>
       <figure>
-        <a href="screens/05-workspace---rulebook.png"><img src="screens/05-workspace---rulebook.png" alt="Rulebook workspace" /></a>
-        <figcaption><strong>05 · Workspace — rulebook</strong> — book tree, entity fields, cross-references with a dangling one called out. Light theme.</figcaption>
+        <a href="screens/05-workspace---novel.png"><img src="screens/05-workspace---novel.png" alt="Novel workspace" /></a>
+        <figcaption><strong>05 · Workspace — novel</strong> — scenes, the scene itself, and continuity side by side. Dark theme.</figcaption>
       </figure>
       <figure>
-        <a href="screens/06-source-control.png"><img src="screens/06-source-control.png" alt="Source control" /></a>
-        <figcaption><strong>06 · Source control</strong> — changes, staged, commit, branches, tags, and the one case that needs a human: a merge conflict.</figcaption>
+        <a href="screens/06-workspace---rulebook.png"><img src="screens/06-workspace---rulebook.png" alt="Rulebook workspace" /></a>
+        <figcaption><strong>06 · Workspace — rulebook</strong> — book tree, entity fields filled in by the collaborator, cross-references with a dangling one called out. Light theme.</figcaption>
+      </figure>
+      <figure>
+        <a href="screens/07-source-control.png"><img src="screens/07-source-control.png" alt="Source control" /></a>
+        <figcaption><strong>07 · Source control</strong> — changes, staged, commit, branches, tags, and the one case that needs a human: a merge conflict.</figcaption>
       </figure>
     </div>
   </body>
