@@ -28,32 +28,60 @@ about the book, and the rest about the work.
 
 ## Running the prototype
 
-`canonwright-ux.figcraft` is a **clickable prototype**, not a set of pictures.
-Every screen is a frame, and the buttons are wired to each other:
+`canonwright-ux.figcraft` is a **clickable prototype**. Every screen is a frame
+and the buttons are wired, so the file can be played: open it in FigCraft and
+press play (Alt+9 shows the wiring).
 
 ```
-00 First run ──skip / open browser──▶ 01 Welcome
-01 Welcome ──new story──▶ 02 What       ──open a project──▶ 06 Workspace
-02 What ──novel──▶ 03 New manuscript    ──rulebook──▶ 07 Workspace
-        ──import a draft──▶ 04 Existing manuscript
-03 New manuscript ──create──▶ 05 First session
-04 Existing ──import / answer later──▶ 05 First session
-05 First session ──accept the proposals──▶ 06 Workspace
-06 / 07 ──source──▶ 08 Source control    08 ──manuscript tab──▶ 06
+00 Set up GitHub ──open the browser / skip──▶ 01 Main
+01 Main ──new project──▶ 02 New project        ──new discussion──▶ 04 Project
+02 New project ──GitHub repo──▶ 03 Choose a repository
+                ──create / cancel──▶ 04 Project / 01 Main
+03 Choose a repository ──use / back──▶ 04 Project / 02 New project
+04 Project ──manuscript──▶ 05 Manuscript       ──source──▶ 07 Source control
+05 / 06 ──discussion / source──▶ 04 / 07      07 ──discussion / manuscript──▶ 04 / 05
 ```
 
-Fifteen links, checked: every destination resolves to a frame.
+Nineteen links, checked. `python3 verify_prototype.py` re-checks them.
 
-To run it: open `canonwright-ux.figcraft` in FigCraft and press the play
-button (or `view.prototype`, Alt+9, to see the wiring). Click through from the
-first screen. The two entry points worth trying:
+### The flow it encodes
 
-- **New book** — Welcome → New story → Novel → pick a seed → Create → the
-  collaborator opens with proposals.
-- **Existing draft** — Welcome → New story → *Import a draft* → what was read
-  from the file → Import and continue.
+1. **First run.** If `git` or `gh` is missing, or nobody is signed in, the app
+   walks through it: what it detected, what it is about to run, the device code,
+   and an honest "skip for now" that leaves local files working and repositories
+   unavailable.
+2. **Main.** The harness's home screen, with **New project** and **New
+   discussion** where it used to say *New session*. Projects and discussions are
+   listed at left; the centre says what a project is and what it holds.
+3. **New project — setup only.** Name, kind (novel or rulebook), and what it
+   starts from: **blank, one file, a folder, or a GitHub repository**. Nothing
+   is read until the project exists, so a half-read file can never leave a broken
+   workspace. The screen lists what is deliberately *not* asked: genre, tone,
+   point of view, tense, the protagonist, what the book is about, classes,
+   ancestries, items, rules.
+4. **Project.** The collaborator's opening discussion — proposals, not a
+   questionnaire. This is where the book is actually started.
 
-`python3 verify_prototype.py` re-checks every link after an edit.
+### Changing it
+
+- **Change the `.figcraft`, not the code.** A layout argument costs minutes here
+  and days in React.
+- **Every clickable thing must be legible.** Interactions live on the button's
+  own rect; the label is a layer above it. An overlay in the button's fill hides
+  the label and turns the prototype into a guessing game.
+
+## The screens
+
+| Screen | What it settles |
+| --- | --- |
+| `00-set-up-github.png` | First run: git and GitHub, the device code, and skipping. |
+| `01-main.png` | **New project** and **New discussion**, projects and discussions listed. |
+| `02-new-project.png` | Setup only: name, kind, and blank / file / folder / repo. |
+| `03-choose-a-repository.png` | Picking the repository that already holds the manuscript. |
+| `04-project.png` | The collaborator opens with proposals; nothing is canon until accepted. |
+| `05-manuscript---novel.png` | Scenes, the scene, continuity. |
+| `06-manuscript---rulebook.png` | Book tree, entity fields, checks. |
+| `07-source-control.png` | Changes, commits, branches, tags. |
 
 ## The palette
 

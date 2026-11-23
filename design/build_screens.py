@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
-"""Generate Canonwright's UX screens as a FigCraft document.
+"""Generate Canonwright's prototype in FigCraft.
 
-Run:  python3 design/build_screens.py
-Then: figcraft-cli run design/screens.json --out design/canonwright-ux.figcraft
+    python3 design/build_screens.py     # emit the command list
+    python3 design/build_document.py    # batch it through figcraft's MCP, save, export
 
-Every screen is a page, so `figcraft-cli render --page <name>` gives one PNG per
-screen. The palette is taken from the logo: ink #25243A, paper #F7F3FF,
-lilac #C5A7FF, violet #8058C5.
+The flow the prototype follows, and the reason for each screen:
+
+    00  Set up GitHub          first run, and the only integration the product needs
+    01  Main                   projects + "New project" / "New discussion"
+    02  New project            setup only: name, kind, what it starts from
+    03  Choose a repository    picking a repo, when that is the source
+    04  Project                the collaborator's opening discussion
+    05  Manuscript             scenes, the scene, continuity
+    06  Rulebook               book tree, entities, references
+    07  Source control         changes, commits, branches, tags
+
+Project creation asks nothing about the manuscript. It configures the project;
+the collaborator asks about the book afterwards, in discussion.
 """
 
 import json
@@ -17,20 +27,20 @@ MONO = "DejaVu Sans Mono"
 
 DARK = dict(
     bg="#14161C", surface="#1B1F27", raised="#232833", line="#2E3542",
-    text="#F2EFF9", body="#CFC9DE", muted="#9A93AD", on_accent="#25243A", accent="#C5A7FF", accent2="#8058C5",
-    ink="#25243A", good="#7BD88F", bad="#FF8A8A", warn="#F2C879",
+    text="#F2EFF9", body="#CFC9DE", muted="#9A93AD", subtle="#6F6885",
+    accent="#C5A7FF", accent2="#8058C5", on_accent="#25243A",
+    good="#7BD88F", warn="#F2C879", bad="#FF8A8A",
 )
 LIGHT = dict(
     bg="#F7F3FF", surface="#FFFFFF", raised="#F1ECFB", line="#E2DAF0",
-    text="#25243A", body="#4A4360", muted="#6F6885", on_accent="#FFFFFF", accent="#8058C5", accent2="#C5A7FF",
-    ink="#25243A", good="#3F8F55", bad="#B4443C", warn="#9A6B12",
+    text="#25243A", body="#4A4360", muted="#6F6885", subtle="#8B84A0",
+    accent="#8058C5", accent2="#C5A7FF", on_accent="#FFFFFF",
+    good="#3F8F55", warn="#9A6B12", bad="#B4443C",
 )
 
-commands = []      # content, drawn into frames
-frames = []        # every page and frame, created first so links can point anywhere
-
-# The frame every layer on the current screen is added to.
-CURRENT = {"ref": None}
+commands = []
+frames = []
+CURRENT = {"ref": None, "name": ""}
 
 
 def cmd(command, as_=None, **params):
@@ -44,10 +54,10 @@ def screen(name, palette):
     """One page, one frame. The frame is what a prototype interaction navigates to."""
     ref = f"screen:{name}"
     frames.append({"command": "page.add", "params": {"name": name}})
-    # page.add appends; index 0 is the document's own page until it is deleted.
-    frames.append(
-        {"command": "page.select", "params": {"index": sum(1 for f in frames if f["command"] == "page.add")}}
-    )
+    frames.append({
+        "command": "page.select",
+        "params": {"index": sum(1 for step in frames if step["command"] == "page.add")},
+    })
     frames.append({
         "command": "frame.create",
         "as": ref,
@@ -55,42 +65,36 @@ def screen(name, palette):
                    "props": {"fill": palette["bg"]}},
     })
     CURRENT["ref"] = ref
+    CURRENT["name"] = name
 
 
-def link(element_as, target_name, trigger="onClick"):
-    """Click `element_as` and the prototype goes to the frame named `target_name`."""
-    commands.append(
-        {
-            "command": "proto.interaction.add",
-            "params": {
-                "id": {"$ref": element_as},
-                "trigger": {"type": trigger},
-                "action": {"type": "navigate", "dest": {"$ref": f"screen:{target_name}"}},
-            },
-        }
-    )
+def link(element_as, target_name):
+    commands.append({
+        "command": "proto.interaction.add",
+        "params": {
+            "id": {"$ref": element_as},
+            "trigger": {"type": "onClick"},
+            "action": {"type": "navigate", "dest": {"$ref": f"screen:{target_name}"}},
+        },
+    })
 
 
-def rect(x, y, w, h, fill, radius=0, stroke=None, name=None, o=1, as_=None):
+def rect(x, y, w, h, fill, radius=0, stroke=None, name=None, as_=None):
     props = {"fill": fill, "cornerRadius": radius}
     if stroke:
         props["stroke"] = stroke
         props["strokeWeight"] = 1
-    if o != 1:
-        props["opacity"] = o
     params = {"x": x, "y": y, "width": w, "height": h, "name": name or "rect", "props": props}
     if CURRENT["ref"]:
         params["parent"] = {"$ref": CURRENT["ref"]}
     cmd("shape.rectangle", as_=as_, **params)
 
 
-def text(x, y, s, size, color, width=None, bold=False, mono=False, height=None, name=None, as_=None):
+def text(x, y, s, size, color, width=None, bold=False, mono=False, name=None, as_=None):
     props = {"fontSize": size, "fontFamily": MONO if mono else FONT, "fill": color}
     if bold:
         props["fontStyle"] = "Bold"
-    if height:
-        props["lineHeight"] = height
-    params = {"text": s, "x": x, "y": y, "props": props, "name": name or s[:24]}
+    params = {"text": s, "x": x, "y": y, "props": props, "name": name or s[:26]}
     if width:
         params["width"] = width
     if CURRENT["ref"]:
@@ -98,650 +102,514 @@ def text(x, y, s, size, color, width=None, bold=False, mono=False, height=None, 
     cmd("text.create", as_=as_, **params)
 
 
+def button(x, y, w, h, label, palette, target=None, as_=None, tone="primary", size=12):
+    """A button as one rect plus one label. The rect is what navigates."""
+    if tone == "primary":
+        fill, ink = palette["accent"], palette["on_accent"]
+    elif tone == "quiet":
+        fill, ink = palette["surface"], palette["muted"]
+    else:
+        fill, ink = palette["raised"], palette["body"]
+    # Step names must be unique across the batch, so they carry their screen.
+    handle = f"{CURRENT['name']}:{as_}" if as_ else None
+    rect(x, y, w, h, fill, radius=8,
+         stroke=None if tone == "primary" else palette["line"], as_=handle, name=label)
+    text(x + 14, y + h / 2 - size * 0.62, label, size, ink, bold=True)
+    if handle and target:
+        link(handle, target)
+
+
 def chip(x, y, label, palette, tone="muted", w=None):
-    colour = {"muted": palette["muted"], "accent": palette["accent"],
-              "good": palette["good"], "bad": palette["bad"], "warn": palette["warn"]}[tone]
-    width = w or (len(label) * 7 + 18)
+    colour = {"muted": palette["muted"], "accent": palette["accent"], "good": palette["good"],
+              "warn": palette["warn"], "bad": palette["bad"]}[tone]
+    width = w or (len(label) * 6.6 + 18)
     rect(x, y, width, 20, palette["raised"], radius=10, stroke=palette["line"])
     text(x + 9, y + 5, label, 10, colour, width=width - 12)
+    return width
 
 
-def field(x, y, w, label, value, palette, hint=None):
-    text(x, y, label, 10, palette["muted"])
-    rect(x, y + 15, w, 30, palette["surface"], radius=6, stroke=palette["line"])
-    text(x + 9, y + 24, value, 11, palette["text"], width=w - 18)
-    if hint:
-        text(x, y + 50, hint, 9, palette["muted"], width=w)
+def app_frame(palette, title):
+    """Title bar shared by every screen: the mark, the title, and Settings."""
+    rect(0, 0, 1440, 40, palette["surface"], name="titlebar")
+    rect(0, 39, 1440, 1, palette["line"], name="titlebar rule")
+    rect(16, 10, 20, 20, palette["accent2"], radius=6, name="mark")
+    text(44, 13, "Canonwright", 11, palette["text"], bold=True)
+    rect(118, 11, 1, 18, palette["line"])
+    text(132, 13, title, 10, palette["muted"])
+    text(1352, 13, "Settings", 10, palette["muted"])
 
 
-def window_chrome(p, title):
-    rect(0, 0, 1440, 44, p["surface"], name="titlebar")
-    rect(0, 43, 1440, 1, p["line"], name="titlebar rule")
-    rect(16, 12, 20, 20, p["accent2"], radius=6, name="mark")
-    text(44, 15, "Canonwright", 12, p["text"], bold=True)
-    rect(120, 13, 1, 18, p["line"])
-    text(134, 15, title, 11, p["muted"])
-    # theme toggle
-    rect(1336, 12, 44, 20, p["raised"], radius=10, stroke=p["line"])
-    rect(1336, 12, 22, 20, p["accent2"], radius=10, name="theme knob")
-    text(1392, 15, "Settings", 10, p["muted"])
-
-
-# ------------------------------------------------------------- 0. first run
-def first_run_github():
-    """Before anything else, the one integration the product genuinely needs."""
+# ------------------------------------------------------------------ 00 github
+def setup_github():
     p = DARK
-    screen("00 First run — GitHub", p)
-    window_chrome(p, "Welcome to Canonwright")
+    screen("00 Set up GitHub", p)
+    app_frame(p, "First run")
 
-    text(200, 150, "Your manuscript should live in git.", 30, p["text"], bold=True)
-    text(200, 200, "Not because you are a programmer — because a draft you can return to, diff and", 13, p["body"])
-    text(200, 220, "show someone is a draft you will finish.", 13, p["body"])
+    text(120, 96, "First, GitHub.", 30, p["text"], bold=True)
+    text(120, 140, "Canonwright keeps the manuscript in a git repository: that is how a draft has", 12, p["body"])
+    text(120, 158, "history, a backup, and a version you can hand to someone.", 12, p["body"])
 
-    rect(200, 268, 620, 96, p["surface"], radius=12, stroke=p["line"])
-    text(224, 284, "WHY THIS IS ASKED FIRST", 9, p["muted"])
-    text(224, 306, "An existing manuscript is often already a repository, not a file on a disk.", 11, p["text"], width=580)
-    text(224, 326, "Connecting now means project creation can offer “read it from GitHub”", 11, p["text"], width=580)
-    text(224, 344, "alongside “open a file”.", 11, p["text"], width=580)
-
-    # state: device code already issued
-    rect(200, 396, 620, 150, p["surface"], radius=12, stroke=p["accent"])
-    text(224, 412, "SIGNING IN", 9, p["accent"])
-    text(224, 436, "Enter this code on GitHub, then approve access:", 12, p["text"])
-    rect(224, 460, 200, 44, p["raised"], radius=8, stroke=p["line"])
-    text(248, 470, "ABCD-1234", 22, p["accent"], bold=True, mono=True)
-    text(224, 516, "github.com/login/device     ·     this window updates by itself", 10, p["muted"])
-
-    rect(200, 566, 240, 40, p["accent"], radius=8, as_="go:open-browser")
-    text(228, 578, "Open the browser", 13, p["on_accent"], bold=True)
-    link("go:open-browser", "01 Welcome")
-    rect(452, 566, 180, 40, p["surface"], radius=8, stroke=p["line"], as_="go:skip")
-    text(478, 578, "Skip for now", 12, p["muted"])
-    link("go:skip", "01 Welcome")
-
-    text(200, 640, "Skipping is fine. Settings → GitHub connects later, and reading from a repository", 10, p["muted"])
-    text(200, 658, "simply stays unavailable until you do.", 10, p["muted"])
-
-    # right rail: what is not being asked
-    rect(880, 150, 360, 470, p["surface"], radius=12, stroke=p["line"])
-    text(904, 170, "ALREADY CHECKED", 9, p["muted"])
-    for i, (label, state, tone) in enumerate([
-        ("git installed", "2.43", "good"),
-        ("GitHub CLI", "2.97", "good"),
-        ("signed in", "not yet", "warn"),
-        ("a local model key", "configured", "good"),
-    ]):
-        y = 200 + i * 44
-        text(904, y, label, 11, p["text"])
-        text(904, y + 16, state, 10, p[tone])
-
-    rect(904, 400, 312, 1, p["line"])
-    text(904, 416, "None of this is required to write.", 10, p["muted"], width=300)
-    text(904, 440, "It is required to keep the manuscript somewhere other than one disk.", 10, p["muted"], width=300)
-
-
-# ------------------------------------------------- 3. new manuscript — starting
-def new_manuscript_setup():
-    """A blank book needs a seed, not an inventory."""
-    p = LIGHT
-    screen("03 New manuscript — start", p)
-    window_chrome(p, "New manuscript")
-
-    text(200, 120, "Where does it start?", 26, p["text"], bold=True)
-    text(200, 158, "A new book needs a way in, not a cast list. Pick whichever of these you already", 12, p["muted"])
-    text(200, 176, "have — the collaborator will build the rest with you in the first conversation.", 12, p["muted"])
-
-    for i, (title, hint, seed) in enumerate([
-        ("A character", "Someone with a want that costs them.", "A caravan master who has to get a load of salt through a closed ford."),
-        ("A situation", "A place and a pressure, no people yet.", "A border town whose only income has just been made illegal."),
-        ("A question", "The thing the book is trying to answer.", "Who do you become when the law is the thing that is wrong?"),
-    ]):
-        y = 228 + i * 132
-        selected = i == 0
-        rect(200, y, 900, 112, p["surface"], radius=12, stroke=p["accent"] if selected else p["line"])
-        text(224, y + 16, title, 15, p["text"], bold=True)
-        text(224, y + 40, hint, 11, p["muted"])
-        if selected:
-            rect(224, y + 62, 840, 34, p["raised"], radius=8, stroke=p["line"])
-            text(236, y + 71, seed, 12, p["text"], width=800)
-        else:
-            text(224, y + 66, "click to write yours", 11, p["muted"])
-
-    text(200, 630, "TITLE", 9, p["muted"])
-    rect(200, 650, 420, 34, p["surface"], radius=8, stroke=p["line"])
-    text(212, 660, "The Salt Road", 12, p["text"])
-    chip(640, 656, "Novel · fantasy", p, "accent", w=130)
-
-    rect(200, 716, 900, 92, p["raised"], radius=10, stroke=p["line"])
-    text(224, 730, "THE REST IS NOT A FORM", 9, p["warn"])
-    text(224, 752, "No cast, no world rules, no theme, no chapter list. The collaborator proposes them,", 11, p["text"], width=860)
-    text(224, 770, "you push back, and nothing becomes canon until you accept it.", 11, p["text"], width=860)
-
-    rect(900, 828, 200, 38, p["accent"], radius=8, as_="go:create")
-    text(936, 841, "Create project", 13, p["on_accent"], bold=True)
-    link("go:create", "05 First session — collaborator")
-
-
-# ---------------------------------------------------------------- 1. welcome
-def welcome():
-    p = LIGHT
-    screen("01 Welcome", p)
-    window_chrome(p, "no project open")
-
-    text(120, 170, "Write the book.", 44, p["text"], bold=True)
-    text(120, 226, "Keep the canon.", 44, p["accent"], bold=True)
-    text(120, 296, "Scenes, viewpoints, facts, rules and threads — held as state,", 13, p["muted"])
-    text(120, 316, "so continuity is checked instead of remembered.", 13, p["muted"])
-
-    rect(120, 380, 440, 190, p["surface"], radius=14, stroke=p["accent"])
-    text(148, 406, "Start a new story", 17, p["text"], bold=True)
-    text(148, 434, "A novel or a rulebook. Answer a short interview,", 11, p["muted"])
-    text(148, 452, "or import a draft you already have.", 11, p["muted"])
-    rect(148, 486, 150, 34, p["accent"], radius=8, as_="go:new-story")
-    text(172, 496, "New story", 12, p["on_accent"], bold=True)
-    link("go:new-story", "02 New story — what")
-    text(316, 496, "or press ⌘N", 10, p["muted"])
-
-    rect(592, 380, 440, 190, p["surface"], radius=14, stroke=p["line"])
-    text(620, 406, "Open a project", 17, p["text"], bold=True)
-    text(620, 434, "A folder, or a GitHub repository you already", 11, p["muted"])
-    text(620, 452, "keep your manuscript in.", 11, p["muted"])
-    rect(620, 486, 150, 34, p["raised"], radius=8, stroke=p["line"], as_="go:open-folder")
-    text(644, 496, "Open folder", 12, p["text"], bold=True)
-    link("go:open-folder", "06 Workspace — novel")
-
-    text(120, 610, "RECENT", 9, p["muted"])
-    rect(120, 630, 912, 1, p["line"])
-    text(120, 650, "No projects yet. Everything you open appears here, most recent first.", 11, p["muted"])
-
-    rect(120, 706, 912, 1, p["line"])
-    text(120, 724, "Light and dark follow the system until you choose one.", 10, p["muted"])
-    rect(1148, 716, 44, 20, p["raised"], radius=10, stroke=p["line"])
-    rect(1148, 716, 22, 20, p["accent2"], radius=10)
-    text(1204, 720, "Theme", 10, p["muted"])
-
-
-# ------------------------------------------------------- 2. what are you writing
-def step_one():
-    p = LIGHT
-    screen("02 New story — what", p)
-    window_chrome(p, "New story")
-
-    rect(0, 44, 260, 856, p["surface"], name="rail")
-    rect(260, 44, 1, 856, p["line"])
-    text(32, 92, "NEW STORY", 10, p["muted"])
-    for i, label in enumerate(["What you are writing", "Where it starts", "The interview"]):
-        y = 130 + i * 44
-        if i == 0:
-            rect(20, y - 8, 220, 34, p["raised"], radius=8)
-            rect(20, y - 8, 3, 34, p["accent"], radius=2)
-            text(44, y, f"{i+1}   {label}", 12, p["text"], bold=True)
-        else:
-            text(44, y, f"{i+1}   {label}", 12, p["muted"])
-
-    text(320, 120, "What are you writing?", 26, p["text"], bold=True)
-    text(320, 160, "This decides the questions you are asked, the checks that run, and the shape of", 12, p["muted"])
-    text(320, 178, "the workspace. You can change it later, but the defaults differ.", 12, p["muted"])
-
-    # novel card, selected
-    rect(320, 226, 470, 300, p["surface"], radius=14, stroke=p["accent"], as_="go:kind-novel")
-    rect(320, 226, 470, 4, p["accent"], radius=2)
-    text(348, 254, "A novel", 20, p["text"], bold=True)
-    text(348, 286, "Scenes with a viewpoint, characters with knowledge,", 11, p["muted"])
-    text(348, 304, "threads that get planted and paid off.", 11, p["muted"])
-    for i, line in enumerate([
-        "Continuity: value shifts, causal links, dead characters",
-        "Knowledge leaks: who could know what, and when",
-        "Voice: per-character constraints on the prose",
-    ]):
-        rect(348, 344 + i * 26, 5, 5, p["accent"], radius=3)
-        text(362, 340 + i * 26, line, 11, p["text"])
-    chip(348, 446, "default", p, "accent", w=70)
-
-    # rulebook card
-    rect(820, 226, 470, 300, p["surface"], radius=14, stroke=p["line"], as_="go:kind-rules")
-    text(848, 254, "A rulebook", 20, p["text"], bold=True)
-    text(848, 286, "Chapters, procedures, classes, items and monsters,", 11, p["muted"])
-    text(848, 304, "with cross-references that must resolve.", 11, p["muted"])
-    for i, line in enumerate([
-        "Referential integrity: every \"see X\" points at X",
-        "Completeness: a class with no numbers is flagged",
-        "Balance: the cap you declare is checked against",
-    ]):
-        rect(848, 344 + i * 26, 5, 5, p["muted"], radius=3)
-        text(862, 340 + i * 26, line, 11, p["text"])
-
-    rect(320, 566, 970, 1, p["line"])
-    text(320, 590, "Hybrid books — a setting with rules, a campaign with scenes — are supported:", 11, p["muted"])
-    text(320, 608, "choose either and turn on the other's checks in the project settings.", 11, p["muted"])
-
-    rect(1116, 806, 174, 38, p["accent"], radius=8, as_="go:continue")
-    text(1160, 819, "Continue", 13, p["on_accent"], bold=True)
-    link("go:kind-novel", "03 New manuscript — start")
-    link("go:kind-rules", "07 Workspace — rulebook")
-    link("go:continue", "03 New manuscript — start")
-    text(960, 819, "Cancel", 12, p["muted"])
-
-
-# ------------------------------------- 4. existing manuscript — read, then ask
-def existing_manuscript_setup():
-    """The file is read first. The questions are about what was found in it."""
-    p = LIGHT
-    screen("04 Existing manuscript — what I read", p)
-    window_chrome(p, "Import · draft.md")
-
-    text(200, 92, "I read the draft. Here is what I found.", 24, p["text"], bold=True)
-    text(200, 128, "These questions came from the file, not from a template. Answer what you like;", 12, p["muted"])
-    text(200, 146, "anything you skip stays as I read it, and you can change it later in the canon panel.", 12, p["muted"])
-
-    # what was read
-    rect(200, 190, 900, 104, p["surface"], radius=12, stroke=p["line"])
-    text(224, 206, "THE SALT ROAD.DOCX · READ IN 1.2s", 9, p["muted"])
-    for i, (label, value) in enumerate([
-        ("41,200 words", "24 scenes"), ("3 viewpoints", "past tense"), ("1 unresolved thread", "2 name mismatches"),
-    ]):
-        text(224 + i * 296, 232, label, 14, p["text"], bold=True)
-        text(224 + i * 296, 254, value, 11, p["muted"])
-    text(224, 276, "Third limited, past tense, chapters split on headings and scene breaks.", 10, p["muted"])
-
-    # questions produced from the file
-    text(200, 320, "QUESTIONS FROM THE DRAFT", 9, p["muted"])
-    questions = [
-        ("I count three viewpoints: Mara, Harek, Ilse. Is Harek a protagonist or an obstacle?",
-         "choice: protagonist · obstacle · both"),
-        ("'the Factor's Office' and 'the Office' appear 11 and 3 times. Which is the name?",
-         "choice: the Factor's Office · the Office"),
-        ("Scene 14 has no causal link to scene 13. A flashback, or a gap to fill?",
-         "choice: flashback · gap to fill"),
-        ("The forged-seal thread is never paid off. Intentional, or should I hold it open?",
-         "choice: intentional · hold it open"),
+    steps = [
+        ("git installed", "2.43.0", "good"),
+        ("GitHub CLI installed", "2.97.0", "good"),
+        ("Sign in to GitHub", "waiting for you", "accent"),
+        ("Ready", "", "muted"),
     ]
-    for i, (question, answer) in enumerate(questions):
-        y = 344 + i * 76
-        rect(200, y, 900, 64, p["surface"], radius=10, stroke=p["line"])
-        text(220, y + 12, question, 11, p["text"], width=860)
-        text(220, y + 40, answer, 10, p["accent"], mono=True)
+    for i, (label, state, tone) in enumerate(steps):
+        y = 216 + i * 52
+        active = tone == "accent"
+        if active:
+            rect(120, y - 8, 560, 44, p["raised"], radius=8)
+            rect(120, y - 8, 3, 44, p["accent"], radius=2)
+        dot = p[tone] if tone != "muted" else p["subtle"]
+        text(140, y, "●", 11, dot)
+        text(162, y - 2, label, 12, p["text"] if active else p["body"], bold=active)
+        if state:
+            text(162, y + 15, state, 9, p["muted"])
 
-    rect(200, 664, 900, 84, p["raised"], radius=10, stroke=p["line"])
-    text(224, 678, "WHAT HAPPENS NEXT", 9, p["muted"])
-    text(224, 700, "The manuscript becomes 24 drafted scenes with the prose kept and the state empty.", 11, p["text"], width=860)
-    text(224, 718, "The collaborator then works through these answers and fills the graph — you are not starting over.", 11, p["text"], width=860)
+    rect(120, 440, 560, 132, p["surface"], radius=12, stroke=p["accent"])
+    text(144, 456, "SIGN IN", 9, p["accent"])
+    text(144, 478, "Enter this code at github.com/login/device:", 11, p["body"])
+    rect(144, 500, 190, 40, p["raised"], radius=8, stroke=p["line"])
+    text(166, 510, "ABCD-1234", 20, p["accent"], bold=True, mono=True)
+    text(144, 548, "This window updates by itself once you approve.", 9, p["muted"])
 
-    rect(200, 828, 220, 38, p["surface"], radius=8, stroke=p["line"], as_="go:import-later")
-    text(228, 841, "Answer later", 12, p["muted"])
-    rect(880, 828, 220, 38, p["accent"], radius=8, as_="go:import-continue")
-    text(910, 841, "Import and continue", 13, p["on_accent"], bold=True)
-    link("go:import-later", "05 First session — collaborator")
-    link("go:import-continue", "05 First session — collaborator")
+    button(120, 596, 220, 40, "Open the browser", p, "01 Main", "go:browser", "primary", 12)
+    button(356, 596, 160, 40, "Skip for now", p, "01 Main", "go:skip", "quiet", 11)
+    text(120, 656, "Skipping is fine: a local file or folder still opens. Repositories stay unavailable until you connect.", 9, p["muted"], width=560)
+
+    rect(760, 216, 520, 300, p["surface"], radius=12, stroke=p["line"])
+    text(784, 236, "WHAT CANONWRIGHT NEEDS FROM GITHUB", 9, p["muted"])
+    for i, line in enumerate([
+        "a repository to hold the manuscript",
+        "permission to read it, and to push when you ask",
+        "nothing else — no profile, no followers, no feed",
+    ]):
+        text(784, 266 + i * 24, f"·  {line}", 11, p["body"], width=470)
+    rect(784, 344, 472, 1, p["line"])
+    text(784, 360, "The GitHub CLI is used rather than a bespoke login: it is already", 10, p["muted"], width=470)
+    text(784, 378, "installed on most machines that have git, and it keeps the token", 10, p["muted"], width=470)
+    text(784, 396, "in the system keyring rather than in a file this app owns.", 10, p["muted"], width=470)
+    text(784, 424, "If gh is missing, this screen offers to install it first, and says", 10, p["muted"], width=470)
+    text(784, 442, "which command it will run.", 10, p["muted"], width=470)
 
 
-# ------------------------------------------- 3b. first session — collaborator opens
-def collaborating():
-    """The product's real first move: proposals and questions, in prose, in chat."""
+# -------------------------------------------------------------------- 01 main
+def main_screen():
+    p = LIGHT
+    screen("01 Main", p)
+    app_frame(p, "")
+
+    rect(0, 40, 300, 860, p["surface"], name="sidebar")
+    rect(300, 40, 1, 860, p["line"])
+
+    button(20, 64, 260, 40, "New project", p, "02 New project", "go:new-project", "primary", 12)
+    button(20, 112, 260, 36, "New discussion", p, "04 Project", "go:new-discussion", "raise", 11)
+
+    text(20, 176, "PROJECTS", 9, p["muted"])
+    projects = [("The Salt Road", "Novel · 3 scenes", True), ("Deeds of Legend", "Rulebook · 118 entries", False)]
+    for i, (name, meta, active) in enumerate(projects):
+        y = 200 + i * 52
+        if active:
+            rect(12, y - 8, 276, 46, p["raised"], radius=8)
+            rect(12, y - 8, 3, 46, p["accent"], radius=2)
+        text(28, y, name, 12, p["text"] if active else p["body"], bold=active)
+        text(28, y + 17, meta, 9, p["muted"])
+
+    text(20, 320, "DISCUSSIONS", 9, p["muted"])
+    for i, (name, when) in enumerate([
+        ("Scene 3: the ford", "2h ago"),
+        ("Harek's reason", "yesterday"),
+        ("Chapter order", "3d ago"),
+    ]):
+        y = 344 + i * 44
+        text(28, y, name, 11, p["body"])
+        text(28, y + 16, when, 9, p["subtle"])
+
+    rect(20, 820, 260, 1, p["line"])
+    text(20, 834, "GitHub: bruceamoser", 9, p["muted"])
+    text(20, 852, "Local model key: configured", 9, p["muted"])
+
+    text(360, 120, "The Salt Road", 24, p["text"], bold=True)
+    chip(360, 160, "Novel", p, "accent", w=64)
+    chip(432, 160, "third limited · past", p, "muted", w=150)
+    chip(590, 160, "3 scenes drafted", p, "muted", w=130)
+
+    rect(360, 224, 700, 260, p["surface"], radius=14, stroke=p["line"])
+    text(392, 256, "Start a project, or pick up a discussion.", 15, p["text"], bold=True)
+    text(392, 288, "A project is a manuscript and its canon. A discussion is a conversation", 11, p["body"], width=620)
+    text(392, 306, "about it — with the collaborator, about a scene, a character, a rule.", 11, p["body"], width=620)
+    button(392, 340, 200, 40, "New project", p, "02 New project", "empty:new-project", "primary", 12)
+    button(608, 340, 200, 40, "New discussion", p, "04 Project", "empty:new-discussion", "raise", 11)
+    text(392, 404, "⌘⇧P for a project · ⌘N for a discussion", 9, p["muted"])
+
+    text(360, 520, "IN THIS PROJECT", 9, p["muted"])
+    for i, (label, value) in enumerate([
+        ("Manuscript", "3 scenes · 4,100 words"),
+        ("Canon", "3 characters · 2 facts · 1 thread"),
+        ("Source", "main · clean"),
+    ]):
+        y = 544 + i * 34
+        rect(360, y, 700, 1, p["line"])
+        text(360, y + 8, label, 10, p["muted"])
+        text(920, y + 8, value, 10, p["text"])
+
+
+# -------------------------------------------------------------- 02 new project
+def new_project():
+    p = LIGHT
+    screen("02 New project", p)
+    app_frame(p, "New project")
+
+    text(160, 88, "New project", 26, p["text"], bold=True)
+    text(160, 126, "This creates a workspace and nothing else. What the book is about is a conversation", 12, p["muted"])
+    text(160, 144, "the project has with you afterwards.", 12, p["muted"])
+
+    text(160, 196, "NAME", 9, p["muted"])
+    rect(160, 216, 520, 34, p["surface"], radius=8, stroke=p["line"])
+    text(174, 226, "The Salt Road", 12, p["text"])
+    chip(716, 222, "Novel", p, "accent", w=64)
+    chip(790, 222, "Rulebook", p, "muted", w=76)
+
+    text(160, 286, "WHAT ARE YOU STARTING FROM?", 9, p["muted"])
+    sources = [
+        ("Blank", "No manuscript yet.", False),
+        ("One file", "docx, md, epub, pdf.", False),
+        ("A folder", "A directory of drafts.", False),
+        ("GitHub repo", "An existing repository.", True),
+    ]
+    for i, (label, hint, selected) in enumerate(sources):
+        x = 160 + i * 288
+        rect(x, 308, 264, 96, p["surface"], radius=12,
+             stroke=p["accent"] if selected else p["line"],
+             as_=f"{CURRENT['name']}:source-github" if selected else None, name=label)
+        text(x + 20, 326, label, 14, p["text"], bold=True)
+        text(x + 20, 352, hint, 10, p["muted"], width=224)
+        if selected:
+            chip(x + 20, 372, "choose", p, "accent", w=64)
+    # The single-file and folder sources open a native picker rather than a
+    # screen, so only the repository source has somewhere to go in the prototype.
+    link(f"{CURRENT['name']}:source-github", "03 Choose a repository")
+
+    rect(160, 428, 1090, 120, p["raised"], radius=12, stroke=p["line"])
+    text(184, 444, "SOURCE", 9, p["warn"])
+    text(184, 466, "Choose one of the four above. Nothing is read until the project exists —", 11, p["text"], width=1040)
+    text(184, 484, "the import runs as the project's first action, so a half-read file never leaves a broken workspace.", 11, p["text"], width=1040)
+    text(184, 512, "A single file may be .docx, .md, .epub or .pdf. A folder is scanned for the same. A repository is cloned first.", 10, p["muted"], width=1040)
+
+    text(160, 578, "LOCATION", 9, p["muted"])
+    text(160, 598, "~/Canonwright/workspaces/the-salt-road", 11, p["muted"], mono=True)
+
+    rect(160, 640, 1090, 1, p["line"])
+    text(160, 660, "NOT ASKED HERE", 9, p["muted"])
+    for i, line in enumerate([
+        "genre, tone, point of view, tense — the collaborator asks in discussion",
+        "who the protagonist is, what they want, what the book is about — same",
+        "classes, ancestries, items, monsters, rules — the collaborator proposes them",
+    ]):
+        text(160, 684 + i * 22, f"·  {line}", 10, p["muted"], width=1040)
+
+    button(160, 796, 140, 38, "Cancel", p, "01 Main", "go:cancel", "quiet", 11)
+    button(1010, 796, 240, 38, "Create project", p, "04 Project", "go:create", "primary", 12)
+
+
+# --------------------------------------------------------- 03 choose a repo
+def choose_repository():
+    p = LIGHT
+    screen("03 Choose a repository", p)
+    app_frame(p, "New project · GitHub")
+
+    text(160, 88, "Choose a repository", 26, p["text"], bold=True)
+    text(160, 126, "Repositories you can write to. The manuscript inside is found when the project", 12, p["muted"])
+    text(160, 144, "is created — the largest document, skipping readmes and vendored files.", 12, p["muted"])
+
+    rect(160, 192, 700, 34, p["surface"], radius=8, stroke=p["line"])
+    text(174, 202, "Filter…", 11, p["subtle"])
+
+    repos = [
+        ("bruceamoser/the-salt-road", "private · updated 2h ago"),
+        ("bruceamoser/deeds-of-legend", "private · updated yesterday"),
+        ("bruceamoser/neon-relic", "public · updated 3d ago"),
+        ("bruceamoser/heroes-of-legend", "private · updated 1w ago"),
+    ]
+    for i, (name, meta) in enumerate(repos):
+        y = 246 + i * 62
+        selected = i == 0
+        rect(160, y, 700, 54, p["surface"], radius=10,
+             stroke=p["accent"] if selected else p["line"])
+        text(180, y + 10, name, 12, p["text"], bold=selected, mono=True)
+        text(180, y + 30, meta, 9, p["muted"])
+        if selected:
+            text(810, y + 18, "selected", 9, p["accent"])
+
+    button(160, 560, 140, 38, "Back", p, "02 New project", "repo:back", "quiet", 11)
+    button(660, 560, 180, 38, "Use repository", p, "04 Project", "repo:use", "primary", 11)
+
+
+# ------------------------------------------------------------------ 04 project
+def project_discussion():
     p = DARK
-    screen("05 First session — collaborator", p)
-    window_chrome(p, "The Salt Road")
+    screen("04 Project", p)
+    app_frame(p, "The Salt Road")
 
-    rect(0, 44, 300, 856, p["surface"], name="rail")
-    rect(300, 44, 1, 856, p["line"])
-    text(24, 68, "THE SALT ROAD", 9, p["muted"])
-    text(24, 88, "Novel · third limited · past", 10, p["muted"])
-    text(24, 128, "CANON", 9, p["muted"])
-    text(24, 148, "0 characters", 10, p["muted"])
-    text(24, 168, "0 facts", 10, p["muted"])
-    text(24, 188, "0 threads", 10, p["muted"])
-    text(24, 228, "MANUSCRIPT", 9, p["muted"])
-    text(24, 248, "0 scenes", 10, p["muted"])
-    text(24, 288, "PROPOSED", 9, p["muted"])
-    text(24, 308, "3 characters", 10, p["accent"])
-    text(24, 328, "1 rule", 10, p["accent"])
-
-    # conversation
-    text(336, 74, "WRITERS' ROOM", 9, p["muted"])
-
-    rect(336, 96, 760, 236, p["surface"], radius=12, stroke=p["line"])
-    text(358, 112, "Collaborator", 11, p["accent"], bold=True)
-    text(358, 134, "The project is set up, so let me start rather than ask you to.", 12, p["text"], width=720)
-    text(358, 158, "Here is the shape I would propose for a third-limited fantasy about a", 12, p["text"], width=720)
-    text(358, 176, "closed road:", 12, p["text"], width=720)
-
-    text(358, 202, "· Mara Vale, a caravan master. Wants the salt through the ford;", 11, p["body"], width=720)
-    text(358, 220, "  needs to admit she left the valley out of fear.", 11, p["body"], width=720)
-    text(358, 238, "· Harek, the ford warden, who is being paid to keep it shut.", 11, p["body"], width=720)
-    text(358, 256, "· Ilse, the duke's factor, counting salt she has no writ for.", 11, p["body"], width=720)
-    text(358, 282, "A hard rule: no salt crosses the ford without the duke's seal.", 11, p["body"], width=720)
-    text(358, 306, "Say what to change, or ask me to go further before I plant scene one.", 11, p["muted"], width=720)
-
-    # Per-proposal actions stay inside the message, clear of the canon panel.
-    for i, (label, tone) in enumerate([
-        ("Accept all three", "accent"), ("Edit one", "muted"), ("Start over", "muted"),
+    rect(0, 40, 300, 860, p["surface"], name="sidebar")
+    rect(300, 40, 1, 860, p["line"])
+    text(20, 64, "THE SALT ROAD", 9, p["muted"])
+    text(20, 84, "Novel", 10, p["body"])
+    for i, (label, active) in enumerate([
+        ("Discussion", True), ("Manuscript", False), ("Canon", False), ("Source", False),
     ]):
-        x = 700 + i * 116
-        rect(x, 296, 108, 22, p["raised"], radius=11, stroke=p["line"],
-             as_=f"go:accept-{i}" if i == 0 else None)
-        text(x + 10, 301, label, 9, p[tone])
-    link("go:accept-0", "06 Workspace — novel")
+        y = 124 + i * 34
+        if active:
+            rect(12, y - 8, 276, 30, p["raised"], radius=6)
+            text(28, y, label, 11, p["text"], bold=True)
+        else:
+            text(28, y, label, 11, p["muted"])
+    text(20, 300, "DISCUSSIONS", 9, p["muted"])
+    for i, name in enumerate(["Scene 3: the ford", "Harek's reason"]):
+        text(28, 324 + i * 26, name, 10, p["body"])
 
-    # the author's turn
-    rect(336, 360, 760, 54, p["raised"], radius=12, stroke=p["line"])
-    text(358, 376, "Mara is good. Make Harek her brother and give him the better reason.", 12, p["text"], width=720)
+    text(336, 64, "DISCUSSION", 9, p["muted"])
+    rect(336, 88, 780, 210, p["surface"], radius=12, stroke=p["line"])
+    text(358, 104, "Collaborator", 11, p["accent"], bold=True)
+    text(358, 128, "The project is set up, so let me start rather than ask you to.", 12, p["text"], width=740)
+    text(358, 152, "Here is the shape I would propose for a third-limited fantasy about a", 12, p["text"], width=740)
+    text(358, 170, "closed road:", 12, p["text"], width=740)
+    text(358, 194, "· Mara Vale, a caravan master. Wants the salt through the ford;", 11, p["body"], width=740)
+    text(358, 212, "   needs to admit she left the valley out of fear.", 11, p["body"], width=740)
+    text(358, 230, "· Harek, the ford warden, being paid to keep it shut.", 11, p["body"], width=740)
+    text(358, 254, "A hard rule: no salt crosses without the duke's seal.", 11, p["body"], width=740)
+    text(358, 276, "Say what to change, or ask me to go further before I plant scene one.", 10, p["muted"], width=740)
 
-    # next proposals
-    rect(336, 446, 760, 150, p["surface"], radius=12, stroke=p["line"])
-    text(358, 462, "Collaborator", 11, p["accent"], bold=True)
-    text(358, 484, "Brother changes the first scene: the ford is a family argument before it is", 12, p["text"], width=720)
-    text(358, 502, "a political one. I have added the relationship and one fact — Harek is owed", 12, p["text"], width=720)
-    text(358, 520, "money he cannot repay — and left the reason open.", 12, p["text"], width=720)
-    text(358, 548, "Two ways to open: the ford already shut, or shut while she watches.", 11, p["muted"], width=720)
-    text(358, 566, "I would take the second — the reader sees who closes it.", 11, p["muted"], width=720)
+    rect(336, 316, 780, 46, p["raised"], radius=10, stroke=p["line"])
+    text(358, 330, "Mara is good. Make Harek her brother and give him the better reason.", 11, p["text"], width=740)
 
-    rect(336, 620, 760, 90, p["surface"], radius=12, stroke=p["line"])
-    text(358, 638, "Tell me who burned the ford, or let me draft scene one and find out.", 11, p["muted"], width=720)
-    rect(336, 724, 760, 40, p["raised"], radius=10, stroke=p["line"])
-    text(350, 736, "Reply, or press ⌘K for a command…", 11, p["muted"])
+    rect(336, 380, 780, 140, p["surface"], radius=12, stroke=p["line"])
+    text(358, 396, "Collaborator", 11, p["accent"], bold=True)
+    text(358, 420, "Brother changes the first scene: the ford is a family argument before it is", 12, p["text"], width=740)
+    text(358, 438, "a political one. I have added the relationship and one fact — Harek is owed", 12, p["text"], width=740)
+    text(358, 456, "money he cannot repay — and left the reason open.", 12, p["text"], width=740)
+    text(358, 484, "Two ways to open: the ford already shut, or shut while she watches.", 10, p["muted"], width=740)
 
-    # right: what the collaborator is holding
-    rect(1136, 44, 304, 856, p["surface"], name="canon")
-    rect(1136, 44, 1, 856, p["line"])
-    text(1160, 68, "PROPOSED CANON", 9, p["muted"])
-    for i, (name, state) in enumerate([
-        ("Mara Vale", "proposed"), ("Harek", "proposed"),
-        ("Ilse", "proposed"), ("no-salt-unsealed", "proposed"),
+    rect(336, 540, 780, 90, p["surface"], radius=12, stroke=p["line"])
+    text(358, 558, "Tell me who burned the ford, or let me draft scene one and find out.", 11, p["muted"], width=740)
+    rect(336, 650, 780, 40, p["raised"], radius=10, stroke=p["line"])
+    text(350, 662, "Reply, or press ⌘K for a command…", 11, p["subtle"])
+
+    rect(1136, 40, 304, 860, p["surface"], name="canon")
+    rect(1136, 40, 1, 860, p["line"])
+    text(1160, 64, "PROPOSED CANON", 9, p["muted"])
+    for i, (name, kind) in enumerate([
+        ("Mara Vale", "character"), ("Harek", "character"), ("no-salt-unsealed", "hard rule"),
     ]):
-        y = 96 + i * 40
-        text(1160, y, name, 11, p["text"], mono=True)
-        text(1160, y + 17, state, 9, p["accent"])
-    rect(1160, 280, 256, 1, p["line"])
-    text(1160, 296, "Nothing is canon until you accept it.", 10, p["muted"], width=240)
-    text(1160, 330, "Accepted proposals become the graph the reviewers check against.", 10, p["muted"], width=240)
+        y = 92 + i * 44
+        text(1160, y, name, 10, p["text"], mono=True)
+        text(1160, y + 15, kind, 9, p["accent"])
+    rect(1160, 236, 256, 1, p["line"])
+    text(1160, 252, "Nothing is canon until you accept it.", 10, p["muted"], width=240)
+
+    button(1160, 700, 256, 34, "Open the manuscript", p, "05 Manuscript — novel", "go:manuscript", "raise", 10)
+    button(1160, 744, 256, 34, "Source control", p, "07 Source control", "go:source", "quiet", 10)
 
 
-# --------------------------------------------------------- 4. novel workspace
+def project_rail(p, name, subtitle, active):
+    rect(0, 40, 300, 860, p["surface"], name="sidebar")
+    rect(300, 40, 1, 860, p["line"])
+    text(20, 64, name.upper(), 9, p["muted"])
+    text(20, 84, subtitle, 10, p["body"])
+    for i, label in enumerate(["Discussion", "Manuscript", "Canon", "Source"]):
+        y = 124 + i * 34
+        if label == active:
+            rect(12, y - 8, 276, 30, p["raised"], radius=6)
+            text(28, y, label, 11, p["text"], bold=True)
+        else:
+            text(28, y, label, 11, p["muted"])
+
+
+# ------------------------------------------------------------ 05 novel workspace
 def novel_workspace():
     p = DARK
-    screen("06 Workspace — novel", p)
-    window_chrome(p, "The Salt Road · Novel")
+    screen("05 Manuscript — novel", p)
+    app_frame(p, "The Salt Road")
+    project_rail(p, "The Salt Road", "Novel · 3 scenes", "Manuscript")
 
-    # left rail: scenes
-    rect(0, 44, 296, 856, p["surface"], name="scenes")
-    rect(296, 44, 1, 856, p["line"])
-    text(24, 68, "SCENES", 9, p["muted"])
-    rect(214, 62, 60, 20, p["raised"], radius=6, stroke=p["line"])
-    text(224, 66, "+ Scene", 10, p["text"])
-    scenes = [
+    text(336, 64, "SCENES", 9, p["muted"])
+    for i, (n, title, status, tone) in enumerate([
         ("1", "The ford", "canon", "good"),
         ("2", "The tally", "canon", "good"),
         ("3", "Ash on the water", "drafted", "accent"),
         ("4", "The seal", "planned", "muted"),
-    ]
-    for i, (n, title, status, tone) in enumerate(scenes):
-        y = 100 + i * 54
-        if i == 2:
-            rect(12, y - 8, 272, 46, p["raised"], radius=8)
-            rect(12, y - 8, 3, 46, p["accent"], radius=2)
-        text(28, y, n, 10, p["muted"], mono=True)
-        text(48, y - 2, title, 12, p["text"] if i == 2 else p["muted"], bold=(i == 2))
-        text(48, y + 16, status, 9, p[tone])
-
-    rect(0, 780, 296, 1, p["line"])
-    text(24, 800, "CONTINUITY", 9, p["muted"])
-    text(24, 822, "2 scenes need a recheck", 10, p["warn"])
-    text(24, 842, "1 thread owed to the reader", 10, p["muted"])
-
-    # centre: the scene
-    text(336, 74, "Scene 3", 10, p["muted"])
-    text(336, 96, "Ash on the water", 26, p["text"], bold=True)
-    chip(336, 136, "drafted", p, "accent", w=66)
-    chip(410, 136, "pov: Mara", p, "muted", w=76)
-    chip(494, 136, "suspicion → certainty", p, "muted", w=160)
-
-    for i in range(9):
-        width = [860, 884, 812, 878, 640, 870, 852, 820, 470][i]
-        rect(336, 186 + i * 30, width, 9, p["raised"], radius=4, o=0.9)
-
-    rect(336, 470, 420, 120, p["surface"], radius=10, stroke=p["line"])
-    text(356, 488, "BRIEF FOR THIS SCENE", 9, p["muted"])
-    text(356, 510, "Mara knows the truce broke. She does not yet know Harek", 11, p["text"], width=390)
-    text(356, 528, "burned the ford — she learns it at line 40.", 11, p["text"], width=390)
-    text(356, 556, "Withheld: 1 later scene · 2 unrevealed facts", 9, p["accent"])
-
-    # right: continuity
-    rect(1136, 44, 304, 856, p["surface"], name="continuity")
-    rect(1136, 44, 1, 856, p["line"])
-    text(1160, 68, "CONTINUITY", 9, p["muted"])
-    rect(1160, 88, 256, 78, p["raised"], radius=8, stroke=p["line"])
-    text(1176, 100, "[CAUSALITY_BREAK]", 9, p["bad"], mono=True)
-    text(1176, 118, "Scene 4 has no link to an earlier scene.", 10, p["text"], width=224)
-    text(1176, 146, "advisory · dismiss or fix", 9, p["muted"])
-
-    rect(1160, 176, 256, 78, p["raised"], radius=8, stroke=p["line"])
-    text(1176, 188, "[DANGLING_SETUP]", 9, p["warn"], mono=True)
-    text(1176, 206, "The forged seal was planted 6 scenes ago.", 10, p["text"], width=224)
-    text(1176, 234, "confirmed against the timeline", 9, p["muted"])
-
-    text(1160, 284, "AUDIT", 9, p["muted"])
-    for i, (label, value) in enumerate([
-        ("Knowledge leaks", "0"), ("Voice drift", "1"), ("Dirty scenes", "2"),
     ]):
-        text(1160, 306 + i * 22, label, 10, p["muted"])
-        text(1382, 306 + i * 22, value, 10, p["text"])
+        y = 92 + i * 46
+        if i == 2:
+            rect(336, y - 8, 300, 40, p["raised"], radius=8)
+            rect(336, y - 8, 3, 40, p["accent"], radius=2)
+        text(352, y, n, 10, p["muted"], mono=True)
+        text(372, y - 2, title, 12, p["text"] if i == 2 else p["body"], bold=(i == 2))
+        text(372, y + 15, status, 9, p[tone])
 
-    rect(1160, 380, 256, 1, p["line"])
-    text(1160, 396, "SOURCES", 9, p["muted"])
-    text(1160, 416, "story.json · 4 scenes", 10, p["muted"], mono=True)
-    text(1160, 434, "main · 2 ahead of origin", 10, p["muted"], mono=True)
+    text(668, 64, "SCENE 3", 9, p["muted"])
+    text(668, 84, "Ash on the water", 24, p["text"], bold=True)
+    chip(668, 120, "drafted", p, "accent", w=62)
+    chip(738, 120, "pov: Mara", p, "muted", w=74)
+    chip(820, 120, "suspicion → certainty", p, "muted", w=150)
+    for i in range(8):
+        width = [420, 400, 412, 300, 418, 396, 250, 410][i]
+        rect(668, 164 + i * 28, width, 8, p["raised"], radius=4)
+
+    rect(1112, 40, 328, 860, p["surface"], name="continuity")
+    rect(1112, 40, 1, 860, p["line"])
+    text(1136, 64, "CONTINUITY", 9, p["muted"])
+    rect(1136, 88, 280, 84, p["raised"], radius=8, stroke=p["line"])
+    text(1152, 100, "[CAUSALITY_BREAK]", 9, p["bad"], mono=True)
+    text(1152, 118, "Scene 4 has no link to an earlier scene.", 10, p["text"], width=250)
+    text(1152, 148, "advisory", 9, p["muted"])
+    rect(1136, 184, 280, 84, p["raised"], radius=8, stroke=p["line"])
+    text(1152, 196, "[DANGLING_SETUP]", 9, p["warn"], mono=True)
+    text(1152, 214, "The forged seal was planted 6 scenes ago.", 10, p["text"], width=250)
+    text(1152, 244, "confirmed against the timeline", 9, p["muted"])
+
+    button(1136, 700, 280, 34, "Discussion", p, "04 Project", "go:discussion", "quiet", 10)
+    button(1136, 744, 280, 34, "Source control", p, "07 Source control", "go:source", "raise", 10)
 
 
-# ------------------------------------------------------- 5. rulebook workspace
+# --------------------------------------------------------- 06 rulebook workspace
 def rulebook_workspace():
     p = LIGHT
-    screen("07 Workspace — rulebook", p)
-    window_chrome(p, "Deeds of Legend · Rulebook")
+    screen("06 Manuscript — rulebook", p)
+    app_frame(p, "Deeds of Legend")
+    project_rail(p, "Deeds of Legend", "Rulebook · 118 entries", "Manuscript")
 
-    rect(0, 44, 296, 856, p["surface"], name="chapters")
-    rect(296, 44, 1, 856, p["line"])
-    text(24, 68, "BOOK", 9, p["muted"])
-    for i, (label, depth) in enumerate([
-        ("Front matter", 0), ("1 · The core mechanic", 0), ("2 · Characters", 0),
-        ("    Classes", 1), ("    Species", 1), ("3 · Adversaries", 0),
-        ("4 · Equipment", 0), ("Appendix", 0),
+    text(336, 64, "BOOK", 9, p["muted"])
+    for i, (label, active) in enumerate([
+        ("1 · The core mechanic", False), ("2 · Characters", True), ("    Classes", False),
+        ("    Species", False), ("3 · Adversaries", False), ("4 · Equipment", False),
     ]):
-        y = 96 + i * 28
-        if i == 3:
-            rect(12, y - 6, 272, 26, p["raised"], radius=6)
-        text(28, y, label, 11, p["text"] if i == 3 else p["muted"], bold=(i == 3))
-    text(24, 380, "ENTITIES", 9, p["muted"])
-    for i, (label, tone) in enumerate([
-        ("Fighter (class)", "text"), ("Duelist (class)", "text"),
-        ("Marsh-wight (monster)", "text"), ("Grapple (procedure)", "warn"),
-    ]):
-        text(28, 402 + i * 24, label, 10, p["text"] if tone == "text" else p["warn"])
+        y = 92 + i * 30
+        if active:
+            rect(336, y - 8, 300, 26, p["raised"], radius=6)
+        text(352, y, label, 11, p["text"] if active else p["body"], bold=active)
 
-    # centre: entity editor
-    text(336, 74, "CLASS · 24 of 118", 9, p["muted"])
-    text(336, 96, "Fighter", 26, p["text"], bold=True)
-    text(336, 134, "A trained combatant who holds the line.", 12, p["muted"])
-
-    text(336, 180, "FIELDS", 9, p["muted"])
-    rect(336, 200, 760, 1, p["line"])
-    fields = [
+    text(668, 64, "CLASS · 24 of 118", 9, p["muted"])
+    text(668, 84, "Fighter", 24, p["text"], bold=True)
+    text(668, 120, "A trained combatant who holds the line.", 11, p["muted"])
+    for i, (key, value) in enumerate([
         ("Traits", "Might, Edge"),
         ("Hit points", "8 + Might at 1st level"),
         ("Starting gear", "One martial weapon, a shield"),
-        ("Advancement", "Gain a talent every odd level"),
-    ]
-    for i, (k, v) in enumerate(fields):
-        y = 214 + i * 58
-        text(336, y, k, 10, p["muted"])
-        rect(336, y + 16, 760, 30, p["surface"], radius=6, stroke=p["line"])
-        text(346, y + 25, v, 11, p["text"])
-
-    text(336, 462, "CROSS-REFERENCES", 9, p["muted"])
-    for i, (target, state, tone) in enumerate([
-        ("core-resolution", "resolves", "good"),
-        ("dice", "resolves", "good"),
-        ("grapple", "dangling — nothing defines it", "bad"),
+        ("Advancement", "A talent every odd level"),
     ]):
-        y = 486 + i * 30
-        text(336, y, target, 11, p["text"], mono=True)
-        text(520, y, state, 10, p[tone])
+        y = 160 + i * 56
+        text(668, y, key, 9, p["muted"])
+        rect(668, y + 14, 400, 30, p["surface"], radius=6, stroke=p["line"])
+        text(678, y + 23, value, 11, p["text"])
 
-    # right: checks
-    rect(1136, 44, 304, 856, p["surface"], name="checks")
-    rect(1136, 44, 1, 856, p["line"])
-    text(1160, 68, "CHECKS", 9, p["muted"])
-    rect(1160, 88, 256, 92, p["raised"], radius=8, stroke=p["bad"])
-    text(1176, 100, "[BROKEN_REFERENCE]", 9, p["bad"], mono=True)
-    text(1176, 118, "`grapple` is referenced but not defined.", 10, p["text"], width=224)
-    text(1176, 146, "error — the book cannot ship with this", 9, p["muted"])
+    rect(1112, 40, 328, 860, p["surface"], name="checks")
+    rect(1112, 40, 1, 860, p["line"])
+    text(1136, 64, "CHECKS", 9, p["muted"])
+    rect(1136, 88, 280, 92, p["raised"], radius=8, stroke=p["bad"])
+    text(1152, 100, "[BROKEN_REFERENCE]", 9, p["bad"], mono=True)
+    text(1152, 118, "`grapple` is referenced but not defined.", 10, p["text"], width=250)
+    text(1152, 148, "error — the book cannot ship with this", 9, p["muted"])
+    rect(1136, 192, 280, 84, p["raised"], radius=8, stroke=p["line"])
+    text(1152, 204, "[INCOMPLETE_ENTITY]", 9, p["warn"], mono=True)
+    text(1152, 222, "Duelist has no fields and no summary.", 10, p["text"], width=250)
+    text(1152, 252, "advisory", 9, p["muted"])
 
-    rect(1160, 190, 256, 78, p["raised"], radius=8, stroke=p["line"])
-    text(1176, 202, "[INCOMPLETE_ENTITY]", 9, p["warn"], mono=True)
-    text(1176, 220, "Duelist has no fields and no summary.", 10, p["text"], width=224)
-    text(1176, 248, "advisory", 9, p["muted"])
-
-    text(1160, 296, "BALANCE", 9, p["muted"])
-    text(1160, 318, "Trait cap: 5 at creation", 10, p["text"])
-    text(1160, 338, "Highest in book: 5", 10, p["good"])
-    text(1160, 358, "No chapter exceeds the cap.", 9, p["muted"])
+    button(1136, 700, 280, 34, "Discussion", p, "04 Project", "go:discussion", "quiet", 10)
+    button(1136, 744, 280, 34, "Source control", p, "07 Source control", "go:source", "raise", 10)
 
 
-# ------------------------------------------------------------ 6. source control
+# ------------------------------------------------------------- 07 source control
 def source_control():
     p = DARK
-    screen("08 Source control", p)
-    window_chrome(p, "The Salt Road · Source")
+    screen("07 Source control", p)
+    app_frame(p, "The Salt Road · Source")
 
-    rect(0, 44, 1440, 40, p["surface"], name="tabs")
-    rect(0, 83, 1440, 1, p["line"])
-    for i, label in enumerate(["Manuscript", "Canon", "Source"]):
-        x = 24 + i * 118
-        if i == 2:
-            rect(x - 10, 54, 96, 28, p["raised"], radius=6)
-            text(x, 60, label, 11, p["text"], bold=True)
+    rect(0, 40, 300, 860, p["surface"], name="sidebar")
+    rect(300, 40, 1, 860, p["line"])
+    text(20, 64, "THE SALT ROAD", 9, p["muted"])
+    text(20, 84, "Novel", 10, p["body"])
+    for i, label in enumerate(["Discussion", "Manuscript", "Canon", "Source"]):
+        y = 124 + i * 34
+        if label == "Source":
+            rect(12, y - 8, 276, 30, p["raised"], radius=6)
+            text(28, y, label, 11, p["text"], bold=True)
         else:
-            text(x, 60, label, 11, p["muted"])
+            text(28, y, label, 11, p["muted"])
 
-    rect(24, 108, 900, 760, p["surface"], radius=12, stroke=p["line"])
-    text(48, 130, "main", 14, p["text"], bold=True)
-    text(96, 133, "↑2  ↓0   origin/main", 10, p["muted"])
+    rect(336, 64, 760, 700, p["surface"], radius=12, stroke=p["line"])
+    text(360, 86, "main", 14, p["text"], bold=True)
+    text(408, 89, "↑2  ↓0   origin/main", 10, p["muted"])
 
-    text(48, 172, "CHANGES · 3", 9, p["muted"])
+    text(360, 128, "CHANGES · 3", 9, p["muted"])
     for i, (path, badge, tone) in enumerate([
         ("manuscript/scene-03.md", "M", "warn"),
         ("story.json", "M", "warn"),
         ("manuscript/scene-04.md", "U", "good"),
     ]):
-        y = 196 + i * 30
-        text(48, y, badge, 9, p[tone], mono=True)
-        text(70, y - 1, path, 11, p["text"], mono=True)
-        rect(846, y - 4, 54, 20, p["raised"], radius=6, stroke=p["line"])
-        text(858, y, "stage", 9, p["muted"])
+        y = 152 + i * 28
+        text(360, y, badge, 9, p[tone], mono=True)
+        text(380, y - 1, path, 10, p["text"], mono=True)
+        text(1010, y, "stage", 9, p["subtle"])
 
-    text(48, 312, "STAGED · 1", 9, p["muted"])
-    text(48, 336, "M", 9, p["good"], mono=True)
-    text(70, 335, "story.json", 11, p["text"], mono=True)
+    text(360, 262, "STAGED · 1", 9, p["muted"])
+    text(360, 286, "M", 9, p["good"], mono=True)
+    text(380, 285, "story.json", 10, p["text"], mono=True)
 
-    rect(48, 380, 852, 70, p["surface"], radius=8, stroke=p["line"])
-    text(60, 394, "Scene 3: Mara works out who burned the ford.", 11, p["muted"])
-    rect(48, 462, 120, 34, p["accent"], radius=8)
-    text(76, 472, "Commit", 12, "#FFFFFF", bold=True)
-    text(184, 472, "1 staged", 10, p["muted"])
+    rect(360, 320, 712, 60, p["surface"], radius=8, stroke=p["line"])
+    text(372, 334, "Scene 3: Mara works out who burned the ford.", 11, p["muted"])
+    button(360, 396, 120, 34, "Commit", p, None, "go:commit", "primary", 11)
+    text(492, 406, "1 staged", 9, p["muted"])
 
-    text(48, 528, "BRANCHES", 9, p["muted"])
+    text(360, 460, "BRANCHES", 9, p["muted"])
     for i, (name, current) in enumerate([("main", True), ("draft/act-two", False)]):
-        y = 552 + i * 26
-        text(48, y, "●" if current else "○", 10, p["accent"] if current else p["muted"])
-        text(70, y, name, 11, p["text"] if current else p["muted"], mono=True)
+        y = 484 + i * 24
+        text(360, y, "●" if current else "○", 10, p["accent"] if current else p["muted"])
+        text(380, y, name, 10, p["text"] if current else p["body"], mono=True)
 
-    text(48, 632, "TAG A DRAFT", 9, p["muted"])
-    rect(48, 654, 300, 30, p["raised"], radius=6, stroke=p["line"])
-    text(58, 663, "draft-2", 11, p["muted"])
-    rect(360, 654, 120, 30, p["raised"], radius=6, stroke=p["line"])
-    text(376, 663, "Tag & push", 10, p["text"])
+    text(360, 556, "TAG A DRAFT", 9, p["muted"])
+    rect(360, 578, 260, 30, p["raised"], radius=6, stroke=p["line"])
+    text(370, 587, "draft-2", 10, p["subtle"])
+    rect(632, 578, 120, 30, p["raised"], radius=6, stroke=p["line"])
+    text(650, 587, "Tag & push", 9, p["body"])
 
-    text(48, 724, "RECENT", 9, p["muted"])
+    text(360, 644, "RECENT", 9, p["muted"])
     for i, (sha, subject) in enumerate([
         ("a3f21c9", "Scene 3: Mara works out who burned the ford"),
         ("7be04d1", "Scene 2: the tally-house"),
-        ("12c9aa4", "Import the draft and set the cast"),
     ]):
-        y = 748 + i * 24
-        text(48, y, sha, 10, p["muted"], mono=True)
-        text(120, y, subject, 11, p["text"])
+        y = 668 + i * 24
+        text(360, y, sha, 9, p["muted"], mono=True)
+        text(430, y, subject, 10, p["body"])
 
-    # right: what git means here
-    rect(948, 108, 468, 760, p["surface"], radius=12, stroke=p["line"])
-    text(972, 130, "This is the manuscript's home", 14, p["text"], bold=True)
+    rect(1120, 64, 300, 220, p["surface"], radius=12, stroke=p["line"])
+    text(1144, 84, "THIS IS THE MANUSCRIPT'S HOME", 9, p["muted"])
     for i, line in enumerate([
-        "Every commit is a draft you can return to.",
-        "Every tag is a version you can hand to a reader.",
-        "The assistant can stage, commit, push and tag;",
-        "it asks before anything leaves the machine.",
+        "Every commit is a draft to return to.",
+        "Every tag is a version to hand over.",
+        "Nothing leaves the machine without",
+        "the assistant asking first.",
     ]):
-        text(972, 160 + i * 20, line, 11, p["muted"], width=420)
+        text(1144, 112 + i * 20, line, 10, p["muted"], width=252)
 
-    text(972, 262, "REMOTE", 9, p["muted"])
-    text(972, 284, "github.com/bruceamoser/the-salt-road", 11, p["text"], mono=True, width=420)
-
-    text(972, 330, "FETCH / PULL / PUSH", 9, p["muted"])
-    for i, label in enumerate(["Fetch", "Pull", "Push"]):
-        rect(972 + i * 104, 352, 96, 30, p["raised"], radius=6, stroke=p["line"])
-        text(996 + i * 104, 361, label, 10, p["text"])
-
-    text(972, 424, "NEEDS A HUMAN", 9, p["muted"])
-    rect(972, 446, 420, 60, p["raised"], radius=8, stroke=p["warn"])
-    text(988, 458, "Merge conflict in manuscript/scene-03.md", 11, p["text"], width=380)
-    text(988, 478, "Resolve in the editor, then continue the merge.", 10, p["muted"])
+    button(1120, 700, 300, 34, "Discussion", p, "04 Project", "go:discussion", "quiet", 10)
+    button(1120, 744, 300, 34, "Manuscript", p, "05 Manuscript — novel", "go:manuscript", "raise", 10)
 
 
-first_run_github()
-welcome()
-step_one()
-new_manuscript_setup()
-existing_manuscript_setup()
-collaborating()
+setup_github()
+main_screen()
+new_project()
+choose_repository()
+project_discussion()
 novel_workspace()
 rulebook_workspace()
 source_control()
-
-
-# --------------------------------------------------------------- the prototype
-# Interactions are bound to the buttons themselves, not to rectangles laid over
-# them: an overlay in the button's fill hides its label, which turns a prototype
-# into a guessing game. Only controls that are *added* for navigation live here.
-
-
-def nav_button(screen_name, x, y, w, h, label, target, name, palette,
-               fill=None, text_color=None, stroke=None, radius=8, size=10):
-    CURRENT["ref"] = f"screen:{screen_name}"
-    as_ = f"nav:{name}"
-    rect(x, y, w, h, fill or palette["raised"], radius=radius,
-         stroke=stroke or palette["line"], name=label, as_=as_)
-    text(x + 10, y + (h - size) / 2 - 1, label, size, text_color or palette["muted"])
-    link(as_, target)
-
-
-# The entry to the import path, which the screens otherwise do not offer.
-nav_button("02 New story — what", 1120, 556, 170, 34, "Import a draft →",
-           "04 Existing manuscript — what I read", "import-link", LIGHT)
-
-# Both workspaces route to source control from their panel header.
-nav_button("06 Workspace — novel", 1240, 60, 96, 26, "Source", "08 Source control",
-           "to-source", DARK, fill=DARK["surface"], stroke=DARK["line"])
-nav_button("07 Workspace — rulebook", 1240, 60, 96, 26, "Source", "08 Source control",
-           "to-source-rules", LIGHT, fill=LIGHT["surface"], stroke=LIGHT["line"])
-
-# Source control routes back to the manuscript through its tab.
-nav_button("08 Source control", 14, 54, 96, 28, "Manuscript", "06 Workspace — novel",
-           "tab-manuscript", DARK, fill=DARK["surface"], stroke=DARK["line"])
 
 # Remove the empty page the document starts with, so page index == screen index.
 cmd("page.delete", id=1)
 
 out = Path(__file__).with_name("screens.json")
-# Content may reference any frame, and every frame now comes first. The trailing
-# page delete has to stay last, so it is split back out of the content list.
 deletes = [step for step in commands if step["command"] == "page.delete"]
 body = [step for step in commands if step["command"] != "page.delete"]
 out.write_text(json.dumps(frames + body + deletes, indent=1))
