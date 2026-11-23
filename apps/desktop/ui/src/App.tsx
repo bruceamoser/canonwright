@@ -56,6 +56,9 @@ import {
   cancelChat,
   chat as sendChat,
   checkpointDiff as fetchCheckpointDiff,
+  githubRepos as fetchGithubRepos,
+  githubSignIn as startGithubSignIn,
+  githubStatus as fetchGithubStatus,
   pickManuscript,
   storyIntake,
   clearApiKey as clearStoredApiKey,
@@ -100,7 +103,7 @@ import {
 } from "./backend";
 import AppMenuBar from "./AppMenuBar";
 import type { AppMenu } from "./AppMenuBar";
-import type { IntakeScript } from "./types";
+import type { GithubStatus, IntakeScript } from "./types";
 import ChatComposer from "./ChatComposer";
 import type { ChatComposerHandle } from "./ChatComposer";
 import MarkdownMessage from "./MarkdownMessage";
@@ -536,11 +539,16 @@ export default function App() {
   const [commandOpen, setCommandOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
-  const [projectMode, setProjectMode] = useState<"new" | "existing">("new");
+  const [projectMode, setProjectMode] = useState<"new" | "existing" | "github">("new");
   const [projectScript, setProjectScript] = useState<IntakeScript | null>(null);
   const [projectAnswers, setProjectAnswers] = useState<Record<string, string>>({});
   const [projectManuscript, setProjectManuscript] = useState<string | null>(null);
   const [projectBusy, setProjectBusy] = useState(false);
+  const [githubStatus, setGithubStatus] = useState<GithubStatus | null>(null);
+  const [githubRepos, setGithubRepos] = useState<string[]>([]);
+  const [githubCode, setGithubCode] = useState<string | null>(null);
+  const [githubBusy, setGithubBusy] = useState(false);
+  const [projectRepo, setProjectRepo] = useState<string | null>(null);
   const [workspacesDir, setWorkspacesDir] = useState("");
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [sessionTitleDraft, setSessionTitleDraft] = useState("");
@@ -2279,6 +2287,8 @@ export default function App() {
     setProjectScript(null);
     setProjectAnswers({});
     setProjectManuscript(null);
+    setProjectRepo(null);
+    setGithubCode(null);
     setProjectBusy(false);
   }, []);
 
@@ -2297,6 +2307,10 @@ export default function App() {
   // here: one source of truth, in Rust, rendered twice.
   useEffect(() => {
     if (!projectDialogOpen) {
+      return;
+    }
+    if (projectMode === "github") {
+      setProjectScript(null);
       return;
     }
     let cancelled = false;
@@ -2326,6 +2340,55 @@ export default function App() {
     };
   }, [projectDialogOpen, projectMode, projectManuscript]);
 
+  useEffect(() => {
+    if (!projectDialogOpen) {
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const status = await fetchGithubStatus();
+        if (cancelled) {
+          return;
+        }
+        setGithubStatus(status);
+        if (status.authenticated) {
+          setGithubRepos(await fetchGithubRepos());
+        }
+      } catch (cause) {
+        if (!cancelled) {
+          setError(describeError(cause));
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectDialogOpen]);
+
+  const connectGithub = useCallback(async () => {
+    setGithubBusy(true);
+    try {
+      const code = await startGithubSignIn();
+      setGithubCode(code);
+      // The CLI opens the browser; we wait for the account to appear.
+      for (let attempt = 0; attempt < 90; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        const status = await fetchGithubStatus();
+        if (status.authenticated) {
+          setGithubStatus(status);
+          setGithubCode(null);
+          setGithubRepos(await fetchGithubRepos());
+          break;
+        }
+      }
+    } catch (cause) {
+      setError(describeError(cause));
+    } finally {
+      setGithubBusy(false);
+    }
+  }, []);
+
   const createProject = useCallback(async () => {
     const name = newProjectName.trim();
     if (name.length === 0) {
@@ -2335,6 +2398,7 @@ export default function App() {
     try {
       const project = await createStoredProject(name, {
         mode: projectMode,
+        repo: projectMode === "github" ? projectRepo ?? undefined : undefined,
         manuscript:
           projectMode === "existing" ? projectManuscript ?? undefined : undefined,
         answers: projectAnswers,
@@ -2357,6 +2421,7 @@ export default function App() {
     projectAnswers,
     projectManuscript,
     projectMode,
+    projectRepo,
     selectProject,
   ]);
 
@@ -3414,11 +3479,12 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-wider text-obd-subtle">
                 Starting point
               </p>
-              <div className="mt-1 grid grid-cols-2 gap-2">
+              <div className="mt-1 grid grid-cols-3 gap-2">
                 {(
                   [
-                    ["new", "New manuscript", "Blank page and an interview."],
-                    ["existing", "Import a draft", "Read the prose, infer what we can."],
+                    ["new", "New", "Blank page."],
+                    ["existing", "Import", "A local file."],
+                    ["github", "GitHub", "An existing repo."],
                   ] as const
                 ).map(([value, label, hint]) => (
                   <button
@@ -3427,6 +3493,7 @@ export default function App() {
                     onClick={() => {
                       setProjectMode(value);
                       setProjectManuscript(null);
+                      setProjectRepo(null);
                       setProjectScript(null);
                       setProjectAnswers({});
                     }}
@@ -3458,6 +3525,71 @@ export default function App() {
               </div>
             )}
 
+            {projectMode === "github" && (
+              <div className="mt-3 rounded-md border border-obd-line bg-obd-inset px-2.5 py-2">
+                {githubStatus === null ? (
+                  <p className="text-[11px] text-obd-subtle">Checking GitHub…</p>
+                ) : !githubStatus.installed ? (
+                  <p className="text-[11px] leading-5 text-obd-subtle">
+                    The GitHub CLI is not installed. Install{" "}
+                    <span className="font-mono text-obd-body">gh</span> from{" "}
+                    <span className="font-mono text-obd-body">cli.github.com</span>, then
+                    reopen this dialog.
+                  </p>
+                ) : !githubStatus.authenticated ? (
+                  <div>
+                    <p className="text-[11px] leading-5 text-obd-body">
+                      Connect GitHub to keep the manuscript in a repository and its
+                      issues as the task board.
+                    </p>
+                    {githubCode ? (
+                      <p className="mt-2 text-[11px] leading-5 text-obd-subtle">
+                        Enter the code{" "}
+                        <span className="font-mono text-[12px] text-obd-text">
+                          {githubCode}
+                        </span>{" "}
+                        in the browser window, then approve access. This dialog updates
+                        by itself.
+                      </p>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => void connectGithub()}
+                        disabled={githubBusy}
+                        className="mt-2 rounded-md border border-obd-line bg-obd-raised px-2.5 py-1.5 text-[11px] text-obd-body hover:bg-obd-raised-strong disabled:opacity-40"
+                      >
+                        {githubBusy ? "Waiting for GitHub…" : "Sign in with GitHub"}
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-[11px] text-obd-muted">
+                      Connected as{" "}
+                      <span className="text-obd-text">{githubStatus.account}</span>
+                    </p>
+                    <select
+                      value={projectRepo ?? ""}
+                      onChange={(event) => setProjectRepo(event.target.value || null)}
+                      className="mt-2 w-full rounded-md border border-obd-line bg-obd-surface px-2 py-1.5 text-[11px] text-obd-text outline-none focus:border-obd-accent/40"
+                    >
+                      <option value="">Choose a repository…</option>
+                      {githubRepos.map((repo) => (
+                        <option key={repo} value={repo}>
+                          {repo}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="mt-1.5 text-[10px] leading-4 text-obd-subtle">
+                      The repository is cloned into your workspaces folder and its
+                      largest manuscript file is imported. From then on the repo is the
+                      manuscript.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {projectScript && projectScript.derived.length > 0 && (
               <div className="mt-3 rounded-md border border-obd-line bg-obd-inset px-2.5 py-2">
                 <p className="text-[9px] uppercase tracking-wider text-obd-subtle">
@@ -3471,7 +3603,11 @@ export default function App() {
               </div>
             )}
 
-            <div className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div
+              className={`mt-4 min-h-0 flex-1 overflow-y-auto pr-1 ${
+                projectMode === "github" ? "hidden" : ""
+              }`}
+            >
               <p className="text-[10px] uppercase tracking-wider text-obd-subtle">
                 {projectScript
                   ? `${projectScript.questions.length} questions · only the title is required`
@@ -3550,7 +3686,8 @@ export default function App() {
                   disabled={
                     projectBusy ||
                     newProjectName.trim().length === 0 ||
-                    (projectMode === "existing" && projectManuscript === null)
+                    (projectMode === "existing" && projectManuscript === null) ||
+                    (projectMode === "github" && projectRepo === null)
                   }
                   className="rounded-md bg-obd-accent px-3 py-1.5 text-[11px] font-medium text-obd-on-accent hover:bg-obd-accent disabled:opacity-30"
                 >

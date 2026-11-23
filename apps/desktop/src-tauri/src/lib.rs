@@ -4496,7 +4496,14 @@ fn create_project(
         return Err("project name must be 80 characters or fewer".to_owned());
     }
     let root = default_workspaces_directory()?;
-    let path = create_workspace_directory(&root, name)?;
+    let from_repo = story
+        .as_ref()
+        .filter(|request| request.mode == "github")
+        .and_then(|request| request.repo.clone());
+    let path = match &from_repo {
+        Some(repo) => clone_repo(&root, repo)?,
+        None => create_workspace_directory(&root, name)?,
+    };
     if let Some(request) = story {
         start_story_in(&path, name, request)?;
     }
@@ -4511,6 +4518,250 @@ fn create_project(
         .workspace_summary(workspace)
         .map_err(|error| error.to_string())?
         .ok_or_else(|| "project disappeared after creation".to_owned())
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+struct GithubStatus {
+    installed: bool,
+    authenticated: bool,
+    account: Option<String>,
+    detail: String,
+}
+
+fn gh_path() -> Option<std::path::PathBuf> {
+    if let Some(path) = canonwright_pipeline::gh_binary() {
+        return Some(path.to_path_buf());
+    }
+    let paths = std::env::var_os("PATH")?;
+    std::env::split_paths(&paths)
+        .map(|directory| directory.join("gh"))
+        .find(|candidate| candidate.is_file())
+}
+
+fn github_status_now() -> GithubStatus {
+    let Some(gh) = gh_path() else {
+        return GithubStatus {
+            installed: false,
+            authenticated: false,
+            account: None,
+            detail: "The GitHub CLI (`gh`) is not installed. Install it from \
+                     https://cli.github.com and try again."
+                .to_owned(),
+        };
+    };
+    let output = std::process::Command::new(&gh)
+        .args(["api", "user", "--jq", ".login"])
+        .output();
+    match output {
+        Ok(output) if output.status.success() => GithubStatus {
+            installed: true,
+            authenticated: true,
+            account: Some(String::from_utf8_lossy(&output.stdout).trim().to_owned()),
+            detail: String::new(),
+        },
+        Ok(output) => GithubStatus {
+            installed: true,
+            authenticated: false,
+            account: None,
+            detail: format!(
+                "Signed out: {}",
+                String::from_utf8_lossy(&output.stderr).trim()
+            ),
+        },
+        Err(error) => GithubStatus {
+            installed: true,
+            authenticated: false,
+            account: None,
+            detail: error.to_string(),
+        },
+    }
+}
+
+#[tauri::command]
+fn github_status() -> GithubStatus {
+    github_status_now()
+}
+
+/// Start `gh auth login --web` and return the one-time code it prints.
+///
+/// The CLI owns the flow: it opens the browser and waits. All this does is
+/// surface the code, because a device flow whose code you cannot see is a dead
+/// end for the user.
+#[tauri::command]
+fn github_sign_in() -> Result<String, String> {
+    let gh = gh_path().ok_or_else(|| "the GitHub CLI (`gh`) is not installed".to_owned())?;
+    let mut command = std::process::Command::new(gh);
+    command
+        .args([
+            "auth",
+            "login",
+            "--hostname",
+            "github.com",
+            "--git-protocol",
+            "https",
+            "--web",
+        ])
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped());
+
+    let (sender, receiver) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let Ok(mut child) = command.spawn() else {
+            let _ = sender.send(Err("could not start `gh auth login`".to_owned()));
+            return;
+        };
+        let mut sent = false;
+        if let Some(stdout) = child.stdout.take() {
+            let reader = std::io::BufReader::new(stdout);
+            for line in std::io::BufRead::lines(reader).map_while(Result::ok) {
+                if !sent {
+                    if let Some(code) = one_time_code(&line) {
+                        let _ = sender.send(Ok(code));
+                        sent = true;
+                    }
+                }
+            }
+        }
+        let _ = child.wait();
+        if !sent {
+            let _ = sender.send(Err(
+                "`gh auth login` finished without printing a one-time code".to_owned(),
+            ));
+        }
+    });
+
+    receiver
+        .recv_timeout(std::time::Duration::from_secs(30))
+        .map_err(|_| "timed out waiting for GitHub to print a code".to_owned())?
+}
+
+/// Pull the device code out of gh's banner line.
+fn one_time_code(line: &str) -> Option<String> {
+    let (_, rest) = line.split_once("one-time code:")?;
+    let code = rest.trim().trim_end_matches('.').trim();
+    (!code.is_empty()).then(|| code.to_owned())
+}
+
+#[tauri::command]
+fn github_repos() -> Result<Vec<String>, String> {
+    let gh = gh_path().ok_or_else(|| "the GitHub CLI (`gh`) is not installed".to_owned())?;
+    let output = std::process::Command::new(gh)
+        .args([
+            "repo",
+            "list",
+            "--limit",
+            "100",
+            "--json",
+            "nameWithOwner",
+            "--jq",
+            ".[].nameWithOwner",
+        ])
+        .output()
+        .map_err(|error| error.to_string())?;
+    if !output.status.success() {
+        return Err(String::from_utf8_lossy(&output.stderr).trim().to_owned());
+    }
+    Ok(String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+        .map(str::to_owned)
+        .collect())
+}
+
+/// `owner/name`, with each half a plausible repository segment.
+///
+/// Checked before `gh` runs: `../escape` passed a character whitelist that
+/// allowed dots, which is exactly what a path-injection test is for.
+fn valid_repository(repo: &str) -> bool {
+    let mut parts = repo.split('/');
+    let (Some(owner), Some(name), None) = (parts.next(), parts.next(), parts.next()) else {
+        return false;
+    };
+    [owner, name].iter().all(|part| {
+        !part.is_empty()
+            && *part != "."
+            && *part != ".."
+            && part
+                .chars()
+                .next()
+                .is_some_and(|first| first.is_ascii_alphanumeric())
+            && part
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
+    })
+}
+
+/// Clone `owner/name` into the workspaces directory and return its path.
+fn clone_repo(root: &Path, repo: &str) -> Result<PathBuf, String> {
+    if !valid_repository(repo) {
+        return Err(format!("{repo:?} is not an owner/name repository"));
+    }
+    let name = repo.rsplit('/').next().unwrap_or(repo);
+    std::fs::create_dir_all(root).map_err(|error| error.to_string())?;
+    let target = root.join(project_slug(name));
+    if target.exists() {
+        return Err(format!(
+            "{} already exists; choose a different repository or remove it first",
+            target.display()
+        ));
+    }
+    let gh = gh_path().ok_or_else(|| "the GitHub CLI (`gh`) is not installed".to_owned())?;
+    let status = std::process::Command::new(gh)
+        .args(["repo", "clone", repo, &target.to_string_lossy()])
+        .status()
+        .map_err(|error| error.to_string())?;
+    if !status.success() {
+        return Err(format!("could not clone {repo}"));
+    }
+    target.canonicalize().map_err(|error| error.to_string())
+}
+
+const MANUSCRIPT_EXTENSIONS: &[&str] = &["md", "markdown", "txt", "docx", "epub", "pdf"];
+
+/// The most likely manuscript in a repository: the largest supported file that
+/// is not vendored, hidden, or a readme.
+fn find_manuscript(root: &Path) -> Option<PathBuf> {
+    fn walk(directory: &Path, depth: usize, best: &mut Option<(u64, PathBuf)>) {
+        if depth > 4 {
+            return;
+        }
+        let Ok(entries) = std::fs::read_dir(directory) else {
+            return;
+        };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            let name = entry.file_name().to_string_lossy().to_ascii_lowercase();
+            if name.starts_with('.') || matches!(name.as_str(), "node_modules" | "target" | "dist")
+            {
+                continue;
+            }
+            if path.is_dir() {
+                walk(&path, depth + 1, best);
+                continue;
+            }
+            let extension = path
+                .extension()
+                .and_then(|value| value.to_str())
+                .unwrap_or_default()
+                .to_ascii_lowercase();
+            if !MANUSCRIPT_EXTENSIONS.contains(&extension.as_str())
+                || name.starts_with("readme")
+                || name.starts_with("changelog")
+                || name.starts_with("license")
+            {
+                continue;
+            }
+            let bytes = path.metadata().map(|metadata| metadata.len()).unwrap_or(0);
+            if best.as_ref().is_none_or(|(current, _)| bytes > *current) {
+                *best = Some((bytes, path));
+            }
+        }
+    }
+    let mut best = None;
+    walk(root, 0, &mut best);
+    best.map(|(_, path)| path)
 }
 
 /// The deterministic intake script, so the UI renders one source of truth
@@ -4549,7 +4800,9 @@ fn build_intake(
             Ok(intake)
         }
         "new" => Ok(canonwright_story::intake::Intake::new_manuscript()),
-        other => Err(format!("mode must be \"new\" or \"existing\", not {other:?}")),
+        other => Err(format!(
+            "mode must be \"new\" or \"existing\", not {other:?}"
+        )),
     }
 }
 
@@ -4561,16 +4814,34 @@ fn start_story_in(
 ) -> Result<(), String> {
     let document = match request.mode.as_str() {
         "existing" => {
-            let path = request.manuscript.clone().ok_or_else(|| {
-                "a manuscript path is required for an existing draft".to_owned()
-            })?;
+            let path = request
+                .manuscript
+                .clone()
+                .ok_or_else(|| "a manuscript path is required for an existing draft".to_owned())?;
             Some(
                 canonwright_manuscript::read(Path::new(&path))
                     .map_err(|error| error.to_string())?,
             )
         }
+        "github" => {
+            let path = request
+                .manuscript
+                .clone()
+                .map(PathBuf::from)
+                .or_else(|| find_manuscript(root))
+                .ok_or_else(|| {
+                    "no manuscript found in that repository: expected a .md, .txt, .docx, \
+                     .epub or .pdf file"
+                        .to_owned()
+                })?;
+            Some(canonwright_manuscript::read(&path).map_err(|error| error.to_string())?)
+        }
         "new" => None,
-        other => return Err(format!("mode must be \"new\" or \"existing\", not {other:?}")),
+        other => {
+            return Err(format!(
+                "mode must be \"new\", \"existing\" or \"github\", not {other:?}"
+            ));
+        }
     };
 
     let mut intake = match &document {
@@ -4617,6 +4888,8 @@ fn start_story_in(
 #[derive(Debug, Default, serde::Deserialize)]
 struct StoryStartRequest {
     mode: String,
+    #[serde(default)]
+    repo: Option<String>,
     #[serde(default)]
     manuscript: Option<String>,
     #[serde(default)]
@@ -6243,6 +6516,9 @@ pub fn run() {
             add_project,
             create_project,
             story_intake,
+            github_status,
+            github_sign_in,
+            github_repos,
             export_project,
             import_project,
             import_project_into,
@@ -7451,5 +7727,59 @@ mod tests {
             ..McpServerSpec::default()
         };
         assert!(mcp_server_config_from_spec(&spec, None).is_err());
+    }
+
+    #[test]
+    fn the_device_code_is_read_out_of_the_gh_banner() {
+        assert_eq!(
+            one_time_code("! First copy your one-time code: ABCD-1234").as_deref(),
+            Some("ABCD-1234")
+        );
+        assert_eq!(
+            one_time_code("  one-time code: WXYZ-9876.  ").as_deref(),
+            Some("WXYZ-9876")
+        );
+        assert_eq!(
+            one_time_code("Opening github.com/login/device in your browser"),
+            None
+        );
+        assert_eq!(one_time_code("one-time code:"), None);
+    }
+
+    #[test]
+    fn the_manuscript_is_the_largest_supported_file() {
+        let jail = tempfile::tempdir().expect("tempdir");
+        let root = jail.path();
+        std::fs::write(root.join("README.md"), "readme").expect("readme");
+        std::fs::write(root.join("notes.txt"), "short").expect("notes");
+        std::fs::write(root.join("The Salt Road.md"), "word ".repeat(500)).expect("book");
+        std::fs::create_dir_all(root.join("node_modules")).expect("dir");
+        std::fs::write(root.join("node_modules/vendored.md"), "x".repeat(10_000)).expect("vendor");
+
+        let found = find_manuscript(root).expect("a manuscript");
+        assert_eq!(found.file_name().unwrap(), "The Salt Road.md");
+    }
+
+    #[test]
+    fn a_repository_with_no_manuscript_is_reported_not_guessed() {
+        let jail = tempfile::tempdir().expect("tempdir");
+        std::fs::write(jail.path().join("README.md"), "nothing here").expect("readme");
+        assert!(find_manuscript(jail.path()).is_none());
+    }
+
+    #[test]
+    fn a_repository_name_that_is_not_owner_slash_name_is_refused_before_gh_runs() {
+        let jail = tempfile::tempdir().expect("tempdir");
+        for bad in [
+            "nothing",
+            "a/b/c",
+            "/leading",
+            "trailing/",
+            "../escape",
+            "a b/c",
+        ] {
+            let error = clone_repo(jail.path(), bad).expect_err("invalid repository");
+            assert!(error.contains("owner/name"), "{bad}: {error}");
+        }
     }
 }

@@ -820,7 +820,15 @@ export type IntakeScript = {
 };
 
 export type StoryStartRequest = {
-  mode: "new" | "existing";
+  mode: "new" | "existing" | "github";
+  repo?: string;
   manuscript?: string;
   answers: Record<string, string>;
+};
+
+export type GithubStatus = {
+  installed: boolean;
+  authenticated: boolean;
+  account: string | null;
+  detail: string;
 };

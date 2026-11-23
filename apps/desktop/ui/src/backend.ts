@@ -5,6 +5,7 @@ import { open, save } from "@tauri-apps/plugin-dialog";
 
 import type {
   AccessMode,
+  GithubStatus,
   IntakeScript,
   StoryStartRequest,
   ChatMode,
@@ -496,6 +497,27 @@ export async function pickDirectory(title: string): Promise<string | null> {
     return typeof selected === "string" ? selected : null;
   }
   return "/mnt/disk4/repos/reference-library";
+}
+
+export async function githubStatus(): Promise<GithubStatus> {
+  if (isTauri) {
+    return invoke<GithubStatus>("github_status");
+  }
+  return { installed: true, authenticated: false, account: null, detail: "mock" };
+}
+
+export async function githubSignIn(): Promise<string> {
+  if (isTauri) {
+    return invoke<string>("github_sign_in");
+  }
+  return "ABCD-1234";
+}
+
+export async function githubRepos(): Promise<string[]> {
+  if (isTauri) {
+    return invoke<string[]>("github_repos");
+  }
+  return ["bruceamoser/the-salt-road"];
 }
 
 export async function pickManuscript(): Promise<string | null> {
