@@ -82,6 +82,25 @@ jobs:
           sha256sum * > SHA256SUMS
           cat SHA256SUMS
 
+      - name: Take the notes from CHANGELOG.md
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          # The section for this version: from its heading to the next one.
+          awk -v v="$version" '
+            $0 == "## " v { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if [ -s release-notes.md ]; then
+            echo "notes: $(wc -l < release-notes.md) lines from CHANGELOG.md"
+          else
+            rm -f release-notes.md
+            echo "no CHANGELOG section for $version; GitHub will generate notes"
+          fi
+
       - name: Publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -93,8 +112,15 @@ jobs:
             gh release upload "$TAG" release-assets/* --clobber
             gh release edit "$TAG" --latest
           else
-            gh release create "$TAG" release-assets/* \
-              --title "Canonwright $TAG" \
-              --generate-notes \
-              --latest
+            if [ -f release-notes.md ]; then
+              gh release create "$TAG" release-assets/* \
+                --title "Canonwright $TAG" \
+                --notes-file release-notes.md \
+                --latest
+            else
+              gh release create "$TAG" release-assets/* \
+                --title "Canonwright $TAG" \
+                --generate-notes \
+                --latest
+            fi
           fi
