@@ -1,0 +1,2 @@
+# Isolated project skill example
+Apply the candidate skill to the supplied fictional example as a dry run. Show the proposed actions, payloads, or user-facing report the skill calls for. Use the example's assumptions about tools and their availability. If the example explicitly describes a missing tool or a failed operation, handle that condition. The harness does not execute actions. Never claim a simulated write succeeded. Use the skill's terminology for named areas, provenance and fields.

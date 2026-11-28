@@ -10,7 +10,7 @@ use std::panic;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-/// Rotate once the log passes this size, keeping one previous file.
+/// Also split busy days into manageable segments.
 const MAX_BYTES: u64 = 4 * 1024 * 1024;
 
 /// The directory holding the database and the log.
@@ -36,14 +36,110 @@ pub fn record(level: &str, message: &str) {
     let Some(path) = log_path() else {
         return;
     };
-    if let Some(parent) = path.parent() {
-        let _ = fs::create_dir_all(parent);
+    let _ = append(&path, level, message, SystemTime::now(), MAX_BYTES);
+}
+
+fn utc_day(time: SystemTime) -> i64 {
+    (time
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
+        / 86400) as i64
+}
+
+fn day_label(day: i64) -> String {
+    let (y, m, d) = civil_from_days(day);
+    format!("{y:04}-{m:02}-{d:02}")
+}
+
+fn archive(path: &Path, day: i64) -> std::io::Result<()> {
+    for n in 1.. {
+        let next = path.with_file_name(format!("canonwright.{}.{n}.log", day_label(day)));
+        if !next.exists() {
+            return fs::rename(path, next);
+        }
     }
-    canonwright_workspace::rotate_file(&path, MAX_BYTES);
-    let Ok(mut file) = OpenOptions::new().create(true).append(true).open(&path) else {
-        return;
-    };
-    let _ = writeln!(file, "{} {level} {message}", timestamp());
+    unreachable!()
+}
+
+fn prune(directory: &Path, today: i64) -> std::io::Result<()> {
+    let oldest = day_label(today - 6);
+    for entry in fs::read_dir(directory)? {
+        let entry = entry?;
+        let name = entry.file_name();
+        let Some(parts) = name
+            .to_str()
+            .and_then(|n| n.strip_prefix("canonwright."))
+            .and_then(|n| n.strip_suffix(".log"))
+            .and_then(|n| n.split_once('.'))
+        else {
+            continue;
+        };
+        let (date, segment) = parts;
+        let valid = date.len() == 10
+            && date.bytes().enumerate().all(|(i, c)| {
+                if i == 4 || i == 7 {
+                    c == b'-'
+                } else {
+                    c.is_ascii_digit()
+                }
+            });
+        if valid
+            && date < oldest.as_str()
+            && segment.parse::<u32>().is_ok()
+            && entry.file_type()?.is_file()
+        {
+            fs::remove_file(entry.path())?;
+        }
+    }
+    Ok(())
+}
+
+fn append(
+    path: &Path,
+    level: &str,
+    message: &str,
+    now: SystemTime,
+    limit: u64,
+) -> std::io::Result<()> {
+    let dir = path.parent().ok_or(std::io::ErrorKind::InvalidInput)?;
+    fs::create_dir_all(dir)?;
+    let lock = OpenOptions::new()
+        .create(true)
+        .truncate(false)
+        .write(true)
+        .open(dir.join("canonwright.log.lock"))?;
+    lock.lock()?;
+    let today = utc_day(now);
+    let legacy = dir.join("canonwright.log.1");
+    if let Ok(meta) = fs::metadata(&legacy) {
+        archive(&legacy, utc_day(meta.modified()?))?;
+    }
+    if let Ok(meta) = fs::metadata(path) {
+        let day = utc_day(meta.modified()?);
+        if day != today || meta.len() >= limit {
+            archive(path, day)?;
+        }
+    }
+    // Clean once per UTC day and directory, including the first append after restart.
+    static LAST: std::sync::Mutex<Option<(PathBuf, i64)>> = std::sync::Mutex::new(None);
+    let mut last = LAST.lock().unwrap_or_else(|e| e.into_inner());
+    if !last.as_ref().is_some_and(|(d, t)| d == dir && *t == today) {
+        prune(dir, today)?;
+        *last = Some((dir.into(), today));
+    }
+    drop(last);
+    let mut file = OpenOptions::new().create(true).append(true).open(path)?;
+    writeln!(
+        file,
+        "{} {level} {}",
+        timestamp(),
+        message.replace(['\n', '\r'], " ")
+    )
+}
+
+pub fn event(name: &str, fields: serde_json::Value) {
+    record("INFO", &format!("{name} {fields}"));
 }
 
 /// Records startup and any panic, then returns the log path for the caller to
@@ -181,6 +277,45 @@ pub fn early_exit_for(arguments: &[String]) -> Option<i32> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn rotation_keeps_seven_utc_dates_and_splits_busy_days() {
+        let directory = tempfile::tempdir().unwrap();
+        let dir = directory.path();
+        let path = dir.join("canonwright.log");
+        let now = SystemTime::now();
+        let today = utc_day(now);
+        let segment = |day, n| dir.join(format!("canonwright.{}.{n}.log", day_label(day)));
+        fs::write(segment(today - 7, 1), "expired").unwrap();
+        fs::write(segment(today - 6, 1), "retained").unwrap();
+        fs::write(dir.join("other.log"), "unrelated").unwrap();
+        fs::write(&path, "yesterday").unwrap();
+        fs::File::open(&path)
+            .unwrap()
+            .set_modified(now - std::time::Duration::from_secs(86400))
+            .unwrap();
+        for msg in ["one", "two", "three"] {
+            append(&path, "INFO", msg, now, 1).unwrap();
+        }
+        assert!(!segment(today - 7, 1).exists());
+        assert!(segment(today - 6, 1).exists());
+        assert!(dir.join("other.log").exists());
+        assert_eq!(
+            fs::read_to_string(segment(today - 1, 1)).unwrap(),
+            "yesterday"
+        );
+        assert!(
+            fs::read_to_string(segment(today, 1))
+                .unwrap()
+                .contains("INFO one")
+        );
+        assert!(
+            fs::read_to_string(segment(today, 2))
+                .unwrap()
+                .contains("INFO two")
+        );
+        assert!(fs::read_to_string(path).unwrap().contains("INFO three"));
+    }
 
     #[test]
     fn the_timestamp_is_a_real_utc_instant() {

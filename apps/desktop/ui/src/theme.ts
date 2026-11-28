@@ -11,7 +11,7 @@ function systemTheme(): ResolvedTheme {
 
 export function storedChoice(): ThemeChoice {
   const stored = window.localStorage.getItem(STORAGE_KEY);
-  return stored === "light" || stored === "dark" || stored === "system" ? stored : "system";
+  return stored === "light" || stored === "dark" || stored === "system" ? stored : "light";
 }
 
 /** Paint the theme before React renders, so the first frame is not the wrong colour. */

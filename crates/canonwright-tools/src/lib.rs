@@ -1203,6 +1203,8 @@ pub struct ToolContext {
     /// usable without an outside-access grant. On by default; a locked-down
     /// deployment can turn it off and require a grant like anywhere else.
     pub scratch_access: bool,
+    /// Per-turn OS-user file access, set only by the host for Full Access.
+    pub full_path_access: bool,
     pub search: Option<Arc<dyn WorkspaceSearch>>,
     pub checkpoints: Option<Arc<dyn CheckpointSink>>,
     pub memory: Option<Arc<dyn MemoryStore>>,
@@ -1243,6 +1245,7 @@ impl Clone for ToolContext {
             read_files_max: self.read_files_max,
             log_retention_days: self.log_retention_days,
             scratch_access: self.scratch_access,
+            full_path_access: self.full_path_access,
             search: self.search.clone(),
             checkpoints: self.checkpoints.clone(),
             memory: self.memory.clone(),
@@ -1281,6 +1284,7 @@ impl ToolContext {
             read_files_max: 20,
             log_retention_days: 5,
             scratch_access: true,
+            full_path_access: false,
             search: None,
             checkpoints: None,
             memory: None,
@@ -1379,7 +1383,7 @@ impl ToolContext {
             }
             resolved.ok_or_else(|| ToolError::OutsideRoot(path.display().to_string()))?
         };
-        if self
+        if self.full_path_access || self
             .outside_grants
             .iter()
             .any(|grant| resolved.starts_with(&grant.path) && (!write || grant.write_access))
@@ -1516,6 +1520,36 @@ impl ToolRegistry {
     #[must_use]
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// File inspection for a book conversation or an assigned book worker.
+    #[must_use]
+    pub fn with_book_reads() -> Self {
+        let mut registry = Self::new();
+        registry.register(ReadFileTool);
+        registry.register(ReadSpillTool);
+        registry.register(ListDirTool);
+        registry.register(GrepTool);
+        registry.register(ListProjectSourcesTool);
+        registry.register(ReadRepoFileTool);
+        registry.register(ListRepoDirTool);
+        registry
+    }
+
+    /// Expose author decisions to the interactive book session.
+    pub fn enable_book_questions(&mut self) {
+        self.register(AskQuestionTool);
+        self.register(ListQuestionsTool);
+    }
+
+    /// Interactive book chat can use host tools when the user selects Full Access.
+    pub fn enable_book_host_tools(&mut self) {
+        self.register(StatFileTool);
+        self.register(WriteFileTool);
+        self.register(EditFileTool);
+        self.register(RunCommandTool);
+        self.register(GitStatusTool);
+        self.register(GitDiffTool);
     }
 
     #[must_use]
@@ -1893,7 +1927,7 @@ impl ToolRegistry {
             normalize_argument_aliases(&tool.definition().input_schema, &mut arguments);
             return finish_result(tool.execute(arguments, context).await, context);
         }
-        if name == TOOL_SEARCH {
+        if self.grouped && name == TOOL_SEARCH {
             let query = optional_string(&arguments, "query").unwrap_or_default();
             let domain = optional_string(&arguments, "domain");
             let server = optional_string(&arguments, "server");
@@ -18841,6 +18875,25 @@ invariants:
             .await
             .expect("invariants");
         assert!(invariants.content.contains("passed"));
+    }
+
+    #[tokio::test]
+    async fn full_access_book_chat_can_read_author_supplied_external_paths() {
+        let book = tempdir().unwrap();
+        let reference = tempdir().unwrap();
+        let path = reference.path().join("layout.txt");
+        std::fs::write(&path, "Reference trim").unwrap();
+        let mut ctx = context(book.path());
+        ctx.scratch_access = false;
+        let read = json!({"path":path});
+        assert!(ReadFileTool.execute(read.clone(), &ctx).await.is_err());
+        ctx.full_path_access = true;
+        let files = ListDirTool.execute(json!({"path":reference.path()}), &ctx).await.unwrap();
+        assert!(files.content.contains("layout.txt"));
+        let result = ReadFileTool.execute(read.clone(), &ctx).await.unwrap();
+        assert!(result.content.contains("Reference trim"));
+        ctx.full_path_access = false;
+        assert!(ReadFileTool.execute(read, &ctx).await.is_err());
     }
 
     struct AnsweringQuestions;

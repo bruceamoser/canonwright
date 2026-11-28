@@ -18,6 +18,7 @@ keyring = ["canonwright-governance/keyring"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
+tempfile = "3"
 tauri = { version = "2", features = [] }
 tauri-plugin-dialog = "2"
 tauri-plugin-notification = "2"
@@ -64,5 +65,4 @@ png = "0.18"
 glib = "0.18"
 
 [dev-dependencies]
-tempfile = "3"
 tokio = { version = "1", features = ["macros", "rt"] }

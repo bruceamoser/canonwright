@@ -83,6 +83,7 @@ const panelTabs: { id: PanelTab; label: string }[] = [
 ];
 
 export type ProjectPanelProps = {
+  embedded?: boolean;
   tab: PanelTab;
   onTab: (tab: PanelTab) => void;
   onClose: () => void;
@@ -306,8 +307,9 @@ export default function ProjectPanel(props: ProjectPanelProps) {
   return (
     <aside
       aria-label="Project workspace"
-      className="flex min-h-0 w-full shrink-0 flex-col border-l border-obd-line bg-obd-surface"
+      className={`flex min-h-0 w-full flex-col bg-obd-surface ${props.embedded ? "flex-1" : "shrink-0 border-l border-obd-line"}`}
     >
+      {!props.embedded && <>
       <div className="flex h-14 shrink-0 items-center justify-between border-b border-obd-line px-3.5">
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
@@ -366,6 +368,8 @@ export default function ProjectPanel(props: ProjectPanelProps) {
           ))}
         </div>
       </div>
+
+      </>}
 
       {dataError !== null && (
         <p className="shrink-0 border-b border-obd-line px-3 py-2 text-[10px] leading-4 text-obd-warning">

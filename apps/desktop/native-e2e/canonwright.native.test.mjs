@@ -14,15 +14,6 @@ import {
   waitFor,
 } from "./webdriver.mjs";
 
-const labelCount = [
-  "Workspace",
-  "Agents",
-  "References",
-  "Knowledge",
-  "Retrieval",
-  "Memory",
-];
-
 let fixture;
 let mock;
 let driver;
@@ -62,24 +53,19 @@ after(async () => {
   await fixture?.cleanup();
 });
 
-test("native app shows counts, agents, chat, and copy controls", { timeout: 60_000 }, async () => {
+test("native book navigation, agents, chat, and copy controls", { timeout: 60_000 }, async () => {
+  const openBook = await waitFor(
+    () => client.find("xpath", "//button[normalize-space(.)='Open book']"),
+    { label: "open book" },
+  );
+  await client.click(openBook);
   await waitFor(
     () => client.find("css selector", "textarea[placeholder^='Ask Canonwright']"),
     { label: "chat composer" },
   );
-
-  for (const label of labelCount) {
-    const button = await client.find(
-      "xpath",
-      `//button[starts-with(normalize-space(.), '${label} (')]`,
-    );
-    assert.ok(button, `${label} count should be visible`);
+  for (const label of ["Files", "Manuscript", "Canon", "Review", "Agents", "Skills"]) {
+    await waitFor(() => client.find("xpath", `//nav[@aria-label='Book detail areas']//button[normalize-space(.)='${label}']`), { label });
   }
-
-  const agents = await client.find(
-    "xpath",
-    "//button[starts-with(normalize-space(.), 'Agents (')]",
-  );
   await waitFor(() => Promise.resolve(existsSync(fixture.dbPath)), {
     label: "isolated database",
   });
@@ -104,10 +90,9 @@ test("native app shows counts, agents, chat, and copy controls", { timeout: 60_0
       now,
     );
 
-  await waitFor(
-    () => client.find("xpath", "//button[starts-with(normalize-space(.), 'Agents (1)')]"),
-    { label: "running agent count" },
-  );
+  const viewMenu = await client.find("xpath", "//button[@role='menuitem' and normalize-space(.)='View']");
+  await client.click(viewMenu);
+  const agents = await client.find("xpath", "//*[@role='menu' and @aria-label='View menu']//*[normalize-space(.)='Session subagents']");
   await client.click(agents);
   await waitFor(() => client.find("css selector", "aside[aria-label='Project workspace']"), {
     label: "project panel",
@@ -126,10 +111,6 @@ test("native app shows counts, agents, chat, and copy controls", { timeout: 60_0
     .run(now - 5_000, now - 5_000, "native-seeded-agent");
   database.close();
 
-  await waitFor(
-    () => client.find("xpath", "//button[starts-with(normalize-space(.), 'Agents (0)')]"),
-    { label: "cleaned-up agent count", timeout: 15_000 },
-  );
   await waitFor(
     () => client.find("xpath", "//*[contains(., 'No subagents yet')]"),
     { label: "cleaned-up Agents panel", timeout: 15_000 },

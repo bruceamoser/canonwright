@@ -57,7 +57,7 @@ export default function ArtifactViewer({
           }
         } else if (
           artifact.content !== undefined &&
-          artifact.content.length > 0
+          artifact.content.length > 0 && !(artifact.kind === "file" && /\.pdf$/i.test(uri))
         ) {
           if (request.current === sequence) {
             setMarkdown(artifact.content);
@@ -287,52 +287,8 @@ function PdfPreview({
   file: ProjectFileView | null;
   title: string;
 }) {
-  const [mode, setMode] = useState<"rendered" | "text">(
-    file?.data_url ? "rendered" : "text",
-  );
-  const extracted = file?.content ?? "";
-  const canRender = typeof file?.data_url === "string";
-  return (
-    <div className="flex h-full min-h-0 flex-col gap-2">
-      <div className="flex shrink-0 items-center gap-1">
-        <button
-          type="button"
-          disabled={!canRender}
-          onClick={() => setMode("rendered")}
-          className={`rounded px-2 py-1 text-[10px] ${
-            mode === "rendered"
-              ? "bg-obd-accent/15 text-obd-accent"
-              : "bg-obd-raised text-obd-muted hover:bg-obd-raised-strong disabled:opacity-40"
-          }`}
-        >
-          Rendered
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode("text")}
-          className={`rounded px-2 py-1 text-[10px] ${
-            mode === "text"
-              ? "bg-obd-accent/15 text-obd-accent"
-              : "bg-obd-raised text-obd-muted hover:bg-obd-raised-strong"
-          }`}
-        >
-          Text
-        </button>
-        <span className="ml-auto font-mono text-[9px] text-obd-subtle">
-          {formatFileSize(file?.size ?? 0)}
-        </span>
-      </div>
-      {mode === "rendered" && canRender ? (
-        <PdfViewer dataUrl={file.data_url ?? ""} title={title} />
-      ) : extracted.trim().length === 0 ? (
-        <EmptyPreview message="This PDF has no extractable text; it may be a scanned document. Use Open in system viewer." />
-      ) : (
-        <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap rounded-lg border border-obd-line bg-obd-inset p-2 font-mono text-[10px] leading-5 text-obd-body">
-          {extracted}
-        </pre>
-      )}
-    </div>
-  );
+  return file?.data_url ? <PdfViewer key={file.path} dataUrl={file.data_url} title={title} /> :
+    <EmptyPreview message="The original PDF could not be loaded." />;
 }
 
 function isHtmlArtifact(artifact: Artifact): boolean {

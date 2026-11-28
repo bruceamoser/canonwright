@@ -114,3 +114,38 @@ pub fn repos(token: &str) -> Result<Vec<String>, String> {
         .map(str::to_owned)
         .collect())
 }
+
+pub fn open_issue(token: &str, repo: &str, title: &str, body: &str) -> Result<String, String> {
+    let valid = |segment: &str| {
+        !segment.is_empty()
+            && !matches!(segment, "." | "..")
+            && segment
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || b"-_.".contains(&byte))
+    };
+    let (owner, name) = repo
+        .split_once('/')
+        .ok_or_else(|| "Expected owner/repository".to_owned())?;
+    if !valid(owner) || !valid(name) {
+        return Err("Invalid repository name".to_owned());
+    }
+    let response = client()?
+        .post(format!("{API}/repos/{owner}/{name}/issues"))
+        .timeout(std::time::Duration::from_secs(30))
+        .bearer_auth(token)
+        .json(&serde_json::json!({ "title": title, "body": body }))
+        .send()
+        .map_err(|error| format!("could not reach GitHub: {error}"))?;
+    if !response.status().is_success() {
+        return Err(format!(
+            "GitHub answered {}. Check repository access and Issues write permission.",
+            response.status()
+        ));
+    }
+    let result: serde_json::Value = response.json().map_err(|error| error.to_string())?;
+    result
+        .get("html_url")
+        .and_then(serde_json::Value::as_str)
+        .map(str::to_owned)
+        .ok_or_else(|| "GitHub returned no issue URL".to_owned())
+}

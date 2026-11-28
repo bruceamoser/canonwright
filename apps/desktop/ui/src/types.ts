@@ -821,6 +821,7 @@ export type IntakeScript = {
 
 export type StoryStartRequest = {
   mode: "new" | "existing" | "github";
+  studio?: boolean;
   kind?: "narrative" | "rules" | "hybrid";
   repo?: string;
   manuscript?: string;

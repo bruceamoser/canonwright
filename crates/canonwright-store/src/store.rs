@@ -1209,6 +1209,26 @@ impl Store {
             .transpose()
     }
 
+    /// Original desktop builds returned findings in chat before they had a durable review queue.
+    pub fn legacy_book_findings(&self, workspace: WorkspaceId) -> Result<Vec<String>, StoreError> {
+        let connection = self.reader()?;
+        let mut statement = connection.prepare(
+            "SELECT json_extract(call.value, '$.function.arguments')
+FROM sessions s
+JOIN session_messages m ON m.session_id = s.id AND m.role = 'assistant'
+JOIN json_each(m.content_json, '$.tool_calls') call
+JOIN session_messages result ON result.session_id = s.id AND result.role = 'tool'
+ AND json_extract(result.content_json,'$.tool_call_id') = json_extract(call.value,'$.id')
+WHERE s.workspace_id = ?1 AND s.deleted_at IS NULL
+ AND json_extract(call.value,'$.function.name') = 'book_propose_finding'
+ AND json_extract(result.content_json,'$.is_error') = 0
+ AND json_extract(result.content_json,'$.content') LIKE 'Presented % for review.'
+ORDER BY m.created_at, m.seq, call.key",
+        )?;
+        let rows = statement.query_map([workspace.to_string()], |row| row.get(0))?;
+        Ok(rows.collect::<Result<_, _>>()?)
+    }
+
     pub fn list_sessions(&self, limit: u32) -> Result<Vec<SessionSummary>, StoreError> {
         let connection = self.reader()?;
         let mut statement = connection.prepare(

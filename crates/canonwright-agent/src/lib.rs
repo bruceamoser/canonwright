@@ -1110,6 +1110,7 @@ impl<T: HttpTransport> Agent<T> {
             let mut context = ToolContext::new(self.workspace.clone());
             context.allow_writes = self.config.policy != ToolPolicy::ReadOnly;
             context.allow_commands = self.config.policy == ToolPolicy::FullAccess;
+            context.full_path_access = self.config.policy == ToolPolicy::FullAccess;
             context.read_files_max = self.config.read_files_max.max(1);
             context.log_retention_days = self.config.log_retention_days;
             context.search = self.search.clone();

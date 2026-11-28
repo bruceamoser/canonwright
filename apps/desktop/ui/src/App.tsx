@@ -101,6 +101,8 @@ import {
   workspaceIndexStatus as fetchIndexStatus,
 } from "./backend";
 import ProductShell from "./product/ProductShell";
+import BookStudio from "./product/BookStudio";
+import type { BookAction, BookStudioHandle } from "./product/studio";
 import AppMenuBar from "./AppMenuBar";
 import type { AppMenu } from "./AppMenuBar";
 import type { GithubStatus, IntakeScript } from "./types";
@@ -472,6 +474,10 @@ export default function App() {
   // The product shell owns everything until a project is opened. Without this,
   // a restored session would drop the writer straight into a project.
   const [enteredProject, setEnteredProject] = useState(false);
+  const [studioProject, setStudioProject] = useState<WorkspaceSummary | null>(null);
+  const [studioActions, setStudioActions] = useState<BookAction[]>([]);
+  const [collapsedBook, setCollapsedBook] = useState<string | null>(null);
+  const studioRef = useRef<BookStudioHandle>(null);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [workspacePath, setWorkspacePath] = useState("");
   const [entries, setEntries] = useState<ChatEntry[]>([]);
@@ -1058,6 +1064,11 @@ export default function App() {
       };
       followRef.current = pendingScrollRestoreRef.current.follow;
       visibleRunRef.current = run === undefined ? null : project.path;
+      setStudioProject(project);
+      setCollapsedBook(null);
+      setPanelOpen(false);
+      setSessionQuery("");
+      setStudioActions([]);
       setEnteredProject(true);
       setActiveProjectId(project.id);
       setWorkspacePath(project.path);
@@ -1065,7 +1076,7 @@ export default function App() {
       rememberProjectPath(project.path);
       setSessionId(run?.sessionId ?? null);
       setEntries(run === undefined ? [] : [...run.entries]);
-      setPermissionMode(run?.permissionMode ?? "read");
+      setPermissionMode(run?.permissionMode ?? "ask-commands");
       setAccessRequest(run?.pendingAccessRequest ?? null);
       setToolApproval(run?.pendingToolApproval ?? null);
       setPendingApproval(run?.pendingApproval ?? null);
@@ -1234,7 +1245,7 @@ export default function App() {
     setEntries([]);
     setTotalDurationMs(0);
     setPreview(null);
-    setPermissionMode("read");
+    setPermissionMode(studioProject ? "ask-commands" : "read");
     setAccessRequest(null);
     setToolApproval(null);
     setBusy(false);
@@ -1243,7 +1254,7 @@ export default function App() {
     setError(null);
     setShowJumpToLatest(false);
     composerRef.current?.focus();
-  }, [captureCurrentScroll]);
+  }, [captureCurrentScroll, studioProject]);
 
   const changePermissionMode = useCallback(
     (mode: PermissionMode) => {
@@ -1500,6 +1511,13 @@ export default function App() {
     if ((!resume && text.length === 0 && pending.length === 0) || workspacePath.length === 0) {
       return;
     }
+    let writing;
+    try {
+      writing = await studioRef.current?.prepare();
+    } catch (cause) {
+      setError(describeError(cause));
+      return;
+    }
     // Only the same project is serialized. Another project may keep a turn
     // streaming while this one starts a new one.
     const activeRun = runsRef.current.get(workspacePath);
@@ -1709,6 +1727,7 @@ export default function App() {
           readFilesMax,
           logRetentionDays,
           strictTools,
+          writing,
         },
         (event) => {
           if (event.type === "content" || event.type === "reasoning") {
@@ -1723,6 +1742,12 @@ export default function App() {
           }
           let eventPreview: PreviewTarget | null = null;
           if (event.type === "tool_result") {
+            if (writing && visibleRunRef.current === runKey && !event.is_error && event.metadata && typeof event.metadata === "object") {
+              const action = event.metadata as BookAction;
+              if (action.book_records_changed || action.book_skill || action.book_changed || action.book_built || action.book_show || action.book_reference) {
+                setStudioActions((previous) => [...previous, action]);
+              }
+            }
             const nextPreview = previewTargetFromMetadata(
               event.metadata,
               workspacePath,
@@ -2077,6 +2102,8 @@ export default function App() {
         };
         followRef.current = pendingScrollRestoreRef.current.follow;
         if (project !== undefined) {
+          if (project.id !== activeProjectId) { setStudioActions([]); setCollapsedBook(null); }
+          setStudioProject(project);
           setActiveProjectId(project.id);
           setWorkspacePath(project.path);
           rememberProjectPath(project.path);
@@ -2114,7 +2141,7 @@ export default function App() {
         setError(describeError(cause));
       }
     },
-    [captureCurrentScroll, projects, workspacePath],
+    [activeProjectId, captureCurrentScroll, projects, workspacePath],
   );
 
   // A notification click focuses the window; the host then names the session it
@@ -2267,6 +2294,8 @@ export default function App() {
         selectProject(remaining[0]);
       } else {
         setActiveProjectId(null);
+        setStudioProject(null);
+        setEnteredProject(false);
         setWorkspacePath("");
         setSessionId(null);
         setEntries([]);
@@ -2570,6 +2599,11 @@ export default function App() {
         },
         {
           label: "Agents",
+          disabled: !studioProject && activeProject === null,
+          onSelect: () => { if (studioRef.current) { setPanelOpen(false); studioRef.current.showAgents(); } else openPanel("agents"); },
+        },
+        {
+          label: "Session subagents",
           checked: panelOpen && panelTab === "agents",
           disabled: activeProject === null,
           onSelect: () => openPanel("agents"),
@@ -2697,17 +2731,238 @@ export default function App() {
     { disabled: workspacePath.length === 0 },
   );
 
-  if (!enteredProject) {
+  function openBook(project: WorkspaceSummary) {
+    setProjectDialogOpen(false);
+    selectProject(project);
+  }
+
+  if (!enteredProject && studioProject === null) {
     return (
       <ProductShell
         projects={projects}
-        onOpen={(project) => selectProject(project)}
-        onProjectsChanged={() => {
-          void loadProjects();
-        }}
+        onOpen={openBook}
+        onProjectsChanged={() => { void loadProjects(); }}
       />
     );
   }
+
+  const chatBody = (
+        <div
+          {...chatDrop.zoneProps}
+          className={`relative flex min-h-0 flex-1 flex-col ${
+            chatDrop.active ? "ring-2 ring-inset ring-obd-accent/30" : ""
+          }`}
+        >
+          {chatDrop.active && (
+            <div className="pointer-events-none absolute inset-0 z-20 flex items-start justify-center bg-obd-accent/[0.04] pt-6 text-[12px] font-medium text-obd-accent">
+              Drop files to attach them to the chat
+            </div>
+          )}
+          <div className="relative min-h-0 flex-1">
+            <div
+              ref={scrollRef}
+              onScroll={handleChatScroll}
+              onKeyDown={handleChatKeyDown}
+              tabIndex={0}
+              role="region"
+              aria-label="Chat transcript"
+              data-testid="chat-scroll"
+              className="chat-scroll h-full overflow-y-auto outline-none"
+            >
+            <div className="chat-column space-y-6 px-5 py-6">
+              {entries.length === 0 && (
+                <div className={studioProject ? "pt-6" : "pt-16"}>
+                  <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl border border-obd-accent/20 bg-obd-accent/10 text-obd-accent">
+                    <Bot size={22} />
+                  </div>
+                  <h2 className="mt-4 text-center text-lg font-medium tracking-tight text-obd-text">
+                    {activeProject === null ? "Open a project to begin" : "What are we writing?"}
+                  </h2>
+                  <p className="mx-auto mt-1 max-w-md text-center text-[12px] leading-5 text-obd-subtle">
+                    {activeProject === null
+                      ? "Choose a project directory so the agent has a workspace and a place to keep session context."
+                      : "Ask about the manuscript, plan a scene, or run a continuity check. Read and search tools run freely; edits and commands follow the access mode."}
+                  </p>
+                  {activeProject === null ? (
+                    <div className="mt-5 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => setProjectDialogOpen(true)}
+                        className="flex items-center gap-1.5 rounded-md bg-obd-accent px-3 py-2 text-[12px] font-medium text-obd-on-accent hover:bg-obd-accent"
+                      >
+                        <Plus size={14} /> New project
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mx-auto mt-5 flex max-w-xl flex-wrap justify-center gap-2">
+                      {(studioProject ? [
+                        "What’s in this book?",
+                        "Review the opening and tell me what needs attention.",
+                        "Create a skill that ",
+                      ] : [
+                        "Start from an existing draft: import a .md, .docx, .epub or .pdf.",
+                        "Show me the story brief for the next scene.",
+                        "Run story_lint and tell me what needs attention.",
+                      ]).map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          type="button"
+                          onClick={() => composerRef.current?.setDraft(suggestion)}
+                          className="rounded-full border border-obd-line bg-obd-raised px-3 py-1.5 text-[11px] text-obd-muted hover:bg-obd-raised-strong hover:text-obd-text"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {entries.map((entry, index) => {
+                const running =
+                  busy &&
+                  entry.role === "assistant" &&
+                  entry.id ===
+                    [...entries].reverse().find((item) => item.role === "assistant")?.id;
+                const lastUser =
+                  entry.role === "user" &&
+                  index ===
+                    entries.reduce(
+                      (last, item, itemIndex) =>
+                        item.role === "user" ? itemIndex : last,
+                      -1,
+                    );
+                const branchable =
+                  entry.role === "user" &&
+                  sessionId !== null &&
+                  entry.seq !== undefined &&
+                  entry.seq > 0;
+                return (
+                  <MessageCard
+                    key={entry.id}
+                    entry={entry}
+                    nowMs={running ? nowMs : undefined}
+                    workspacePath={workspacePath}
+                    onOpenPreview={openPreview}
+                    onRetry={lastUser && !busy ? () => void send("", [], true) : undefined}
+                    onEdit={
+                      branchable
+                        ? () => {
+                            composerRef.current?.setDraft(entry.text);
+                            setPendingFork({ seq: entry.seq ?? 0 });
+                          }
+                        : undefined
+                    }
+                    onReviewChanges={
+                      entry.role === "assistant" && (entry.checkpointCount ?? 0) > 0
+                        ? () => openPanel("checkpoints")
+                        : undefined
+                    }
+                    running={running}
+                  />
+                );
+              })}
+
+              {busy && (
+                <div className="flex items-center gap-2 text-[12px] text-obd-accent">
+                  <Loader2 size={14} className="animate-spin" />
+                  Working through the workspace…
+                </div>
+              )}
+            </div>
+            </div>
+            {showJumpToLatest && (
+              <button
+                type="button"
+                aria-label="Jump to latest"
+                onClick={jumpToLatest}
+                className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-obd-line bg-obd-surface/95 px-3 py-1.5 text-[11px] font-medium text-obd-text shadow-lg backdrop-blur hover:bg-obd-surface"
+              >
+                <ArrowDown size={12} /> Jump to latest
+              </button>
+            )}
+          </div>
+
+          <ChatComposer
+            ref={composerRef}
+            workspacePath={workspacePath}
+            hasProject={activeProject !== null}
+            busy={busy}
+            stopRequested={stopRequested}
+            permissionMode={permissionMode}
+            mode={chatMode}
+            onMode={setChatMode}
+            model={model}
+            thinking={thinking}
+            accessNotice={accessNotice}
+            error={error}
+            queuedMessages={queuedMessages}
+            branchNotice={
+              pendingFork === null
+                ? null
+                : "Sending will branch from the edited message; the original conversation is kept."
+            }
+            onCancelBranch={() => setPendingFork(null)}
+            onPermissionMode={changePermissionMode}
+            onOpenSettings={composerOpenModel}
+            onDismissAccessNotice={dismissAccessNotice}
+            onDismissError={dismissError}
+            onRemoveQueued={removeQueued}
+            onSend={composerSend}
+            onSteer={composerSteer}
+            onQueue={queue}
+            onStop={composerStop}
+            onError={composerError}
+          />
+        </div>
+  );
+
+  const projectPane = (tab: PanelTab, embedded = false) => (
+            <ProjectPanel
+              tab={tab}
+              embedded={embedded}
+              onTab={setPanelTab}
+              onClose={() => setPanelOpen(false)}
+              project={activeProject}
+              indexSummary={indexSummary}
+              indexing={indexing}
+              indexError={indexError}
+              onRefreshIndex={() => void refreshWorkspaceIndex()}
+              memories={memoryList}
+              memoryError={memoryError}
+              onForgetMemory={(id) => void forgetMemory(id)}
+              checkpoints={checkpointList}
+              restoringCheckpoint={restoringCheckpoint}
+              checkpointDiffId={checkpointDiffId}
+              checkpointDiffText={checkpointDiffText}
+              checkpointNotice={checkpointNotice}
+              checkpointError={checkpointError}
+              onShowDiff={(id) => void showCheckpointDiff(id)}
+              onRestore={(id) => void restoreCheckpoint(id)}
+              foundation={foundation}
+              apiKeyStatus={apiKeyStatus}
+              sessionId={sessionId}
+              onOpenSettings={openSettings}
+              onArtifact={openArtifact}
+              onImportBundle={() => void startMergeImport()}
+              revision={projectRevision}
+              onWorkspaceChanged={markWorkspaceChanged}
+            />
+  );
+
+  const previewPane = preview !== null && (
+        <PreviewPane
+          target={preview}
+          workspacePath={workspacePath}
+          revision={projectRevision}
+          width={previewWidth}
+          reserved={(studioProject ? 550 : 720) + (panelOpen ? panelWidth + 4 : 0)}
+          onResizeStart={startPreviewResize}
+          onClose={() => setPreview(null)}
+          onArtifact={openArtifact}
+          onWorkspaceChanged={markWorkspaceChanged}
+        />
+  );
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-[var(--obd-bg)] text-[var(--obd-text)]">
@@ -2716,6 +2971,60 @@ export default function App() {
       </div>
       <AppMenuBar menus={menus} />
       <main className="flex min-h-0 flex-1 overflow-hidden bg-obd-surface text-obd-strong">
+      {studioProject ? (
+        <BookStudio
+          key={studioProject.id}
+          ref={studioRef}
+          project={studioProject}
+          onReview={message => { void send(message); }}
+          engineBusy={busy}
+          actions={studioActions}
+          chat={<div className="studio-engine flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-obd-surface text-obd-text">
+            {chatBody}
+          </div>}
+          preview={previewPane}
+          onClosePreview={() => setPreview(null)}
+          files={projectPane("workspace", true)}
+          navigation={(open, active, areas, selectedArea, openArea) => <>
+            <button type="button" className="studio-new-session" disabled={busy} onClick={newSession}>
+              <Plus size={16} /> New session
+            </button>
+            <label className="studio-session-search">
+              <Search size={14} />
+              <input type="search" aria-label="Search book sessions" placeholder="Search sessions"
+                value={sessionQuery} onChange={(event) => setSessionQuery(event.target.value)} />
+            </label>
+            <p className="studio-nav-label">Books</p>
+            {projects.map((book) => (
+              <div key={book.id} className="studio-nav-book">
+                <button type="button" className="studio-book-row" aria-current={book.id === studioProject.id ? "page" : undefined}
+                  disabled={busy} title={book.name} aria-expanded={book.id === studioProject.id && collapsedBook !== book.id} onClick={() => { if (book.id === studioProject.id) setCollapsedBook(collapsedBook === book.id ? null : book.id); else void studioRef.current?.prepare().then(() => openBook(book)).catch((cause: unknown) => setError(describeError(cause))); }}>
+                  {book.id === studioProject.id && collapsedBook !== book.id ? <ChevronDown size={12}/> : <ChevronRight size={12}/>}<Folder size={14} /><span>{book.name}</span>
+                </button>
+                {book.id === studioProject.id && collapsedBook !== book.id && <div className="studio-book-shortcuts">
+                  <button type="button" aria-current={active === "manuscript" || undefined} onClick={() => open("manuscript")}><FileText size={13}/>Manuscript</button>
+                  <button type="button" aria-current={active === "canon" || undefined} onClick={() => open("canon")}><BookOpen size={13}/>Canon</button>
+                  {active === "canon" && <div className="studio-nav-areas">{areas.map(name =>
+                    <button type="button" key={name} aria-current={name === selectedArea || undefined} onClick={() => openArea(name)}>{name}</button>
+                  )}</div>}
+                  <button type="button" aria-current={active === "review" || undefined} onClick={() => open("review")}><CheckCircle2 size={13}/>Review</button>
+                  <button type="button" aria-current={active === "agents" || undefined} onClick={() => open("agents")}><Bot size={13}/>Agents</button>
+                  <p className="studio-nav-label">Sessions</p>
+                </div>}
+                {book.id === studioProject.id && collapsedBook !== book.id && projectSessions.filter((session) =>
+                  (session.title ?? "Discussion").toLowerCase().includes(sessionQuery.trim().toLowerCase())
+                ).map((session) => (
+                  <button type="button" className="studio-session-row" key={session.id} aria-current={session.id === sessionId ? "page" : undefined}
+                    disabled={busy} title={session.title ?? "Discussion"} onClick={() => void openSession(session)}>
+                    <MessageSquare size={12}/><span>{session.title ?? "Discussion"}</span>
+                  </button>
+                ))}
+              </div>
+            ))}
+          </>}
+          onLibrary={() => { setStudioProject(null); setEnteredProject(false); }}
+        />
+      ) : <>
       {sidebarOpen && (
         <aside className="flex w-[276px] shrink-0 flex-col border-r border-obd-line bg-obd-surface">
           <div className="flex h-14 items-center gap-2 border-b border-obd-line px-3">
@@ -2726,6 +3035,8 @@ export default function App() {
               <p className="truncate text-[13px] font-semibold tracking-tight">Canonwright</p>
               <p className="truncate text-[10px] text-obd-subtle">narrative harness</p>
             </div>
+            <button type="button" className="text-[11px] text-obd-accent"
+              onClick={() => setEnteredProject(false)}>Library</button>
             <button
               type="button"
               aria-label="Collapse sidebar"
@@ -3036,185 +3347,12 @@ export default function App() {
           )}
         </header>
 
-        <div
-          {...chatDrop.zoneProps}
-          className={`relative flex min-h-0 flex-1 flex-col ${
-            chatDrop.active ? "ring-2 ring-inset ring-obd-accent/30" : ""
-          }`}
-        >
-          {chatDrop.active && (
-            <div className="pointer-events-none absolute inset-0 z-20 flex items-start justify-center bg-obd-accent/[0.04] pt-6 text-[12px] font-medium text-obd-accent">
-              Drop files to attach them to the chat
-            </div>
-          )}
-          <div className="relative min-h-0 flex-1">
-            <div
-              ref={scrollRef}
-              onScroll={handleChatScroll}
-              onKeyDown={handleChatKeyDown}
-              tabIndex={0}
-              role="region"
-              aria-label="Chat transcript"
-              data-testid="chat-scroll"
-              className="chat-scroll h-full overflow-y-auto outline-none"
-            >
-            <div className="chat-column space-y-6 px-5 py-6">
-              {entries.length === 0 && (
-                <div className="pt-16">
-                  <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl border border-obd-accent/20 bg-obd-accent/10 text-obd-accent">
-                    <Bot size={22} />
-                  </div>
-                  <h2 className="mt-4 text-center text-lg font-medium tracking-tight text-obd-text">
-                    {activeProject === null ? "Open a project to begin" : "What are we writing?"}
-                  </h2>
-                  <p className="mx-auto mt-1 max-w-md text-center text-[12px] leading-5 text-obd-subtle">
-                    {activeProject === null
-                      ? "Choose a project directory so the agent has a workspace and a place to keep session context."
-                      : "Ask about the manuscript, plan a scene, or run a continuity check. Read and search tools run freely; edits and commands follow the access mode."}
-                  </p>
-                  {activeProject === null ? (
-                    <div className="mt-5 flex justify-center">
-                      <button
-                        type="button"
-                        onClick={() => setProjectDialogOpen(true)}
-                        className="flex items-center gap-1.5 rounded-md bg-obd-accent px-3 py-2 text-[12px] font-medium text-obd-on-accent hover:bg-obd-accent"
-                      >
-                        <Plus size={14} /> New project
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="mx-auto mt-5 flex max-w-xl flex-wrap justify-center gap-2">
-                      {[
-                        "Start from an existing draft: import a .md, .docx, .epub or .pdf.",
-                        "Show me the story brief for the next scene.",
-                        "Run story_lint and tell me what needs attention.",
-                      ].map((suggestion) => (
-                        <button
-                          key={suggestion}
-                          type="button"
-                          onClick={() => composerRef.current?.setDraft(suggestion)}
-                          className="rounded-full border border-obd-line bg-obd-raised px-3 py-1.5 text-[11px] text-obd-muted hover:bg-obd-raised-strong hover:text-obd-text"
-                        >
-                          {suggestion}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {entries.map((entry, index) => {
-                const running =
-                  busy &&
-                  entry.role === "assistant" &&
-                  entry.id ===
-                    [...entries].reverse().find((item) => item.role === "assistant")?.id;
-                const lastUser =
-                  entry.role === "user" &&
-                  index ===
-                    entries.reduce(
-                      (last, item, itemIndex) =>
-                        item.role === "user" ? itemIndex : last,
-                      -1,
-                    );
-                const branchable =
-                  entry.role === "user" &&
-                  sessionId !== null &&
-                  entry.seq !== undefined &&
-                  entry.seq > 0;
-                return (
-                  <MessageCard
-                    key={entry.id}
-                    entry={entry}
-                    nowMs={running ? nowMs : undefined}
-                    workspacePath={workspacePath}
-                    onOpenPreview={openPreview}
-                    onRetry={lastUser && !busy ? () => void send("", [], true) : undefined}
-                    onEdit={
-                      branchable
-                        ? () => {
-                            composerRef.current?.setDraft(entry.text);
-                            setPendingFork({ seq: entry.seq ?? 0 });
-                          }
-                        : undefined
-                    }
-                    onReviewChanges={
-                      entry.role === "assistant" && (entry.checkpointCount ?? 0) > 0
-                        ? () => openPanel("checkpoints")
-                        : undefined
-                    }
-                    running={running}
-                  />
-                );
-              })}
-
-              {busy && (
-                <div className="flex items-center gap-2 text-[12px] text-obd-accent">
-                  <Loader2 size={14} className="animate-spin" />
-                  Working through the workspace…
-                </div>
-              )}
-            </div>
-            </div>
-            {showJumpToLatest && (
-              <button
-                type="button"
-                aria-label="Jump to latest"
-                onClick={jumpToLatest}
-                className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-obd-line bg-obd-surface/95 px-3 py-1.5 text-[11px] font-medium text-obd-text shadow-lg backdrop-blur hover:bg-obd-surface"
-              >
-                <ArrowDown size={12} /> Jump to latest
-              </button>
-            )}
-          </div>
-
-          <ChatComposer
-            ref={composerRef}
-            workspacePath={workspacePath}
-            hasProject={activeProject !== null}
-            busy={busy}
-            stopRequested={stopRequested}
-            permissionMode={permissionMode}
-            mode={chatMode}
-            onMode={setChatMode}
-            model={model}
-            thinking={thinking}
-            accessNotice={accessNotice}
-            error={error}
-            queuedMessages={queuedMessages}
-            branchNotice={
-              pendingFork === null
-                ? null
-                : "Sending will branch from the edited message; the original conversation is kept."
-            }
-            onCancelBranch={() => setPendingFork(null)}
-            onPermissionMode={changePermissionMode}
-            onOpenSettings={composerOpenModel}
-            onDismissAccessNotice={dismissAccessNotice}
-            onDismissError={dismissError}
-            onRemoveQueued={removeQueued}
-            onSend={composerSend}
-            onSteer={composerSteer}
-            onQueue={queue}
-            onStop={composerStop}
-            onError={composerError}
-          />
-        </div>
+        {chatBody}
       </div>
 
-      {preview !== null && (
-        <PreviewPane
-          target={preview}
-          workspacePath={workspacePath}
-          revision={projectRevision}
-          width={previewWidth}
-          reserved={720 + (panelOpen ? panelWidth + 4 : 0)}
-          onResizeStart={startPreviewResize}
-          onClose={() => setPreview(null)}
-          onArtifact={openArtifact}
-          onWorkspaceChanged={markWorkspaceChanged}
-        />
-      )}
+      </>}
+
+      {!studioProject && previewPane}
 
       {panelOpen && (
         <>
@@ -3233,35 +3371,7 @@ export default function App() {
               }px))`,
             }}
           >
-            <ProjectPanel
-              tab={panelTab}
-              onTab={setPanelTab}
-              onClose={() => setPanelOpen(false)}
-              project={activeProject}
-              indexSummary={indexSummary}
-              indexing={indexing}
-              indexError={indexError}
-              onRefreshIndex={() => void refreshWorkspaceIndex()}
-              memories={memoryList}
-              memoryError={memoryError}
-              onForgetMemory={(id) => void forgetMemory(id)}
-              checkpoints={checkpointList}
-              restoringCheckpoint={restoringCheckpoint}
-              checkpointDiffId={checkpointDiffId}
-              checkpointDiffText={checkpointDiffText}
-              checkpointNotice={checkpointNotice}
-              checkpointError={checkpointError}
-              onShowDiff={(id) => void showCheckpointDiff(id)}
-              onRestore={(id) => void restoreCheckpoint(id)}
-              foundation={foundation}
-              apiKeyStatus={apiKeyStatus}
-              sessionId={sessionId}
-              onOpenSettings={openSettings}
-              onArtifact={openArtifact}
-              onImportBundle={() => void startMergeImport()}
-              revision={projectRevision}
-              onWorkspaceChanged={markWorkspaceChanged}
-            />
+            {projectPane(panelTab)}
           </div>
         </>
       )}

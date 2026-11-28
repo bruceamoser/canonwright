@@ -532,13 +532,13 @@ export async function githubRepos(): Promise<string[]> {
   return ["bruceamoser/the-salt-road"];
 }
 
-export async function pickManuscript(): Promise<string | null> {
+export async function pickManuscript(pdfOnly = false): Promise<string | null> {
   if (isTauri) {
     const selected = await open({
       directory: false,
       multiple: false,
-      title: "Choose a manuscript",
-      filters: [
+      title: pdfOnly ? "Choose the original PDF" : "Choose a manuscript",
+      filters: pdfOnly ? [{name:"PDF",extensions:["pdf"]}] : [
         { name: "Manuscript", extensions: ["md", "markdown", "txt", "docx", "epub", "pdf"] },
       ],
     });
@@ -1944,6 +1944,7 @@ export type ChatInput = {
   logRetentionDays?: number;
   /** Ask the provider to constrain tool arguments to their schema (beta). */
   strictTools?: boolean;
+  writing?: { projectId: string; sectionId: string | null; recordId: string | null; area: string | null; selection: string };
 };
 
 export async function respondToApproval(
@@ -1982,6 +1983,7 @@ export async function chat(
         readFilesMax: input.readFilesMax,
         logRetentionDays: input.logRetentionDays,
         strictTools: input.strictTools,
+        writing: input.writing,
       },
       onEvent: channel,
     });

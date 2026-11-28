@@ -537,7 +537,7 @@ function ChatComposer({
             }
             className="block w-full resize-none bg-transparent px-3.5 pt-3 text-[13px] leading-5 text-obd-strong outline-none placeholder:text-obd-subtle"
           />
-          <div className="flex items-center gap-1.5 px-2 pb-2 pt-1">
+          <div className="flex flex-wrap items-center gap-1.5 px-2 pb-2 pt-1">
             <button
               type="button"
               onClick={() => void attachDocuments()}
@@ -591,7 +591,7 @@ function ChatComposer({
               </span>
               {thinking && <span className="text-obd-accent/70">thinking</span>}
             </button>
-            <span className="ml-auto text-[10px] text-obd-subtle">
+            <span className="chat-composer-hint ml-auto text-[10px] text-obd-subtle">
               {busy
                 ? "Enter to steer · Shift+Enter for a newline"
                 : "Enter to send · Shift+Enter for a newline"}

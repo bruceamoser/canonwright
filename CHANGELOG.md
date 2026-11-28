@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.30
+
+Chat, Writer and Editorial Reviewer can assess English manuscript passages locally. Quick screening uses Desklib. Strict generation checks require Desklib and Falcon Binoculars agreement. Legacy GPT-2 follow-up remains available for comparison. Optional research modes rank passages by full-size Fast-DetectGPT discrepancy or EditLens editing intensity. Reports include source offsets and excerpts. Scores cannot establish authorship.
+
+The Linux Debian package includes setup scripts. Model weights are separate downloads. EditLens requires authorized access to Pangram’s noncommercial checkpoint. See the detector README for setup and interpretation.
+
 ## 0.2.1
 
 The release that makes the previous one visible.

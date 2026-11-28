@@ -8,6 +8,7 @@ mod pipeline;
 mod preview;
 mod process;
 mod services;
+mod studio;
 
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
@@ -17,8 +18,8 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use base64::Engine as _;
 use canonwright_agent::{
-    AgentConfig, AgentError, AgentObserver, ApprovalGate, AttemptFailure, CompactionRecord, Inbox,
-    StepOutcome, StepSettlement, ToolStatus, default_agent,
+    Agent, AgentConfig, AgentError, AgentObserver, ApprovalGate, AttemptFailure, CompactionRecord,
+    Inbox, StepOutcome, StepSettlement, ToolStatus, default_agent,
 };
 use canonwright_core::event::{NewEvent, SessionEventKind};
 use canonwright_core::{SessionId, WorkspaceId};
@@ -1195,7 +1196,8 @@ struct SubagentSettings {
     api_key: String,
     workspace_id: WorkspaceId,
     workspace_path: PathBuf,
-    parent_session: SessionId,
+    parent_session: Option<SessionId>,
+    writing: Option<studio::agent::Focus>,
     model: String,
     thinking: bool,
     reasoning_effort: Option<ReasoningEffort>,
@@ -1217,7 +1219,7 @@ struct SubagentSettings {
     session_reads: SessionReads,
     /// The parent turn's question prompt, so a delegated question is shown
     /// rather than queued out of sight.
-    questions: QuestionPrompt,
+    questions: Option<QuestionPrompt>,
 }
 
 struct SubagentRunner {
@@ -1260,7 +1262,7 @@ impl SubagentRuntime for SubagentRunner {
         let record = SubagentRecord {
             id: id.clone(),
             workspace_id: self.settings.workspace_id,
-            parent_session_id: Some(self.settings.parent_session.to_string()),
+            parent_session_id: self.settings.parent_session.map(|id|id.to_string()),
             title: spec.title.clone(),
             task: spec.task.clone(),
             model: spec
@@ -1388,6 +1390,7 @@ impl AgentObserver for SubagentObserver {
     }
 
     fn on_tool_call(&self, step: u32, call: &canonwright_llm::chat::ToolCall) {
+        diagnostics::event("worker.tool_started",json!({"worker":self.id,"step":step,"tool":call.function.name,"call":call.id}));
         let args = truncate_for_ui(&call.function.arguments);
         update_subagent_record(
             &self.store,
@@ -1411,6 +1414,7 @@ impl AgentObserver for SubagentObserver {
         _metadata: &Value,
     ) {
         let name = call.function.name.as_str();
+        diagnostics::event("worker.tool_finished",json!({"worker":self.id,"step":step,"tool":name,"call":call.id,"ok":!is_error}));
         let result = truncate_for_ui(content);
         update_subagent_record(
             &self.store,
@@ -1482,27 +1486,53 @@ async fn run_subagent(
     spec: SubagentSpec,
     cancel: Arc<AtomicBool>,
 ) {
+    let queued = spec
+        .task
+        .strip_prefix("CanonWright queued work\n")
+        .and_then(|body| serde_json::from_str::<Value>(body).ok())
+        .and_then(|v| serde_json::from_value::<studio::review_queue::Work>(v["work"].clone()).ok());
+    let sync=studio::chapter_sync::directive(&spec.task).or_else(||studio::editorial::directive(&spec.task)).or_else(||studio::process::directive(&spec.task));
+    let keeper = spec.task.starts_with(studio::KEEPER_PROMPT);
+    let editorial = sync.is_some() || keeper || spec.task.starts_with(studio::EDITORIAL_PROMPT);
     let workspace = Arc::new(WorkspaceService::new(settings.workspace_path.clone()));
     let mut client = DeepSeekClient::new(ReqwestTransport::new(), settings.api_key.clone())
         .with_model(spec.model.unwrap_or_else(|| settings.model.clone()))
         .with_base_url(settings.base_url.clone())
         .with_user_id(settings.user_id.clone())
-        .with_thinking(settings.thinking);
+        .with_thinking(settings.thinking && !editorial);
     if let Some(effort) = settings.reasoning_effort {
         client = client.with_reasoning_effort(effort);
     }
-    let agent = default_agent(
-        client,
-        workspace,
-        AgentConfig {
-            policy: subagent_policy(settings.policy, spec.allow_writes),
-            max_steps: 0,
-            stream: false,
-            session_reads: Some(Arc::clone(&settings.session_reads)),
-            questions: Some(settings.questions.clone()),
-            ..AgentConfig::default()
-        },
-    )
+    let mut config = AgentConfig {
+        policy: subagent_policy(settings.policy, spec.allow_writes),
+        max_steps: if queued.is_some() { 80 } else { 0 },
+        max_parallel_tool_calls: 1,
+        stream: false,
+        session_reads: Some(Arc::clone(&settings.session_reads)),
+        questions: settings.questions.clone(),
+        ..AgentConfig::default()
+    };
+    let agent = if let Some(focus) = &settings.writing {
+        let registry = if let Some(prompt)=sync {let guidance = if studio::process::directive(&spec.task).is_some() {String::new()} else {
+                let role = if spec.task.starts_with(studio::chapter_sync::KEEPER) {"canon_keeper"} else if studio::editorial::directive(&spec.task).is_some() {"editorial_reviewer"} else {"canon_reviewer"};
+                studio::process::role_guidance(&settings.workspace_path,role)
+            };
+            config.system_prompt=Some(format!("{guidance}\n{prompt}"));config.active_tools.clear();canonwright_tools::ToolRegistry::new()} else if let Some(work)=&queued {
+            config.system_prompt=Some(format!("You are the {} background worker for CanonWright. Use the registered book tools to perform the queued request. Consult the outline and applicable skills. Inspect prior receipts before resuming. Clearly report completed work and blockers. Only report a write after a successful tool result.",work.role));
+            if let Some(prompt)=config.system_prompt.as_mut(){prompt.push_str(&studio::process::role_guidance(&settings.workspace_path,&work.role));}
+            studio::agent::role_tools(&work.role,&work.focus,&mut config.active_tools)
+        } else if editorial {
+            let (role, prompt) = if keeper {("canon_keeper", studio::KEEPER_PROMPT)} else {("canon_reviewer", studio::EDITORIAL_PROMPT)};
+            config.system_prompt = Some(format!("{}\n{prompt}",studio::process::role_guidance(&settings.workspace_path,role)));
+            studio::agent::reviewer_tools(focus,&mut config.active_tools)
+        } else {
+            config.system_prompt = Some(studio::agent::prompt(&settings.workspace_path));
+            studio::agent::tools(focus,&mut config.active_tools)
+        };
+        Agent::new(client, registry, workspace, config)
+    } else {
+        default_agent(client, workspace, config)
+    }
     .with_approvals(Arc::clone(&settings.approvals))
     .with_memory(Arc::new(WorkspaceMemory {
         store: Arc::clone(&settings.store),
@@ -1535,8 +1565,13 @@ async fn run_subagent(
         cancel: Arc::clone(&cancel),
         events: settings.events.clone(),
     };
+    let output_instruction = if studio::process::directive(&spec.task).is_some() { "Apply the supplied skill to the example and return its output." } else if editorial {
+        "Return the editorial verdict in the JSON format requested in the task."
+    } else {
+        "Finish with a concise report covering what changed, what you checked, and any remaining risk."
+    };
     let prompt = format!(
-        "You are a directed subagent spawned by the main Canonwright agent. Work only on the task below. You share the parent workspace and access mode, cannot spawn further subagents, and must not ask the user questions. Use tools as needed, verify your work, and finish with a concise report covering what changed, what you checked, and any remaining risk.\n\nTask:\n{}",
+        "You are a directed subagent spawned by the main Canonwright agent. Work only on the task below. You share the parent workspace and access mode, cannot spawn further subagents, and must not ask the user questions. Use tools as needed and verify your work. {output_instruction}\n\nTask:\n{}",
         spec.task
     );
     let outcome = agent
@@ -1545,7 +1580,18 @@ async fn run_subagent(
     let update = match outcome {
         Ok(run) => SubagentUpdate {
             status: Some("completed".to_owned()),
-            result: Some(run.text),
+            result: Some(if editorial {
+                run.new_messages
+                    .last()
+                    .filter(|msg| {
+                        msg.role == ChatRole::Assistant
+                            && msg.tool_calls.as_ref().is_none_or(Vec::is_empty)
+                    })
+                    .and_then(|msg| msg.content.clone())
+                    .unwrap_or_default()
+            } else {
+                run.text
+            }),
             steps: Some(run.steps),
             append_log: Some("\n[completed]\n".to_owned()),
             ..SubagentUpdate::default()
@@ -1643,6 +1689,7 @@ impl WorkspaceSearch for StoreSearch {
             .collect())
     }
 }
+
 
 #[derive(Serialize)]
 pub struct Health {
@@ -4506,7 +4553,21 @@ fn create_project(
         None => create_workspace_directory(&root, name)?,
     };
     if let Some(request) = story {
-        start_story_in(&path, name, request)?;
+        if request.studio {
+            let source = match request.mode.as_str() {
+                "existing" => Some(PathBuf::from(
+                    request
+                        .manuscript
+                        .ok_or_else(|| "Select a manuscript or folder".to_owned())?,
+                )),
+                "github" => Some(path.clone()),
+                "new" => None,
+                _ => return Err("Unknown book source".to_owned()),
+            };
+            studio::initialize(&path, request.kind.as_deref(), source.as_deref(), from_repo)?;
+        } else {
+            start_story_in(&path, name, request)?;
+        }
     }
     let store = state
         .store
@@ -4641,27 +4702,30 @@ fn clone_repo(root: &Path, repo: &str) -> Result<PathBuf, String> {
     }
     let token = github_api::stored_token()
         .ok_or_else(|| "connect GitHub with a token before connecting a repository".to_owned())?;
-    // Cloned with the token in the URL, then the remote is reset: leaving it
-    // would write the credential into .git/config on disk.
-    let authed = format!("https://x-access-token:{token}@github.com/{repo}.git");
-    let status = std::process::Command::new("git")
+    let header =
+        base64::engine::general_purpose::STANDARD.encode(format!("x-access-token:{token}"));
+    let output = std::process::Command::new("git")
         .arg("clone")
-        .arg(&authed)
+        .arg(format!("https://github.com/{repo}.git"))
         .arg(&target)
-        .status()
+        .env("GIT_CONFIG_COUNT", "3")
+        .env("GIT_CONFIG_KEY_0", "http.https://github.com/.extraHeader")
+        .env(
+            "GIT_CONFIG_VALUE_0",
+            format!("Authorization: Basic {header}"),
+        )
+        .env("GIT_CONFIG_KEY_1", "credential.helper")
+        .env("GIT_CONFIG_VALUE_1", "")
+        .env("GIT_CONFIG_KEY_2", "http.followRedirects")
+        .env("GIT_CONFIG_VALUE_2", "false")
+        .env("GIT_TERMINAL_PROMPT", "0")
+        .output()
         .map_err(|error| error.to_string())?;
-    if !status.success() {
-        return Err(format!("could not clone {repo}"));
+    if !output.status.success() {
+        return Err(format!(
+            "Could not clone {repo}. Check the connected account's repository access."
+        ));
     }
-    let _ = std::process::Command::new("git")
-        .args([
-            "remote",
-            "set-url",
-            "origin",
-            &format!("https://github.com/{repo}.git"),
-        ])
-        .current_dir(&target)
-        .status();
     target.canonicalize().map_err(|error| error.to_string())
 }
 
@@ -4861,6 +4925,8 @@ fn start_story_in(
 #[derive(Debug, Default, serde::Deserialize)]
 struct StoryStartRequest {
     mode: String,
+    #[serde(default)]
+    studio: bool,
     /// "narrative", "rules" or "hybrid".
     #[serde(default)]
     kind: Option<String>,
@@ -5063,15 +5129,112 @@ fn workspace_default() -> String {
     }
 }
 
+struct BackgroundApprovals;
+#[async_trait::async_trait]
+impl ApprovalGate for BackgroundApprovals {
+    async fn decide(&self, _: &ApprovalRequest) -> ApprovalDecision {
+        ApprovalDecision::Deny
+    }
+}
+
+// Start independently of the library, selected book, and interactive sessions.
+static BOOK_QUEUE_SIGNAL: tokio::sync::Notify = tokio::sync::Notify::const_new();
+
+fn resume_book_workers() {
+    BOOK_QUEUE_SIGNAL.notify_one();
+}
+
+fn supervise_book_workers(handle: tauri::AppHandle) {
+    diagnostics::event("queue.supervisor_started",json!({"poll_seconds":5}));
+    tauri::async_runtime::spawn(async move {
+        loop {
+            let app = handle.clone();
+            if let Err(e) = tauri::async_runtime::spawn_blocking(move || scan_book_queues(app)).await {
+                diagnostics::record("ERROR",&format!("Book queue scan interrupted: {e}"));
+            }
+            tokio::select! {
+                _ = BOOK_QUEUE_SIGNAL.notified() => {},
+                _ = tokio::time::sleep(Duration::from_secs(5)) => {},
+            }
+        }
+    });
+}
+
+fn scan_book_queues(handle: tauri::AppHandle) {
+    let state = handle.state::<AppState>();
+    let projects = match state
+        .store
+        .lock()
+        .map_err(|e| e.to_string())
+        .and_then(|s| s.list_workspaces().map_err(|e| e.to_string()))
+    {
+        Ok(rows) => rows,
+        Err(e) => {
+            diagnostics::record("ERROR",&format!("Book queue database scan: {e}"));
+            return;
+        }
+    };
+    for project in projects {
+        let root = PathBuf::from(&project.path);
+        if studio::review_queue::dispatching(&root) || !studio::review_queue::needs_worker(&root) {
+            continue;
+        }
+        diagnostics::event("queue.discovered",json!({"book":root}));
+        let start = (|| -> Result<(), String> {
+            let api_key = resolve_api_key(&state)?;
+            let user_id = ensure_user_id(&*state.store.lock().map_err(|e| e.to_string())?)?;
+            let runner = SubagentRunner {
+                settings: Arc::new(SubagentSettings {
+                    store: state.store.clone(),
+                    api_key,
+                    workspace_id: project.id,
+                    workspace_path: root.clone(),
+                    parent_session: None,
+                    writing: Some(studio::agent::Focus::book(project.id.to_string())),
+                    model: FLASH_MODEL.into(),
+                    thinking: false,
+                    reasoning_effort: None,
+                    base_url: std::env::var("CANONWRIGHT_DEEPSEEK_BASE_URL")
+                        .unwrap_or_else(|_| "https://api.deepseek.com".into()),
+                    user_id,
+                    grants: vec![],
+                    terminal: state.terminal.clone(),
+                    mcp: state.mcp.get(&root)?,
+                    policy: ToolPolicy::WritesOnly,
+                    approvals: Arc::new(BackgroundApprovals),
+                    events: Channel::new(|_| Ok(())),
+                    session_reads: new_session_reads(),
+                    questions: None,
+                }),
+                active: state.subagent_cancels.clone(),
+            };
+            let mut context = canonwright_tools::ToolContext::new(Arc::new(
+                WorkspaceService::new(root.clone()),
+            ));
+            context.subagents = Some(Arc::new(runner));
+            studio::review_queue::wake(&root, &context).map_err(|e| e.to_string())
+        })();
+        if let Err(error) = start {
+            studio::review_queue::record_startup_error(&root, &error);
+            diagnostics::event("queue.start_failed",json!({"book":root,"error":error}));
+        }
+    }
+}
+
 #[tauri::command]
-fn save_api_key(state: State<'_, AppState>, key: String) -> Result<(), String> {
+fn save_api_key(
+    state: State<'_, AppState>,
+    key: String,
+) -> Result<(), String> {
     if key.trim().is_empty() {
         return Err("API key must not be empty".to_owned());
     }
     state
         .secrets
         .set(API_KEY_REFERENCE, &Secret::new(key.trim()))
-        .map_err(|error| error.to_string())
+        .map_err(|error| error.to_string())?;
+    resume_book_workers();
+    Ok(())
 }
 
 #[tauri::command]
@@ -5090,12 +5253,15 @@ fn clear_api_key(state: State<'_, AppState>) -> Result<(), String> {
 
 #[tauri::command]
 fn api_key_status(state: State<'_, AppState>) -> Result<bool, String> {
+    if std::env::var_os("DEEPSEEK_API_KEY").is_some() {
+        return Ok(true);
+    }
     let stored = state
         .secrets
         .get(API_KEY_REFERENCE)
         .map_err(|error| error.to_string())?
         .is_some();
-    Ok(stored || std::env::var_os("DEEPSEEK_API_KEY").is_some())
+    Ok(stored)
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -5461,6 +5627,8 @@ pub struct ChatInput {
     /// needs the strict endpoint, so the base URL follows this flag.
     #[serde(default)]
     pub strict_tools: Option<bool>,
+    #[serde(default)]
+    pub(crate) writing: Option<studio::agent::Focus>,
 }
 
 #[tauri::command]
@@ -5644,6 +5812,26 @@ async fn chat(
     request: ChatInput,
     on_event: Channel<AgentEvent>,
 ) -> Result<ChatReply, String> {
+    let mut request = request;
+    if request.run_id.trim().is_empty() {
+        request.run_id = Uuid::now_v7().to_string();
+    }
+    let run = request.run_id.clone();
+    let started = std::time::Instant::now();
+    diagnostics::event("chat.started", json!({"run":run,"session":request.session_id,"attachments":request.attachments.len(),"resume":request.resume}));
+    let result = run_chat(state, request, on_event).await;
+    match &result {
+        Ok(reply) => diagnostics::event("chat.completed", json!({"run":run,"session":reply.session_id,"steps":reply.steps,"elapsed_ms":reply.duration_ms})),
+        Err(_) => diagnostics::event("chat.failed", json!({"run":run,"elapsed_ms":started.elapsed().as_millis()})),
+    }
+    result
+}
+
+async fn run_chat(
+    state: State<'_, AppState>,
+    request: ChatInput,
+    on_event: Channel<AgentEvent>,
+) -> Result<ChatReply, String> {
     let ChatInput {
         run_id,
         session_id,
@@ -5663,6 +5851,7 @@ async fn chat(
         read_files_max,
         log_retention_days,
         strict_tools,
+        writing,
     } = request;
     let prompt = message.trim().to_owned();
     if !resume && prompt.is_empty() && attachments.is_empty() {
@@ -5688,17 +5877,21 @@ async fn chat(
         _ => None,
     };
     let workspace_path = PathBuf::from(workspace_path);
+    if let Some(focus) = &writing {
+        if workspace_path
+            .canonicalize()
+            .map_err(|cause| cause.to_string())?
+            != studio::registered_root(&state, &focus.project_id)?
+        {
+            return Err("The conversation must belong to the open book".to_owned());
+        }
+    }
     if !workspace_path.is_dir() {
         return Err(format!(
             "workspace is not a directory: {}",
             workspace_path.display()
         ));
     }
-    let run_id = if run_id.trim().is_empty() {
-        Uuid::now_v7().to_string()
-    } else {
-        run_id
-    };
     // This guard lives until the end of the turn and removes the run entry on
     // every exit path, including errors and cancellation.
     let run_guard = begin_run(&state.runs, &run_id, session_id.as_deref())?;
@@ -5752,6 +5945,12 @@ async fn chat(
             }
         };
 
+        if writing
+            .as_ref()
+            .is_some_and(|focus| focus.project_id != workspace_id)
+        {
+            return Err("This conversation belongs to a different book".to_owned());
+        }
         repair_interrupted_turn(&store, session)?;
         if mode == "agent" {
             store
@@ -5811,6 +6010,11 @@ async fn chat(
         )
     };
 
+    let mut writing=writing.or_else(||workspace_path.join(".canonwright/studio/book.json").is_file().then(|| studio::agent::Focus::book(workspace_id.clone())));
+    if let Some(focus)=writing.as_mut(){
+        let rows=state.store.lock().map_err(|e|e.to_string())?.load_messages(session).map_err(|e|e.to_string())?;
+        focus.author_sources=studio::author::messages(rows);
+    }
     let (history, user_id, surface_seqs) = history;
     let strict_tools = strict_tools.unwrap_or(false);
     let base_url = std::env::var("CANONWRIGHT_DEEPSEEK_BASE_URL").unwrap_or_else(|_| {
@@ -5848,7 +6052,7 @@ async fn chat(
         Arc::clone(records.entry(session).or_insert_with(new_session_reads))
     };
     // Taken in its own block so the lock guard cannot outlive this statement.
-    let active_tools: Vec<String> = {
+    let mut active_tools: Vec<String> = {
         let stored = state
             .active_tools
             .lock()
@@ -5861,31 +6065,38 @@ async fn chat(
                 .collect()
         })
     };
-    let mut agent = default_agent(
-        client,
-        Arc::new(WorkspaceService::new(workspace_path.clone())),
-        AgentConfig {
-            policy,
-            extra_instructions,
-            max_steps: max_steps.unwrap_or(0).min(100_000),
-            session_reads: Some(Arc::clone(&session_reads)),
-            questions: Some(QuestionPrompt::new(Arc::new(DesktopQuestions {
-                pending: Arc::clone(&state.pending_questions),
-                cancel: Arc::clone(&cancel),
-                events: on_event.clone(),
-            }))),
-            // A caller-set budget wins over the default; the provider enforces
-            // its own ceiling regardless, and exceeding it is handled as a
-            // truncated response rather than a failed turn.
-            max_output_tokens: max_output_tokens
-                .unwrap_or_else(|| AgentConfig::default().max_output_tokens),
-            read_files_max: read_files_max.unwrap_or(20).clamp(1, 200),
-            log_retention_days: log_retention_days.unwrap_or(5).clamp(1, 365),
-            strict_tools,
-            active_tools: active_tools.clone(),
-            ..AgentConfig::default()
-        },
-    );
+    let registry = writing
+        .as_ref()
+        .map(|focus| studio::agent::chat_tools(focus, &mut active_tools, policy == ToolPolicy::FullAccess));
+    let workspace = Arc::new(WorkspaceService::new(workspace_path.clone()));
+    let config = AgentConfig {
+        policy,
+        extra_instructions,
+        system_prompt: writing
+            .as_ref()
+            .map(|_| studio::agent::prompt(&workspace_path)),
+        max_steps: max_steps.unwrap_or(0).min(100_000),
+        session_reads: Some(Arc::clone(&session_reads)),
+        questions: Some(QuestionPrompt::new(Arc::new(DesktopQuestions {
+            pending: Arc::clone(&state.pending_questions),
+            cancel: Arc::clone(&cancel),
+            events: on_event.clone(),
+        }))),
+        // A caller-set budget wins over the default; the provider enforces
+        // its own ceiling regardless, and exceeding it is handled as a
+        // truncated response rather than a failed turn.
+        max_output_tokens: max_output_tokens
+            .unwrap_or_else(|| AgentConfig::default().max_output_tokens),
+        read_files_max: read_files_max.unwrap_or(20).clamp(1, 200),
+        log_retention_days: log_retention_days.unwrap_or(5).clamp(1, 365),
+        strict_tools,
+        active_tools,
+        ..AgentConfig::default()
+    };
+    let mut agent = match registry {
+        Some(registry) => Agent::new(client, registry, workspace, config),
+        None => default_agent(client, workspace, config),
+    };
     // Built before the subagent wiring so a child asks the same questions the
     // parent would, through the same gate and the same pending map.
     let approvals: Arc<dyn ApprovalGate> = Arc::new(DesktopApprovals {
@@ -5924,8 +6135,51 @@ async fn chat(
                 reason: grant.reason.clone(),
             })
             .collect();
+        let runner: Arc<dyn SubagentRuntime> = Arc::new(SubagentRunner {
+            settings: Arc::new(SubagentSettings {
+                store: Arc::clone(&state.store),
+                api_key: api_key.clone(),
+                workspace_id,
+                workspace_path: workspace_path.clone(),
+                parent_session: Some(session),
+                writing: writing.clone(),
+                model: model_name.clone(),
+                thinking: thinking_enabled,
+                reasoning_effort: effort,
+                base_url: base_url.clone(),
+                user_id: user_id.clone(),
+                grants: subagent_grants.clone(),
+                terminal: Arc::clone(&state.terminal),
+                mcp: Arc::clone(&mcp_manager),
+                policy: if writing.is_some() {
+                    ToolPolicy::WritesOnly
+                } else {
+                    policy
+                },
+                approvals: if writing.is_some() {
+                    Arc::new(BackgroundApprovals)
+                } else {
+                    Arc::clone(&approvals)
+                },
+                events: on_event.clone(),
+                session_reads: Arc::clone(&session_reads),
+                questions: Some(QuestionPrompt::new(Arc::new(DesktopQuestions {
+                    pending: Arc::clone(&state.pending_questions),
+                    cancel: Arc::clone(&cancel),
+                    events: on_event.clone(),
+                }))),
+            }),
+            active: Arc::clone(&state.subagent_cancels),
+        });
+        if writing.is_some() {
+            let mut context = canonwright_tools::ToolContext::new(Arc::new(WorkspaceService::new(
+                workspace_path.clone(),
+            )));
+            context.subagents = Some(Arc::clone(&runner));
+            studio::review_queue::wake(&workspace_path, &context).map_err(|e| e.to_string())?;
+        }
         agent = agent
-            .with_outside_grants(subagent_grants.clone())
+            .with_outside_grants(subagent_grants)
             .with_lsp(Arc::new(DesktopLsp::new(workspace_path.clone())))
             .with_sessions(Arc::new(WorkspaceSessions {
                 store: Arc::clone(&state.store),
@@ -5935,33 +6189,7 @@ async fn chat(
             .with_terminal(Arc::new(DesktopTerminal {
                 manager: Arc::clone(&state.terminal),
             }))
-            .with_subagents(Arc::new(SubagentRunner {
-                settings: Arc::new(SubagentSettings {
-                    store: Arc::clone(&state.store),
-                    api_key: api_key.clone(),
-                    workspace_id,
-                    workspace_path: workspace_path.clone(),
-                    parent_session: session,
-                    model: model_name.clone(),
-                    thinking: thinking_enabled,
-                    reasoning_effort: effort,
-                    base_url: base_url.clone(),
-                    user_id: user_id.clone(),
-                    grants: subagent_grants,
-                    terminal: Arc::clone(&state.terminal),
-                    mcp: Arc::clone(&mcp_manager),
-                    policy,
-                    approvals: Arc::clone(&approvals),
-                    events: on_event.clone(),
-                    session_reads: Arc::clone(&session_reads),
-                    questions: QuestionPrompt::new(Arc::new(DesktopQuestions {
-                        pending: Arc::clone(&state.pending_questions),
-                        cancel: Arc::clone(&cancel),
-                        events: on_event.clone(),
-                    })),
-                }),
-                active: Arc::clone(&state.subagent_cancels),
-            }));
+            .with_subagents(runner);
     }
     agent = agent
         .with_inbox(run_guard.inbox())
@@ -6474,6 +6702,8 @@ pub fn run() {
             // pipeline that forgets itself on restart is not unattended.
             let handle = app.handle().clone();
             executor::resume_watchers(&handle, &app.state::<AppState>());
+            let _=studio::DESKTOP.set(handle.clone());
+            supervise_book_workers(handle);
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -6496,6 +6726,21 @@ pub fn run() {
             list_projects,
             add_project,
             create_project,
+            studio::studio_book,
+            studio::studio_attach_pdf,
+            studio::studio_retry_failed_reviews,
+            studio::studio_section,
+            studio::studio_save_section,
+            studio::studio_add_section,
+            studio::studio_import,
+            studio::studio_order,
+            studio::studio_build,
+            studio::studio_compiled,
+            studio::studio_record,
+            studio::studio_decide,
+            studio::studio_answer,
+            studio::studio_save_skill,
+            studio::studio_open_issue,
             story_intake,
             github_status,
             github_set_token,

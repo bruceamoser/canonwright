@@ -63,23 +63,6 @@ export default function AppMenuBar({ menus }: { menus: AppMenu[] }) {
         </span>
       </div>
 
-      <button
-        type="button"
-        onClick={theme.cycle}
-        title={`Theme: ${theme.choice} — click for the next`}
-        aria-label={`Theme: ${theme.choice}`}
-        className="ml-auto mr-1 flex items-center gap-1 rounded px-1.5 py-1 text-[10px] text-obd-subtle hover:bg-obd-raised hover:text-obd-body"
-      >
-        {theme.choice === "system" ? (
-          <Monitor size={12} />
-        ) : theme.choice === "light" ? (
-          <Sun size={12} />
-        ) : (
-          <Moon size={12} />
-        )}
-        <span className="capitalize">{theme.choice}</span>
-      </button>
-
       {menus.map((menu) => {
         const open = openMenu === menu.label;
         return (
@@ -145,6 +128,22 @@ export default function AppMenuBar({ menus }: { menus: AppMenu[] }) {
           </div>
         );
       })}
+      <button
+        type="button"
+        onClick={theme.cycle}
+        title={`Theme: ${theme.choice} — click for the next`}
+        aria-label={`Theme: ${theme.choice}`}
+        className="ml-auto mr-1 flex items-center gap-1 rounded px-1.5 py-1 text-[10px] text-obd-subtle hover:bg-obd-raised hover:text-obd-body"
+      >
+        {theme.choice === "system" ? (
+          <Monitor size={12} />
+        ) : theme.choice === "light" ? (
+          <Sun size={12} />
+        ) : (
+          <Moon size={12} />
+        )}
+        <span className="capitalize">{theme.choice}</span>
+      </button>
     </div>
   );
 }

@@ -5,7 +5,8 @@ import { createProject, pickDirectory, pickManuscript } from "../backend";
 import type { StoryStartRequest, WorkspaceSummary } from "../types";
 import RepoPicker from "./RepoPicker";
 
-type Kind = "narrative" | "rules";
+type Kind = "narrative" | "rules" | "hybrid";
+const KINDS = { narrative: "Novel", rules: "Core rulebook", hybrid: "TTRPG content book" };
 
 type Props = {
   onCancel: () => void;
@@ -36,7 +37,7 @@ export default function NewProjectScreen({ onCancel, onCreated }: Props) {
     setBusy(story.mode);
     setError(null);
     try {
-      const project = await createProject(finalName, story);
+      const project = await createProject(finalName, { ...story, studio: true });
       onCreated(project);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause));
@@ -130,7 +131,7 @@ export default function NewProjectScreen({ onCancel, onCreated }: Props) {
   return (
     <div className="h-full overflow-y-auto bg-obd-bg px-10 py-10 text-obd-text">
       <div className="max-w-2xl">
-        <h1 className="text-xl font-semibold tracking-tight">New project</h1>
+        <h1 className="text-xl font-semibold tracking-tight">New book</h1>
 
         <div className="mt-7 text-[10px] uppercase tracking-wide text-obd-muted">Name</div>
         <input
@@ -142,7 +143,7 @@ export default function NewProjectScreen({ onCancel, onCreated }: Props) {
 
         <div className="mt-6 text-[10px] uppercase tracking-wide text-obd-muted">Type</div>
         <div className="mt-1.5 flex gap-2">
-          {(["narrative", "rules"] as Kind[]).map((option) => (
+          {(Object.keys(KINDS) as Kind[]).map((option) => (
             <button
               key={option}
               type="button"
@@ -153,7 +154,7 @@ export default function NewProjectScreen({ onCancel, onCreated }: Props) {
                   : "border-obd-line text-obd-muted hover:bg-obd-raised"
               }`}
             >
-              {option === "narrative" ? "Novel" : "Rulebook"}
+              {KINDS[option]}
             </button>
           ))}
         </div>

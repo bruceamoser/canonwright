@@ -166,20 +166,8 @@ pub fn preview_file(resolved: &Path, relative: String) -> Result<ProjectFileView
             ))
         }
         PreviewKind::Pdf => {
-            let bytes = read_bounded(resolved, size, MAX_DOCUMENT_BYTES, "PDF")?;
-            let mut view = data_url_view(relative, "pdf", size, "application/pdf", &bytes);
-            // Text extraction is only a fallback for viewers that cannot
-            // render PDF pages; a failure must not hide the document.
-            let text = guarded(move || {
-                pdf_extract::extract_text(resolved).map_err(|error| error.to_string())
-            })
-            .ok()
-            .and_then(Result::ok)
-            .unwrap_or_default();
-            let clipped = clip(&text);
-            view.truncated = clipped.len() < text.len();
-            view.content = Some(clipped);
-            Ok(view)
+            let bytes = read_bounded(resolved, size, 64 * 1024 * 1024, "PDF")?;
+            Ok(data_url_view(relative, "pdf", size, "application/pdf", &bytes))
         }
         PreviewKind::Sheet => sheet_view(resolved, relative, size, &extension),
         PreviewKind::Doc => {
@@ -585,16 +573,13 @@ mod tests {
     }
 
     #[test]
-    fn pdf_files_extract_text() {
+    fn pdf_preview_returns_original_document() {
         let root = tempdir().expect("tempdir");
         let path = root.path().join("sample.pdf");
         std::fs::write(&path, sample_pdf("Hello PDF")).expect("pdf");
         let view = preview_file(&path, "sample.pdf".to_owned()).expect("preview");
         assert_eq!(view.kind, "pdf");
-        assert!(
-            view.content.unwrap_or_default().contains("Hello PDF"),
-            "pdf text should be extracted"
-        );
+        assert!(view.content.is_none());
         assert!(
             view.data_url
                 .expect("pdf data url")
