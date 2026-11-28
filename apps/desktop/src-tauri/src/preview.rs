@@ -167,7 +167,13 @@ pub fn preview_file(resolved: &Path, relative: String) -> Result<ProjectFileView
         }
         PreviewKind::Pdf => {
             let bytes = read_bounded(resolved, size, 64 * 1024 * 1024, "PDF")?;
-            Ok(data_url_view(relative, "pdf", size, "application/pdf", &bytes))
+            Ok(data_url_view(
+                relative,
+                "pdf",
+                size,
+                "application/pdf",
+                &bytes,
+            ))
         }
         PreviewKind::Sheet => sheet_view(resolved, relative, size, &extension),
         PreviewKind::Doc => {

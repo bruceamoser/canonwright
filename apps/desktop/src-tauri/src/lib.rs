@@ -1262,7 +1262,7 @@ impl SubagentRuntime for SubagentRunner {
         let record = SubagentRecord {
             id: id.clone(),
             workspace_id: self.settings.workspace_id,
-            parent_session_id: self.settings.parent_session.map(|id|id.to_string()),
+            parent_session_id: self.settings.parent_session.map(|id| id.to_string()),
             title: spec.title.clone(),
             task: spec.task.clone(),
             model: spec
@@ -1390,7 +1390,10 @@ impl AgentObserver for SubagentObserver {
     }
 
     fn on_tool_call(&self, step: u32, call: &canonwright_llm::chat::ToolCall) {
-        diagnostics::event("worker.tool_started",json!({"worker":self.id,"step":step,"tool":call.function.name,"call":call.id}));
+        diagnostics::event(
+            "worker.tool_started",
+            json!({"worker":self.id,"step":step,"tool":call.function.name,"call":call.id}),
+        );
         let args = truncate_for_ui(&call.function.arguments);
         update_subagent_record(
             &self.store,
@@ -1414,7 +1417,10 @@ impl AgentObserver for SubagentObserver {
         _metadata: &Value,
     ) {
         let name = call.function.name.as_str();
-        diagnostics::event("worker.tool_finished",json!({"worker":self.id,"step":step,"tool":name,"call":call.id,"ok":!is_error}));
+        diagnostics::event(
+            "worker.tool_finished",
+            json!({"worker":self.id,"step":step,"tool":name,"call":call.id,"ok":!is_error}),
+        );
         let result = truncate_for_ui(content);
         update_subagent_record(
             &self.store,
@@ -1491,7 +1497,9 @@ async fn run_subagent(
         .strip_prefix("CanonWright queued work\n")
         .and_then(|body| serde_json::from_str::<Value>(body).ok())
         .and_then(|v| serde_json::from_value::<studio::review_queue::Work>(v["work"].clone()).ok());
-    let sync=studio::chapter_sync::directive(&spec.task).or_else(||studio::editorial::directive(&spec.task)).or_else(||studio::process::directive(&spec.task));
+    let sync = studio::chapter_sync::directive(&spec.task)
+        .or_else(|| studio::editorial::directive(&spec.task))
+        .or_else(|| studio::process::directive(&spec.task));
     let keeper = spec.task.starts_with(studio::KEEPER_PROMPT);
     let editorial = sync.is_some() || keeper || spec.task.starts_with(studio::EDITORIAL_PROMPT);
     let workspace = Arc::new(WorkspaceService::new(settings.workspace_path.clone()));
@@ -1565,7 +1573,9 @@ async fn run_subagent(
         cancel: Arc::clone(&cancel),
         events: settings.events.clone(),
     };
-    let output_instruction = if studio::process::directive(&spec.task).is_some() { "Apply the supplied skill to the example and return its output." } else if editorial {
+    let output_instruction = if studio::process::directive(&spec.task).is_some() {
+        "Apply the supplied skill to the example and return its output."
+    } else if editorial {
         "Return the editorial verdict in the JSON format requested in the task."
     } else {
         "Finish with a concise report covering what changed, what you checked, and any remaining risk."
@@ -1689,7 +1699,6 @@ impl WorkspaceSearch for StoreSearch {
             .collect())
     }
 }
-
 
 #[derive(Serialize)]
 pub struct Health {
@@ -5145,12 +5154,14 @@ fn resume_book_workers() {
 }
 
 fn supervise_book_workers(handle: tauri::AppHandle) {
-    diagnostics::event("queue.supervisor_started",json!({"poll_seconds":5}));
+    diagnostics::event("queue.supervisor_started", json!({"poll_seconds":5}));
     tauri::async_runtime::spawn(async move {
         loop {
             let app = handle.clone();
-            if let Err(e) = tauri::async_runtime::spawn_blocking(move || scan_book_queues(app)).await {
-                diagnostics::record("ERROR",&format!("Book queue scan interrupted: {e}"));
+            if let Err(e) =
+                tauri::async_runtime::spawn_blocking(move || scan_book_queues(app)).await
+            {
+                diagnostics::record("ERROR", &format!("Book queue scan interrupted: {e}"));
             }
             tokio::select! {
                 _ = BOOK_QUEUE_SIGNAL.notified() => {},
@@ -5170,7 +5181,7 @@ fn scan_book_queues(handle: tauri::AppHandle) {
     {
         Ok(rows) => rows,
         Err(e) => {
-            diagnostics::record("ERROR",&format!("Book queue database scan: {e}"));
+            diagnostics::record("ERROR", &format!("Book queue database scan: {e}"));
             return;
         }
     };
@@ -5179,7 +5190,7 @@ fn scan_book_queues(handle: tauri::AppHandle) {
         if studio::review_queue::dispatching(&root) || !studio::review_queue::needs_worker(&root) {
             continue;
         }
-        diagnostics::event("queue.discovered",json!({"book":root}));
+        diagnostics::event("queue.discovered", json!({"book":root}));
         let start = (|| -> Result<(), String> {
             let api_key = resolve_api_key(&state)?;
             let user_id = ensure_user_id(&*state.store.lock().map_err(|e| e.to_string())?)?;
@@ -5208,24 +5219,20 @@ fn scan_book_queues(handle: tauri::AppHandle) {
                 }),
                 active: state.subagent_cancels.clone(),
             };
-            let mut context = canonwright_tools::ToolContext::new(Arc::new(
-                WorkspaceService::new(root.clone()),
-            ));
+            let mut context =
+                canonwright_tools::ToolContext::new(Arc::new(WorkspaceService::new(root.clone())));
             context.subagents = Some(Arc::new(runner));
             studio::review_queue::wake(&root, &context).map_err(|e| e.to_string())
         })();
         if let Err(error) = start {
             studio::review_queue::record_startup_error(&root, &error);
-            diagnostics::event("queue.start_failed",json!({"book":root,"error":error}));
+            diagnostics::event("queue.start_failed", json!({"book":root,"error":error}));
         }
     }
 }
 
 #[tauri::command]
-fn save_api_key(
-    state: State<'_, AppState>,
-    key: String,
-) -> Result<(), String> {
+fn save_api_key(state: State<'_, AppState>, key: String) -> Result<(), String> {
     if key.trim().is_empty() {
         return Err("API key must not be empty".to_owned());
     }
@@ -5818,11 +5825,20 @@ async fn chat(
     }
     let run = request.run_id.clone();
     let started = std::time::Instant::now();
-    diagnostics::event("chat.started", json!({"run":run,"session":request.session_id,"attachments":request.attachments.len(),"resume":request.resume}));
+    diagnostics::event(
+        "chat.started",
+        json!({"run":run,"session":request.session_id,"attachments":request.attachments.len(),"resume":request.resume}),
+    );
     let result = run_chat(state, request, on_event).await;
     match &result {
-        Ok(reply) => diagnostics::event("chat.completed", json!({"run":run,"session":reply.session_id,"steps":reply.steps,"elapsed_ms":reply.duration_ms})),
-        Err(_) => diagnostics::event("chat.failed", json!({"run":run,"elapsed_ms":started.elapsed().as_millis()})),
+        Ok(reply) => diagnostics::event(
+            "chat.completed",
+            json!({"run":run,"session":reply.session_id,"steps":reply.steps,"elapsed_ms":reply.duration_ms}),
+        ),
+        Err(_) => diagnostics::event(
+            "chat.failed",
+            json!({"run":run,"elapsed_ms":started.elapsed().as_millis()}),
+        ),
     }
     result
 }
@@ -6010,10 +6026,20 @@ async fn run_chat(
         )
     };
 
-    let mut writing=writing.or_else(||workspace_path.join(".canonwright/studio/book.json").is_file().then(|| studio::agent::Focus::book(workspace_id.clone())));
-    if let Some(focus)=writing.as_mut(){
-        let rows=state.store.lock().map_err(|e|e.to_string())?.load_messages(session).map_err(|e|e.to_string())?;
-        focus.author_sources=studio::author::messages(rows);
+    let mut writing = writing.or_else(|| {
+        workspace_path
+            .join(".canonwright/studio/book.json")
+            .is_file()
+            .then(|| studio::agent::Focus::book(workspace_id.clone()))
+    });
+    if let Some(focus) = writing.as_mut() {
+        let rows = state
+            .store
+            .lock()
+            .map_err(|e| e.to_string())?
+            .load_messages(session)
+            .map_err(|e| e.to_string())?;
+        focus.author_sources = studio::author::messages(rows);
     }
     let (history, user_id, surface_seqs) = history;
     let strict_tools = strict_tools.unwrap_or(false);
@@ -6065,9 +6091,9 @@ async fn run_chat(
                 .collect()
         })
     };
-    let registry = writing
-        .as_ref()
-        .map(|focus| studio::agent::chat_tools(focus, &mut active_tools, policy == ToolPolicy::FullAccess));
+    let registry = writing.as_ref().map(|focus| {
+        studio::agent::chat_tools(focus, &mut active_tools, policy == ToolPolicy::FullAccess)
+    });
     let workspace = Arc::new(WorkspaceService::new(workspace_path.clone()));
     let config = AgentConfig {
         policy,
@@ -6702,7 +6728,7 @@ pub fn run() {
             // pipeline that forgets itself on restart is not unattended.
             let handle = app.handle().clone();
             executor::resume_watchers(&handle, &app.state::<AppState>());
-            let _=studio::DESKTOP.set(handle.clone());
+            let _ = studio::DESKTOP.set(handle.clone());
             supervise_book_workers(handle);
             Ok(())
         })

@@ -98,7 +98,7 @@ export default function PdfViewer({
     </nav>}
     {error ? <p role="alert">{error}</p> : !document && <p role="status">Loading PDF…</p>}
     <div className="min-h-0 flex-1 overflow-auto rounded bg-obd-inset p-2" ref={containerRef} data-testid="pdf-pages">
-      {document && <canvas ref={canvasRef} key={pageNumber} aria-label={`${title}, page ${pageNumber}`} className="mx-auto block max-w-none bg-white" />}
+      {document && <canvas ref={canvasRef} key={pageNumber} aria-label={`${title}, page ${pageNumber}`} className="mx-auto block max-w-none bg-obd-canvas" />}
     </div>
   </div>;
 }

@@ -23,7 +23,8 @@ pub(crate) struct Focus {
 
 impl Focus {
     pub(super) fn same_selection(&self, other: &Self) -> bool {
-        self.area_request == other.area_request && self.author_sources == other.author_sources
+        self.area_request == other.area_request
+            && self.author_sources == other.author_sources
             && self.project_id == other.project_id
             && self.section_id == other.section_id
             && self.record_id == other.record_id
@@ -145,11 +146,14 @@ pub(crate) fn tools(focus: &Focus, active: &mut Vec<String>) -> ToolRegistry {
 }
 
 pub(crate) fn chat_tools(focus: &Focus, active: &mut Vec<String>, full: bool) -> ToolRegistry {
-    let mut registry = tools(focus,active);
+    let mut registry = tools(focus, active);
     registry.enable_book_questions();
     if full {
         registry.enable_book_host_tools();
-        registry.register(BookTool { action: Action::PrepareEdition, focus: focus.clone() });
+        registry.register(BookTool {
+            action: Action::PrepareEdition,
+            focus: focus.clone(),
+        });
     }
     registry
 }
@@ -157,9 +161,36 @@ pub(crate) fn chat_tools(focus: &Focus, active: &mut Vec<String>, full: bool) ->
 pub(crate) fn role_tools(role: &str, focus: &Focus, active: &mut Vec<String>) -> ToolRegistry {
     use Action::*;
     let extra: &[Action] = match role {
-        "chat" => &[AssessText, PublishEdition, AuthorPassages, Show, Dispatch, RequestAreas, Editorial, QueueControl],
-        "writer" => &[AssessText, PrepareEdition, Add, Edit, OutlineEdit, Build, ResolveIssue, EditCompanion],
-        "canon_keeper" => &[Finding, AuthorPassages, AuthorFact, Research, CleanResearch, RequestAreas, AnswerQuestion, RequestWriter],
+        "chat" => &[
+            AssessText,
+            PublishEdition,
+            AuthorPassages,
+            Show,
+            Dispatch,
+            RequestAreas,
+            Editorial,
+            QueueControl,
+        ],
+        "writer" => &[
+            AssessText,
+            PrepareEdition,
+            Add,
+            Edit,
+            OutlineEdit,
+            Build,
+            ResolveIssue,
+            EditCompanion,
+        ],
+        "canon_keeper" => &[
+            Finding,
+            AuthorPassages,
+            AuthorFact,
+            Research,
+            CleanResearch,
+            RequestAreas,
+            AnswerQuestion,
+            RequestWriter,
+        ],
         "editorial_reviewer" => &[AssessText, LocalIssue],
         "process_manager" if focus.area_request => &[Area, SetTemplate],
         "process_manager" => &[Area, SetTemplate, SaveSkill, Rollback],
@@ -406,21 +437,27 @@ impl Tool for BookTool {
         let (description, risk, properties, required) = match self.action {
             Action::RequestAreas => (
                 "Queue the Process Manager to create, rename, remove or reshape canon areas for this book. Include the requested names, purpose and constraints. Empty areas are supported.",
-                RiskLevel::Write, json!({"request":string}), vec!["request"],
+                RiskLevel::Write,
+                json!({"request":string}),
+                vec!["request"],
             ),
             Action::CleanResearch => (
                 "Clean specified research entries in place. Remove an exactly repeated opening paragraph and unresolved links with an unambiguous resolved twin of identical name and context. Preserves sources and unrelated entries.",
-                RiskLevel::Write, json!({"record_ids":{"type":"array","items":string}}), vec!["record_ids"],
+                RiskLevel::Write,
+                json!({"record_ids":{"type":"array","items":string}}),
+                vec!["record_ids"],
             ),
             Action::Research => (
                 "Save a research-only entry to any existing canon area using its template. Provide a source locator or the origin of an unverified lead. Supply checked_source only when you actually consulted the source. Repeat the area and title to enrich the same entry.",
                 RiskLevel::Write,
                 json!({"area":string,"title":string,"detail":string,"fields":values,"source":string,"basis":{"enum":["checked_source","unverified_lead"]}}),
-                vec!["area","title","detail","fields","source","basis"],
+                vec!["area", "title", "detail", "fields", "source", "basis"],
             ),
             Action::AuthorPassages => (
                 "Find exact saved author passages available in this chat or assignment, newest messages first. Search by a word or browse with offset. Cite supporting source_ref IDs for author facts.",
-                RiskLevel::Read, json!({"query":string,"offset":{"type":"integer","minimum":0}}), vec![],
+                RiskLevel::Read,
+                json!({"query":string,"offset":{"type":"integer","minimum":0}}),
+                vec![],
             ),
             Action::AuthorFact => (
                 "Save an explicitly confirmed author fact to canon, even before drafting. Use source_refs from book_author_passages or exact quotes from focus.authorSources, use template keys and omit unknowns. Reuse the same title and area when adding links.",
@@ -582,11 +619,15 @@ impl Tool for BookTool {
             ),
             Action::PrepareEdition => (
                 "Export a named edition to Markdown and a 6 by 9 inch PDF under editions/. Choose section_ids for a sampler. Omitting IDs includes the complete outline. Requires Pandoc and Typst.",
-                RiskLevel::Write, json!({"edition":string,"title":string,"author":string,"section_ids":{"type":"array","items":string}}), vec!["edition","title"]
+                RiskLevel::Write,
+                json!({"edition":string,"title":string,"author":string,"section_ids":{"type":"array","items":string}}),
+                vec!["edition", "title"],
             ),
             Action::PublishEdition => (
                 "Perform one authorized publishing step for the active book. Commit includes only the named edition PDF and Markdown. For GitHub actions supply account (personal or work) and exact owner/repo. New repositories are private. Supply tag, title and notes for release. Inspect origin and confirm the author's intended destination and selection.",
-                RiskLevel::Network, json!({"operation":{"enum":["status","commit","create_private_repo","push","release"]},"edition":string,"message":string,"account":{"enum":["personal","work"]},"repository":string,"tag":string,"title":string,"notes":string}),vec!["operation"]
+                RiskLevel::Network,
+                json!({"operation":{"enum":["status","commit","create_private_repo","push","release"]},"edition":string,"message":string,"account":{"enum":["personal","work"]},"repository":string,"tag":string,"title":string,"notes":string}),
+                vec!["operation"],
             ),
             Action::OutlineEdit => (
                 "Rename or move an existing section, preserving its ID, text and links. Read book_outline. Supply title to rename, and/or before_id or after_id to move relative to another section.",
@@ -749,11 +790,27 @@ impl BookTool {
                 Ok(ToolResult::ok(json!({"edited":relative}).to_string()))
             }
             Action::CleanResearch => {
-                let ids: Vec<Uuid> = serde_json::from_value(args["record_ids"].clone()).map_err(|e| as_argument(error(e)))?;
-                let receipt = author::clean_research(root, self.focus.job_id.ok_or_else(||as_argument("Requires a queued Keeper".into()))?, &ids).map_err(as_argument)?;
-                Ok(ToolResult::ok(receipt.to_string()).with_metadata(json!({"book_records_changed":true})))
+                let ids: Vec<Uuid> = serde_json::from_value(args["record_ids"].clone())
+                    .map_err(|e| as_argument(error(e)))?;
+                let receipt = author::clean_research(
+                    root,
+                    self.focus
+                        .job_id
+                        .ok_or_else(|| as_argument("Requires a queued Keeper".into()))?,
+                    &ids,
+                )
+                .map_err(as_argument)?;
+                Ok(ToolResult::ok(receipt.to_string())
+                    .with_metadata(json!({"book_records_changed":true})))
             }
-            Action::AuthorPassages => Ok(ToolResult::ok(author::list_passages(&self.focus.author_sources,args["query"].as_str().unwrap_or(""),args["offset"].as_u64().unwrap_or(0) as usize).to_string())),
+            Action::AuthorPassages => Ok(ToolResult::ok(
+                author::list_passages(
+                    &self.focus.author_sources,
+                    args["query"].as_str().unwrap_or(""),
+                    args["offset"].as_u64().unwrap_or(0) as usize,
+                )
+                .to_string(),
+            )),
             Action::AuthorFact | Action::Research => {
                 let research = matches!(self.action, Action::Research);
                 let id = author::save_entry(
@@ -761,7 +818,8 @@ impl BookTool {
                     self.focus
                         .job_id
                         .ok_or_else(|| as_argument("Requires a queued Keeper".into()))?,
-                    &args, research,
+                    &args,
+                    research,
                 )
                 .map_err(as_argument)?;
                 Ok(ToolResult::ok(
@@ -773,7 +831,9 @@ impl BookTool {
                 let area_request = matches!(self.action, Action::RequestAreas);
                 let mut focus = self.focus.clone();
                 focus.area_request = area_request;
-                focus.author_sources = if area_request || (args["source_refs"].is_null() && args["author_quotes"].is_null()) {
+                focus.author_sources = if area_request
+                    || (args["source_refs"].is_null() && args["author_quotes"].is_null())
+                {
                     vec![]
                 } else {
                     if args["role"] != "canon_keeper" {
@@ -786,7 +846,11 @@ impl BookTool {
                 };
                 let id = review_queue::submit(
                     root,
-                    if area_request { "process_manager" } else { argument(&args, "role")? },
+                    if area_request {
+                        "process_manager"
+                    } else {
+                        argument(&args, "role")?
+                    },
                     argument(&args, "request")?,
                     &focus,
                 )
@@ -924,7 +988,9 @@ impl BookTool {
             }
             Action::AssessText => {
                 let path = root.to_owned();
-                let report = crate::off_thread(move || detector::assess(&path,&book,&args)).await.map_err(ToolError::Failed)?;
+                let report = crate::off_thread(move || detector::assess(&path, &book, &args))
+                    .await
+                    .map_err(ToolError::Failed)?;
                 Ok(ToolResult::ok(report))
             }
             Action::Outline => {
@@ -1186,16 +1252,41 @@ impl BookTool {
                     .with_metadata(json!({"book_built":true})))
             }
             Action::PrepareEdition | Action::PublishEdition => {
-                let prepare = matches!(self.action,Action::PrepareEdition);
+                let prepare = matches!(self.action, Action::PrepareEdition);
                 let path = root.to_owned();
-                let receipt = crate::off_thread(move || if prepare {edition::prepare(&path,&args)} else {edition::publish(&path,&args)}).await.map_err(as_argument)?;
+                let receipt = crate::off_thread(move || {
+                    if prepare {
+                        edition::prepare(&path, &args)
+                    } else {
+                        edition::publish(&path, &args)
+                    }
+                })
+                .await
+                .map_err(as_argument)?;
                 Ok(ToolResult::ok(receipt.to_string()))
             }
             Action::OutlineEdit => {
                 let id = section(&args, &self.focus)?;
-                let anchor = |key: &str| args.get(key).map(|v|serde_json::from_value::<Uuid>(v.clone()).map_err(|e| as_argument(error(e)))).transpose();
-                update_outline_section(root,id,args.get("title").map(|_|argument(&args,"title")).transpose()?,anchor("before_id")?,anchor("after_id")?).map_err(as_argument)?;
-                Ok(ToolResult::ok(json!({"updated_section":id}).to_string()).with_metadata(json!({"book_changed":true})))
+                let anchor = |key: &str| {
+                    args.get(key)
+                        .map(|v| {
+                            serde_json::from_value::<Uuid>(v.clone())
+                                .map_err(|e| as_argument(error(e)))
+                        })
+                        .transpose()
+                };
+                update_outline_section(
+                    root,
+                    id,
+                    args.get("title")
+                        .map(|_| argument(&args, "title"))
+                        .transpose()?,
+                    anchor("before_id")?,
+                    anchor("after_id")?,
+                )
+                .map_err(as_argument)?;
+                Ok(ToolResult::ok(json!({"updated_section":id}).to_string())
+                    .with_metadata(json!({"book_changed":true})))
             }
             Action::Add => {
                 let title = argument(&args, "title")?;
@@ -1282,7 +1373,9 @@ impl BookTool {
                         "Read the current section before revising.".to_owned(),
                     ));
                 }
-                if (old.is_empty() && !source.text.is_empty()) || (!old.is_empty() && source.text.match_indices(old).take(2).count() != 1) {
+                if (old.is_empty() && !source.text.is_empty())
+                    || (!old.is_empty() && source.text.match_indices(old).take(2).count() != 1)
+                {
                     return Err(as_argument(
                         "The old passage must occur exactly once.".to_owned(),
                     ));
@@ -1515,7 +1608,12 @@ mod tests {
         ] {
             assert!(registry.definition_for(denied, &json!({})).is_none());
         }
-        for allowed in ["book_request_canon_areas", "book_queue_work", "book_queue_status", "book_control_work"] {
+        for allowed in [
+            "book_request_canon_areas",
+            "book_queue_work",
+            "book_queue_status",
+            "book_control_work",
+        ] {
             assert!(advertised.iter().any(|t| t.name == allowed));
         }
         for full in [false, true] {
@@ -1527,18 +1625,44 @@ mod tests {
             }
             assert_eq!(exposed.iter().any(|t| t.name == "run_command"), full);
         }
-        let area_focus = Focus { area_request: true, ..focus.clone() };
+        let area_focus = Focus {
+            area_request: true,
+            ..focus.clone()
+        };
         let manager = role_tools("process_manager", &area_focus, &mut Vec::new());
-        assert!(manager.definition_for("book_set_template", &json!({})).is_some());
-        assert!(manager.definition_for("book_save_project_skill", &json!({})).is_none());
+        assert!(
+            manager
+                .definition_for("book_set_template", &json!({}))
+                .is_some()
+        );
+        assert!(
+            manager
+                .definition_for("book_save_project_skill", &json!({}))
+                .is_none()
+        );
         let keeper = role_tools("canon_keeper", &focus, &mut Vec::new());
-        assert!(keeper.definition_for("book_record_research", &json!({})).is_some());
-        assert!(keeper.definition_for("book_request_canon_areas", &json!({})).is_some());
-        assert!(registry.definition_for("book_record_research", &json!({})).is_none());
+        assert!(
+            keeper
+                .definition_for("book_record_research", &json!({}))
+                .is_some()
+        );
+        assert!(
+            keeper
+                .definition_for("book_request_canon_areas", &json!({}))
+                .is_some()
+        );
+        assert!(
+            registry
+                .definition_for("book_record_research", &json!({}))
+                .is_none()
+        );
         assert!(advertised.iter().any(|tool| tool.name == "read_file"));
         assert!(advertised.iter().any(|tool| tool.name == "book_show"));
         let ctx = ToolContext::new(Arc::new(WorkspaceService::new(root.path().to_owned())));
-        let request = BookTool { action: Action::RequestAreas, focus: focus.clone() };
+        let request = BookTool {
+            action: Action::RequestAreas,
+            focus: focus.clone(),
+        };
         let args = json!({"request":"Create separate Folklore and People areas"});
         let queued = request.execute(args.clone(), &ctx).await.unwrap();
         let repeated = request.execute(args, &ctx).await.unwrap();
@@ -1566,23 +1690,45 @@ mod tests {
         initialize(root.path(), Some("novel"), None, None).unwrap();
         let ctx = ToolContext::new(Arc::new(WorkspaceService::new(root.path().to_owned())));
         let mut focus = Focus::book("test".into());
-        focus.author_sources.push(author::Statement {session:"session".into(), message:1, quote:"Al’s her father. Other notes.".into()});
-        let read = BookTool { action:Action::AuthorPassages, focus:focus.clone() };
+        focus.author_sources.push(author::Statement {
+            session: "session".into(),
+            message: 1,
+            quote: "Al’s her father. Other notes.".into(),
+        });
+        let read = BookTool {
+            action: Action::AuthorPassages,
+            focus: focus.clone(),
+        };
         let result = read.execute(json!({"query":"father"}), &ctx).await.unwrap();
         let sources: Value = serde_json::from_str(&result.content).unwrap();
         let refs = json!([sources["passages"][0]["source_ref"]]);
-        let chat = BookTool { action:Action::Dispatch, focus };
-        chat.execute(json!({"role":"canon_keeper","request":"Save the relationship","source_refs":refs}), &ctx).await.unwrap();
+        let chat = BookTool {
+            action: Action::Dispatch,
+            focus,
+        };
+        chat.execute(
+            json!({"role":"canon_keeper","request":"Save the relationship","source_refs":refs}),
+            &ctx,
+        )
+        .await
+        .unwrap();
         let book = load(root.path()).unwrap();
         let job = &book.review_jobs[0];
         let work = job.work.as_ref().unwrap();
-        assert_eq!(work.focus.author_sources.len(),1);
-        let keeper = BookTool { action:Action::AuthorFact, focus:work.focus.clone() };
-        review_queue::update_job(root.path(),job.id,|j| { j.state="running".into(); Ok(()) }).unwrap();
+        assert_eq!(work.focus.author_sources.len(), 1);
+        let keeper = BookTool {
+            action: Action::AuthorFact,
+            focus: work.focus.clone(),
+        };
+        review_queue::update_job(root.path(), job.id, |j| {
+            j.state = "running".into();
+            Ok(())
+        })
+        .unwrap();
         keeper.execute(json!({"area":"Characters","title":"Al","detail":"Her father.","fields":{"role":"Father"},"source_refs":refs}), &ctx).await.unwrap();
         let record = &load(root.path()).unwrap().records[0];
-        assert_eq!(record.author_sources[0].quote,"Al’s her father.");
-        assert_eq!(record.author_sources[0].message,1);
+        assert_eq!(record.author_sources[0].quote, "Al’s her father.");
+        assert_eq!(record.author_sources[0].message, 1);
     }
 
     #[tokio::test]
@@ -1593,24 +1739,60 @@ mod tests {
         let first = load(root).unwrap().sections[0].id;
         let prologue = add_at(root, "Opening", "First scene.").unwrap();
         let mut focus = Focus::book("book".into());
-        let id = review_queue::submit(root,"writer","Fill first chapter and move opening",&focus).unwrap();
-        review_queue::update_job(root,id,|j| {j.state="running".into(); Ok(())}).unwrap();
+        let id = review_queue::submit(
+            root,
+            "writer",
+            "Fill first chapter and move opening",
+            &focus,
+        )
+        .unwrap();
+        review_queue::update_job(root, id, |j| {
+            j.state = "running".into();
+            Ok(())
+        })
+        .unwrap();
         focus.job_id = Some(id);
         let ctx = ToolContext::new(Arc::new(WorkspaceService::new(root.to_owned())));
-        let edit = BookTool { action: Action::Edit, focus: focus.clone() };
-        let outline = BookTool { action: Action::OutlineEdit, focus };
-        let args = json!({"section_id":first,"revision":hash_bytes(b""),"old":"","new":"Second scene."});
-        edit.execute(args.clone(),&ctx).await.unwrap();
-        assert!(edit.execute(args,&ctx).await.is_err());
+        let edit = BookTool {
+            action: Action::Edit,
+            focus: focus.clone(),
+        };
+        let outline = BookTool {
+            action: Action::OutlineEdit,
+            focus,
+        };
+        let args =
+            json!({"section_id":first,"revision":hash_bytes(b""),"old":"","new":"Second scene."});
+        edit.execute(args.clone(), &ctx).await.unwrap();
+        assert!(edit.execute(args, &ctx).await.is_err());
         assert!(edit.execute(json!({"section_id":first,"revision":hash_bytes(b"Second scene."),"old":"","new":"Overwrite"}),&ctx).await.is_err());
-        assert!(outline.execute(json!({"section_id":prologue,"before_id":prologue,"title":"Wrong"}),&ctx).await.is_err());
-        outline.execute(json!({"section_id":prologue,"before_id":first,"title":"Prologue"}),&ctx).await.unwrap();
+        assert!(
+            outline
+                .execute(
+                    json!({"section_id":prologue,"before_id":prologue,"title":"Wrong"}),
+                    &ctx
+                )
+                .await
+                .is_err()
+        );
+        outline
+            .execute(
+                json!({"section_id":prologue,"before_id":first,"title":"Prologue"}),
+                &ctx,
+            )
+            .await
+            .unwrap();
         let book = load(root).unwrap();
         assert_eq!(book.sections[0].id, prologue);
         assert_eq!(book.sections[0].title, "Prologue");
-        let manuscript = compile(root,&book).unwrap();
-        assert!(manuscript.find("First scene.").unwrap()<manuscript.find("Second scene.").unwrap());
-        assert!(book.review_jobs.iter().any(|j|j.parent_job==Some(id) && j.sync.is_some()));
+        let manuscript = compile(root, &book).unwrap();
+        assert!(
+            manuscript.find("First scene.").unwrap() < manuscript.find("Second scene.").unwrap()
+        );
+        assert!(
+            book.review_jobs
+                .iter()
+                .any(|j| j.parent_job == Some(id) && j.sync.is_some())
+        );
     }
-
 }

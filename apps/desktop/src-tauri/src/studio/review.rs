@@ -400,7 +400,13 @@ pub(super) async fn run(
         ) {
             let _guard = BOOK_IO.lock().map_err(|e| ToolError::Failed(error(e)))?;
             let mut current = load(root).map_err(ToolError::Failed)?;
-            review_queue::record_result(&mut current, record.id, record.id, previous.decision, &record.finding.title);
+            review_queue::record_result(
+                &mut current,
+                record.id,
+                record.id,
+                previous.decision,
+                &record.finding.title,
+            );
             save(root, &current).map_err(ToolError::Failed)?;
             return Ok(ToolResult::ok(
                 json!({"record_id":record.id,"editorial":previous}).to_string(),
@@ -561,7 +567,13 @@ pub(super) async fn run(
         let child = editorial::refer(root, &mut current, record.id, Some(record.id), conflict)
             .map_err(ToolError::Failed)?;
         current.records[index].editorial = Some(verdict.clone());
-        review_queue::record_result(&mut current, record.id, record.id, verdict.decision, &record.finding.title);
+        review_queue::record_result(
+            &mut current,
+            record.id,
+            record.id,
+            verdict.decision,
+            &record.finding.title,
+        );
         save(root, &current).map_err(ToolError::Failed)?;
         return Ok(ToolResult::ok(
             json!({"record_id":record.id,"editorial_job":child,"editorial":verdict}).to_string(),
@@ -644,7 +656,13 @@ pub(super) async fn run(
         .records
         .iter()
         .any(|r| r.id == saved_id && r.pending);
-    review_queue::record_result(&mut current, record.id, saved_id, verdict.decision, &record.finding.title);
+    review_queue::record_result(
+        &mut current,
+        record.id,
+        saved_id,
+        verdict.decision,
+        &record.finding.title,
+    );
     save(root, &current).map_err(ToolError::Failed)?;
     Ok(ToolResult::ok(
         json!({"record_id":saved_id,"pending":pending,"editorial":verdict}).to_string(),

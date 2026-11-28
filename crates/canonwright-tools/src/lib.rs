@@ -1383,10 +1383,11 @@ impl ToolContext {
             }
             resolved.ok_or_else(|| ToolError::OutsideRoot(path.display().to_string()))?
         };
-        if self.full_path_access || self
-            .outside_grants
-            .iter()
-            .any(|grant| resolved.starts_with(&grant.path) && (!write || grant.write_access))
+        if self.full_path_access
+            || self
+                .outside_grants
+                .iter()
+                .any(|grant| resolved.starts_with(&grant.path) && (!write || grant.write_access))
         {
             Ok(resolved)
         } else {
@@ -18888,7 +18889,10 @@ invariants:
         let read = json!({"path":path});
         assert!(ReadFileTool.execute(read.clone(), &ctx).await.is_err());
         ctx.full_path_access = true;
-        let files = ListDirTool.execute(json!({"path":reference.path()}), &ctx).await.unwrap();
+        let files = ListDirTool
+            .execute(json!({"path":reference.path()}), &ctx)
+            .await
+            .unwrap();
         assert!(files.content.contains("layout.txt"));
         let result = ReadFileTool.execute(read.clone(), &ctx).await.unwrap();
         assert!(result.content.contains("Reference trim"));

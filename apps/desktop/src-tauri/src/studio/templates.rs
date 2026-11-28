@@ -226,7 +226,6 @@ impl Template {
                     .bytes()
                     .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'_')
                 || !keys.insert(&f.key)
-
             {
                 return Err(format!(
                     "Invalid or duplicate field '{}'. Use a stable lowercase key, label and guidance.",
@@ -237,7 +236,11 @@ impl Template {
                 return Err(format!("Field {} needs a label of 1–100 bytes.", f.key));
             }
             if f.guidance.trim().is_empty() || f.guidance.len() > 600 {
-                return Err(format!("Field {} needs guidance of 1–600 bytes (received {}). Keep its key.", f.key, f.guidance.len()));
+                return Err(format!(
+                    "Field {} needs guidance of 1–600 bytes (received {}). Keep its key.",
+                    f.key,
+                    f.guidance.len()
+                ));
             }
         }
         Ok(())

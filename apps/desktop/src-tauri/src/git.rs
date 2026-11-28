@@ -109,22 +109,39 @@ pub(crate) fn ensure_book_repo(root: &Path) -> Result<(), String> {
     let marker = root.join(".git");
     let run = |args: &[&str]| -> Result<Output, String> {
         let mut command = Command::new("git");
-        command.current_dir(root).args(args)
-            .env_remove("GIT_DIR").env_remove("GIT_WORK_TREE").env_remove("GIT_COMMON_DIR")
-            .env_remove("GIT_INDEX_FILE").env_remove("GIT_OBJECT_DIRECTORY")
-            .env("GIT_TERMINAL_PROMPT","0");
-        let output = crate::process::run_bounded(&mut command, GIT_PROBE_TIMEOUT, "book repository setup")?;
-        if !output.status.success() { return Err(failure(args, &output)); }
+        command
+            .current_dir(root)
+            .args(args)
+            .env_remove("GIT_DIR")
+            .env_remove("GIT_WORK_TREE")
+            .env_remove("GIT_COMMON_DIR")
+            .env_remove("GIT_INDEX_FILE")
+            .env_remove("GIT_OBJECT_DIRECTORY")
+            .env("GIT_TERMINAL_PROMPT", "0");
+        let output =
+            crate::process::run_bounded(&mut command, GIT_PROBE_TIMEOUT, "book repository setup")?;
+        if !output.status.success() {
+            return Err(failure(args, &output));
+        }
         Ok(output)
     };
     match std::fs::symlink_metadata(&marker) {
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => { run(&["init", "-b", "main", "."])?; }
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            run(&["init", "-b", "main", "."])?;
+        }
         Err(e) => return Err(e.to_string()),
         Ok(_) => {}
     }
     let top = run(&["rev-parse", "--show-toplevel"])?;
-    if Path::new(&text(&top)).canonicalize().map_err(|e|e.to_string())? != root.canonicalize().map_err(|e|e.to_string())? {
-        return Err(format!("Expected a manuscript repository rooted at {}",root.display()));
+    if Path::new(&text(&top))
+        .canonicalize()
+        .map_err(|e| e.to_string())?
+        != root.canonicalize().map_err(|e| e.to_string())?
+    {
+        return Err(format!(
+            "Expected a manuscript repository rooted at {}",
+            root.display()
+        ));
     }
     Ok(())
 }
@@ -966,10 +983,23 @@ mod tests {
         let book = parent.path().join("manuscript");
         std::fs::create_dir(&book).unwrap();
         ensure_book_repo(&book).unwrap();
-        assert_eq!(PathBuf::from(text(&git(&book,&["rev-parse","--show-toplevel"]).unwrap())), book.canonicalize().unwrap());
-        assert!(git(&book,&["symbolic-ref","HEAD","refs/heads/draft"]).unwrap().status.success());
+        assert_eq!(
+            PathBuf::from(text(
+                &git(&book, &["rev-parse", "--show-toplevel"]).unwrap()
+            )),
+            book.canonicalize().unwrap()
+        );
+        assert!(
+            git(&book, &["symbolic-ref", "HEAD", "refs/heads/draft"])
+                .unwrap()
+                .status
+                .success()
+        );
         ensure_book_repo(&book).unwrap();
-        assert_eq!(text(&git(&book,&["symbolic-ref","--short","HEAD"]).unwrap()),"draft");
+        assert_eq!(
+            text(&git(&book, &["symbolic-ref", "--short", "HEAD"]).unwrap()),
+            "draft"
+        );
     }
 
     fn init_repo() -> tempfile::TempDir {

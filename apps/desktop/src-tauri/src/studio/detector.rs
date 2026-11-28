@@ -45,7 +45,12 @@ pub(super) fn assess(root: &Path, book: &Book, args: &Value) -> Result<String, S
     let mode = args
         .get("mode")
         .map_or(Some("quick"), Value::as_str)
-        .filter(|m| matches!(*m, "quick" | "follow_up" | "strict" | "fast_detectgpt" | "editlens"))
+        .filter(|m| {
+            matches!(
+                *m,
+                "quick" | "follow_up" | "strict" | "fast_detectgpt" | "editlens"
+            )
+        })
         .ok_or("Unknown detector mode")?;
     let python = if runtime.join("venv-cu128/verified").is_file() {
         runtime.join("venv-cu128/bin/python")
@@ -116,12 +121,26 @@ mod tests {
         );
         assert_eq!(follow["second_pass"]["scored"], report["scored_windows"]);
         assert_eq!(report["second_pass"]["unavailable"], 0);
-        let strict = assess(dir.path(), &book, &json!({"text":text,"mode":"strict","threshold":0})).unwrap();
+        let strict = assess(
+            dir.path(),
+            &book,
+            &json!({"text":text,"mode":"strict","threshold":0}),
+        )
+        .unwrap();
         let strict: Value = serde_json::from_str(&strict).unwrap();
         assert_eq!(strict["mode"], "strict");
         assert_eq!(strict["second_pass"]["enabled"], false);
-        assert_eq!(strict["corroborated_windows"], strict["binoculars"]["promoted"]);
-        assert!(strict["results"].as_array().unwrap().iter().all(|row| row["review_tier"] != "both_flagged"));
+        assert_eq!(
+            strict["corroborated_windows"],
+            strict["binoculars"]["promoted"]
+        );
+        assert!(
+            strict["results"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|row| row["review_tier"] != "both_flagged")
+        );
         assert!(report["scored_windows"].as_u64().unwrap() >= 2);
         for row in report["results"].as_array().unwrap() {
             assert_eq!(row["section_id"], json!(id));

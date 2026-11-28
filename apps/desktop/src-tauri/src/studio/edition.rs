@@ -161,9 +161,16 @@ pub(super) fn publish(root: &Path, args: &Value) -> Result<Value, String> {
         }
         match op {
             "push" => {
-                let destinations = run(root, "git", &["remote", "get-url", "--push", "--all", "origin"])?;
+                let destinations = run(
+                    root,
+                    "git",
+                    &["remote", "get-url", "--push", "--all", "origin"],
+                )?;
                 if destinations.trim_end_matches(".git") != host {
-                    return Err("Set the book's push URL to its account-scoped GitHub HTTPS destination".into());
+                    return Err(
+                        "Set the book's push URL to its account-scoped GitHub HTTPS destination"
+                            .into(),
+                    );
                 }
                 let branch = run(root, "git", &["symbolic-ref", "--short", "HEAD"])?;
                 gh_run(&[
@@ -237,16 +244,30 @@ mod tests {
         let root = tmp.path();
         crate::git::ensure_book_repo(root).unwrap();
         run(root, "git", &["config", "user.name", "Fixture"]).unwrap();
-        run(root, "git", &["config", "user.email", "fixture@example.invalid"]).unwrap();
+        run(
+            root,
+            "git",
+            &["config", "user.email", "fixture@example.invalid"],
+        )
+        .unwrap();
         let edition = root.join("editions/sample");
         fs::create_dir_all(&edition).unwrap();
         fs::write(edition.join("manuscript.md"), "# Sample").unwrap();
         fs::write(edition.join("book.pdf"), b"%PDF-fixture").unwrap();
         fs::write(root.join("private-notes"), "Private fixture").unwrap();
         run(root, "git", &["add", "private-notes"]).unwrap();
-        publish(root, &json!({"operation":"commit","edition":"sample","message":"Sample edition"})).unwrap();
-        assert_eq!(run(root,"git",&["ls-tree","-r","--name-only","HEAD"]).unwrap(),
-                   "editions/sample/book.pdf\neditions/sample/manuscript.md");
-        assert_eq!(run(root,"git",&["diff","--cached","--name-only"]).unwrap(),"private-notes");
+        publish(
+            root,
+            &json!({"operation":"commit","edition":"sample","message":"Sample edition"}),
+        )
+        .unwrap();
+        assert_eq!(
+            run(root, "git", &["ls-tree", "-r", "--name-only", "HEAD"]).unwrap(),
+            "editions/sample/book.pdf\neditions/sample/manuscript.md"
+        );
+        assert_eq!(
+            run(root, "git", &["diff", "--cached", "--name-only"]).unwrap(),
+            "private-notes"
+        );
     }
 }

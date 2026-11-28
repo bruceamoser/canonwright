@@ -551,8 +551,12 @@ pub(super) async fn run(root: &Path, context: &ToolContext, id: Uuid) -> Result<
         match parse(&answer) {
             Ok(parsed) => Ok(parsed),
             Err(reason) => {
-                let task = format!("{prompt}\nYour previous JSON failed validation: {reason}. Correct the response using the same source data.\nPrevious response:\n{answer}\nBook data:\n{data}");
-                let corrected = review::read_worker(cx, title.into(), task).await.map_err(error)?;
+                let task = format!(
+                    "{prompt}\nYour previous JSON failed validation: {reason}. Correct the response using the same source data.\nPrevious response:\n{answer}\nBook data:\n{data}"
+                );
+                let corrected = review::read_worker(cx, title.into(), task)
+                    .await
+                    .map_err(error)?;
                 parse(&corrected)
             }
         }

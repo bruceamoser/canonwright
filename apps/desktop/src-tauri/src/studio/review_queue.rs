@@ -142,7 +142,9 @@ pub(super) fn control(root: &Path, id: Uuid, operation: &str) -> Result<(), Stri
                         .push(json!({"previous_test_failure":job.error,"prior_attempt":prior}));
                     if let Some(target) = &job.repair_target {
                         job.process_repairs = 1;
-                        job.receipts.push(json!({"skill_test_failure":job.error,"target":target,"attempt":1}));
+                        job.receipts.push(
+                            json!({"skill_test_failure":job.error,"target":target,"attempt":1}),
+                        );
                     } else {
                         job.process_drafts.clear();
                     }
@@ -343,12 +345,15 @@ async fn run_work(
                         "Worker finished without a successful book change. See its report.".into(),
                     );
                 }
-                if j.state == "done" && work.role == "writer"
+                if j.state == "done"
+                    && work.role == "writer"
                     && let Some(last) = j.receipts.last().filter(|r| r["ok"] == false)
                 {
                     j.state = "failed".into();
-                    j.error = Some(format!("Final Writer operation failed: {}. Check earlier receipts for saved work.",
-                        last["error"].as_str().unwrap_or("see tool receipt")));
+                    j.error = Some(format!(
+                        "Final Writer operation failed: {}. Check earlier receipts for saved work.",
+                        last["error"].as_str().unwrap_or("see tool receipt")
+                    ));
                 }
                 if j.state == "done"
                     && matches!(j.editorial, Some(editorial::Assignment::Repair { .. }))
@@ -390,7 +395,13 @@ async fn run_work(
 
 static ACTIVE: LazyLock<Mutex<HashSet<PathBuf>>> = LazyLock::new(Default::default);
 
-pub(super) fn record_result(book: &mut Book, id: Uuid, result: Uuid, decision: review::Decision, title: &str) {
+pub(super) fn record_result(
+    book: &mut Book,
+    id: Uuid,
+    result: Uuid,
+    decision: review::Decision,
+    title: &str,
+) {
     if let Some(job) = book.review_jobs.iter_mut().find(|job| job.id == id) {
         job.review_decision = Some(decision);
         job.reviewed_title = Some(title.to_owned());

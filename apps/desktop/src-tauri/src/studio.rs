@@ -1,14 +1,14 @@
 pub(crate) mod agent;
-mod review;
-pub(crate) mod editorial;
 pub(crate) mod chapter_sync;
+pub(crate) mod editorial;
+mod review;
 pub(crate) mod review_queue;
 pub(crate) use review::{EDITORIAL_PROMPT, KEEPER_PROMPT};
-mod templates;
-mod edition;
-mod detector;
 pub(crate) mod author;
+mod detector;
+mod edition;
 pub(crate) mod process;
+mod templates;
 use templates::{Templates, Values, check_entry};
 
 use std::fs;
@@ -80,7 +80,7 @@ impl Kind {
 
 #[derive(Clone, Deserialize, Serialize)]
 struct Section {
-    #[serde(default,skip_serializing_if="Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     original_pdf: Option<String>,
     id: Uuid,
     title: String,
@@ -113,14 +113,14 @@ struct Citation {
 
 #[derive(Clone, Deserialize, Serialize)]
 struct Record {
-    #[serde(default,skip_serializing_if="Vec::is_empty")]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     research_sources: Vec<author::ResearchSource>,
-    #[serde(default,skip_serializing_if="Vec::is_empty")]
-    author_sources:Vec<author::Statement>,
-    #[serde(default,skip_serializing_if="Vec::is_empty")]
-    retained:Vec<process::Retained>,
-    #[serde(default,skip_serializing_if="Vec::is_empty")]
-    unverified_sections:Vec<Uuid>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    author_sources: Vec<author::Statement>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    retained: Vec<process::Retained>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    unverified_sections: Vec<Uuid>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     citations: Vec<Citation>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -138,8 +138,8 @@ struct Record {
 
 #[derive(Clone, Default, Deserialize, Serialize)]
 struct Book {
-    #[serde(default,skip_serializing_if="Vec::is_empty")]
-    process_history:Vec<process::Version>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    process_history: Vec<process::Version>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     review_jobs: Vec<review_queue::Job>,
     #[serde(default)]
@@ -303,7 +303,9 @@ fn save(root: &Path, book: &Book) -> Result<(), String> {
         &manifest(root)?,
         &serde_json::to_string_pretty(book).map_err(error)?,
     )?;
-    if let Some(app)=DESKTOP.get(){let _=app.emit("canonwright:book-updated",root.to_string_lossy());}
+    if let Some(app) = DESKTOP.get() {
+        let _ = app.emit("canonwright:book-updated", root.to_string_lossy());
+    }
     Ok(())
 }
 
@@ -341,33 +343,52 @@ fn add_section(root: &Path, book: &mut Book, title: String, text: &str) -> Resul
     }
     let id = Uuid::now_v7();
     write(&section_path(root, id)?, text)?;
-    book.sections.push(Section { id, title, original_pdf:None });
+    book.sections.push(Section {
+        id,
+        title,
+        original_pdf: None,
+    });
     Ok(id)
 }
 
-fn retain_pdf(root:&Path, bytes:&[u8])->Result<String,String>{
-    if bytes.len()>64*1024*1024 || !bytes.windows(5).take(1024).any(|w|w==b"%PDF-"){return Err("Choose a PDF up to 64 MiB".into());}
-    let relative=format!(".canonwright/studio/originals/{}.pdf", hash_bytes(bytes));
-    let path=local(root,Path::new(&relative))?;
-    let parent=path.parent().ok_or("Missing PDF directory")?;
+fn retain_pdf(root: &Path, bytes: &[u8]) -> Result<String, String> {
+    if bytes.len() > 64 * 1024 * 1024 || !bytes.windows(5).take(1024).any(|w| w == b"%PDF-") {
+        return Err("Choose a PDF up to 64 MiB".into());
+    }
+    let relative = format!(".canonwright/studio/originals/{}.pdf", hash_bytes(bytes));
+    let path = local(root, Path::new(&relative))?;
+    let parent = path.parent().ok_or("Missing PDF directory")?;
     fs::create_dir_all(parent).map_err(error)?;
-    let mut temp=tempfile::NamedTempFile::new_in(parent).map_err(error)?;
-    std::io::Write::write_all(&mut temp,bytes).map_err(error)?;
+    let mut temp = tempfile::NamedTempFile::new_in(parent).map_err(error)?;
+    std::io::Write::write_all(&mut temp, bytes).map_err(error)?;
     temp.persist(path).map_err(error)?;
     Ok(relative)
 }
 
 #[tauri::command]
-pub(crate) fn studio_attach_pdf(state:State<'_,AppState>,project_id:String,section_id:Uuid,path:String)->Result<(),String>{
-    let root=registered_root(&state,&project_id)?;
-    let _guard=BOOK_IO.lock().map_err(error)?;
-    let mut book=load(&root)?;
-    let section=book.sections.iter_mut().find(|s|s.id==section_id).ok_or("Unknown section")?;
-    if section.original_pdf.is_some(){return Err("This section already has an original PDF".into());}
-    let file=Path::new(&path);
-    if fs::metadata(file).map_err(error)?.len()>64*1024*1024{return Err("Choose a PDF up to 64 MiB".into());}
-    section.original_pdf=Some(retain_pdf(&root,&fs::read(file).map_err(error)?)?);
-    save(&root,&book)
+pub(crate) fn studio_attach_pdf(
+    state: State<'_, AppState>,
+    project_id: String,
+    section_id: Uuid,
+    path: String,
+) -> Result<(), String> {
+    let root = registered_root(&state, &project_id)?;
+    let _guard = BOOK_IO.lock().map_err(error)?;
+    let mut book = load(&root)?;
+    let section = book
+        .sections
+        .iter_mut()
+        .find(|s| s.id == section_id)
+        .ok_or("Unknown section")?;
+    if section.original_pdf.is_some() {
+        return Err("This section already has an original PDF".into());
+    }
+    let file = Path::new(&path);
+    if fs::metadata(file).map_err(error)?.len() > 64 * 1024 * 1024 {
+        return Err("Choose a PDF up to 64 MiB".into());
+    }
+    section.original_pdf = Some(retain_pdf(&root, &fs::read(file).map_err(error)?)?);
+    save(&root, &book)
 }
 
 fn supported(path: &Path) -> bool {
@@ -425,26 +446,38 @@ fn import_sources(
             return Err(format!("Source file is too large: {}", path.display()));
         }
         use canonwright_manuscript::{BlockKind, Format, detect, read};
-        let pdf_bytes=if matches!(detect(&path.to_string_lossy()),Some(Format::Pdf)){Some(fs::read(&path).map_err(error)?)}else{None};
+        let pdf_bytes = if matches!(detect(&path.to_string_lossy()), Some(Format::Pdf)) {
+            Some(fs::read(&path).map_err(error)?)
+        } else {
+            None
+        };
         let text = match detect(&path.to_string_lossy()) {
             Some(Format::Markdown | Format::PlainText) => {
                 fs::read_to_string(&path).map_err(error)?
             }
-            _ => (if let Some(bytes)=&pdf_bytes{canonwright_manuscript::read_bytes(bytes,&path.to_string_lossy(),Some(Format::Pdf))}else{read(&path)})
-                .map_err(error)?
-                .blocks
-                .into_iter()
-                .map(|block| match block.kind {
-                    BlockKind::Heading(depth) => format!(
-                        "{} {}",
-                        "#".repeat(usize::from(depth).clamp(1, 6)),
-                        block.text
-                    ),
-                    BlockKind::Break => "***".to_owned(),
-                    BlockKind::Paragraph => block.text,
-                })
-                .collect::<Vec<_>>()
-                .join("\n\n"),
+            _ => (if let Some(bytes) = &pdf_bytes {
+                canonwright_manuscript::read_bytes(
+                    bytes,
+                    &path.to_string_lossy(),
+                    Some(Format::Pdf),
+                )
+            } else {
+                read(&path)
+            })
+            .map_err(error)?
+            .blocks
+            .into_iter()
+            .map(|block| match block.kind {
+                BlockKind::Heading(depth) => format!(
+                    "{} {}",
+                    "#".repeat(usize::from(depth).clamp(1, 6)),
+                    block.text
+                ),
+                BlockKind::Break => "***".to_owned(),
+                BlockKind::Paragraph => block.text,
+            })
+            .collect::<Vec<_>>()
+            .join("\n\n"),
         };
         let title = text
             .trim_start()
@@ -455,7 +488,9 @@ fn import_sources(
             .filter(|heading| !heading.is_empty() && heading.chars().count() <= 120)
             .map_or(title, str::to_owned);
         add_section(root, book, title, &text)?;
-        if let Some(bytes)=pdf_bytes{book.sections.last_mut().unwrap().original_pdf=Some(retain_pdf(root,&bytes)?);}
+        if let Some(bytes) = pdf_bytes {
+            book.sections.last_mut().unwrap().original_pdf = Some(retain_pdf(root, &bytes)?);
+        }
     }
     Ok(count)
 }
@@ -507,10 +542,16 @@ fn available(book: &Book, skill: &Skill) -> bool {
 }
 
 #[tauri::command]
-pub(crate) fn studio_retry_failed_reviews(state:State<'_,AppState>,project_id:String,ids:Vec<Uuid>)->Result<usize,String>{
-    let root=registered_root(&state,&project_id)?;
-    let count=review_queue::retry_failed_reviews(&root,&ids)?;
-    if count>0{crate::resume_book_workers();}
+pub(crate) fn studio_retry_failed_reviews(
+    state: State<'_, AppState>,
+    project_id: String,
+    ids: Vec<Uuid>,
+) -> Result<usize, String> {
+    let root = registered_root(&state, &project_id)?;
+    let count = review_queue::retry_failed_reviews(&root, &ids)?;
+    if count > 0 {
+        crate::resume_book_workers();
+    }
     Ok(count)
 }
 
@@ -542,11 +583,19 @@ pub(crate) fn studio_book(
         .into_iter()
         .map(|area| (area.to_owned(), book.template(area)))
         .collect();
-    let job_roles = book.review_jobs.iter().map(|job| {
-        let role = if job.state == "ready" { None } else { job.claimed_role.as_deref() }
+    let job_roles = book
+        .review_jobs
+        .iter()
+        .map(|job| {
+            let role = if job.state == "ready" {
+                None
+            } else {
+                job.claimed_role.as_deref()
+            }
             .unwrap_or_else(|| review_queue::job_role(&book, job));
-        (job.id, role.to_owned())
-    }).collect();
+            (job.id, role.to_owned())
+        })
+        .collect();
     Ok(BookView {
         job_roles,
         templates,
@@ -584,7 +633,7 @@ fn skill_catalog(root: &Path, book: &Book) -> Result<Vec<SkillCard>, String> {
         Err(cause) if cause.kind() == std::io::ErrorKind::NotFound => {}
         Err(cause) => return Err(error(cause)),
     }
-    process::merge_catalog(book,&mut skills);
+    process::merge_catalog(book, &mut skills);
     Ok(skills)
 }
 
@@ -618,8 +667,10 @@ pub(crate) fn studio_save_section(
     text: String,
 ) -> Result<SectionView, String> {
     let root = registered_root(&state, &project_id)?;
-    let changed = chapter_sync::save_edit(&root,section_id,&revision,&text,None)?;
-    if changed.is_some(){crate::resume_book_workers();}
+    let changed = chapter_sync::save_edit(&root, section_id, &revision, &text, None)?;
+    if changed.is_some() {
+        crate::resume_book_workers();
+    }
     Ok(SectionView {
         revision: hash_bytes(text.as_bytes()),
         text,
@@ -637,16 +688,30 @@ pub(crate) fn studio_add_section(
 }
 
 fn add_at(root: &Path, title: &str, text: &str) -> Result<Uuid, String> {
-    add_at_with_parent(root,title,text,None)
+    add_at_with_parent(root, title, text, None)
 }
 
-fn add_at_with_parent(root:&Path,title:&str,text:&str,parent:Option<Uuid>)->Result<Uuid,String>{
+fn add_at_with_parent(
+    root: &Path,
+    title: &str,
+    text: &str,
+    parent: Option<Uuid>,
+) -> Result<Uuid, String> {
     let _guard = BOOK_IO.lock().map_err(error)?;
     let title = section_title(title)?;
     let mut book = load(root)?;
     let id = add_section(root, &mut book, title.to_owned(), text)?;
-    if parent.is_some() && !text.is_empty(){
-        chapter_sync::stage(&mut book,id,&SectionView{text:String::new(),revision:hash_bytes(b"")},text,parent)?;
+    if parent.is_some() && !text.is_empty() {
+        chapter_sync::stage(
+            &mut book,
+            id,
+            &SectionView {
+                text: String::new(),
+                revision: hash_bytes(b""),
+            },
+            text,
+            parent,
+        )?;
     }
     save(root, &book)?;
     Ok(id)
@@ -669,11 +734,22 @@ pub(crate) async fn studio_import(
     .await
 }
 
-fn update_outline_section(root: &Path, id: Uuid, title: Option<&str>, before: Option<Uuid>, after: Option<Uuid>) -> Result<(), String> {
+fn update_outline_section(
+    root: &Path,
+    id: Uuid,
+    title: Option<&str>,
+    before: Option<Uuid>,
+    after: Option<Uuid>,
+) -> Result<(), String> {
     let _guard = BOOK_IO.lock().map_err(error)?;
     let mut book = load(root)?;
-    let index = book.sections.iter().position(|s| s.id == id).ok_or("Unknown manuscript section")?;
-    if before.is_some() && after.is_some() || title.is_none() && before.is_none() && after.is_none() {
+    let index = book
+        .sections
+        .iter()
+        .position(|s| s.id == id)
+        .ok_or("Unknown manuscript section")?;
+    if before.is_some() && after.is_some() || title.is_none() && before.is_none() && after.is_none()
+    {
         return Err("Supply a title or one placement anchor".into());
     }
     let mut section = book.sections.remove(index);
@@ -681,13 +757,19 @@ fn update_outline_section(root: &Path, id: Uuid, title: Option<&str>, before: Op
         section.title = section_title(title)?.to_owned();
     }
     let position = if let Some(anchor) = before.or(after) {
-        book.sections.iter().position(|s| s.id == anchor).ok_or("Choose a different existing section as the anchor")? + usize::from(after.is_some())
-    } else { index };
+        book.sections
+            .iter()
+            .position(|s| s.id == anchor)
+            .ok_or("Choose a different existing section as the anchor")?
+            + usize::from(after.is_some())
+    } else {
+        index
+    };
     book.sections.insert(position, section);
     save(root, &book)
 }
 
-fn section_title(title: &str) -> Result<&str,String> {
+fn section_title(title: &str) -> Result<&str, String> {
     let title = title.trim();
     if title.is_empty() || title.contains(['\r', '\n']) || title.chars().count() > 120 {
         return Err("Enter a section title of 1–120 characters on one line".to_owned());
@@ -848,10 +930,10 @@ fn recover_review(root: &Path, book: &mut Book, history: Vec<String>) -> Result<
 fn insert_finding(book: &mut Book, section: Option<Uuid>, finding: Finding, pending: bool) -> Uuid {
     let id = Uuid::now_v7();
     book.records.push(Record {
-        research_sources:vec![],
-        author_sources:vec![],
-        retained:vec![],
-        unverified_sections:vec![],
+        research_sources: vec![],
+        author_sources: vec![],
+        retained: vec![],
+        unverified_sections: vec![],
         citations: vec![],
         editorial: None,
         id,
@@ -970,7 +1052,11 @@ fn consolidate(book: &mut Book, index: usize, target: usize, merge: bool) -> Res
             canon.citations.push(citation);
         }
     }
-    for source in proposal.author_sources{if !canon.author_sources.contains(&source){canon.author_sources.push(source);}}
+    for source in proposal.author_sources {
+        if !canon.author_sources.contains(&source) {
+            canon.author_sources.push(source);
+        }
+    }
     canon.retained.extend(proposal.retained);
     canon.editorial = proposal.editorial;
     if canon.answer.is_none() {
@@ -985,7 +1071,12 @@ fn consolidate(book: &mut Book, index: usize, target: usize, merge: bool) -> Res
     for value in book
         .records
         .iter_mut()
-        .flat_map(|r| r.finding.fields.values_mut().chain(r.retained.iter_mut().map(|f|&mut f.value)))
+        .flat_map(|r| {
+            r.finding
+                .fields
+                .values_mut()
+                .chain(r.retained.iter_mut().map(|f| &mut f.value))
+        })
         .filter_map(serde_json::Value::as_array_mut)
     {
         for item in value.iter_mut() {
@@ -1019,11 +1110,21 @@ fn decide(root: &Path, id: Uuid, accept: bool) -> Result<(), String> {
     let job = if let Some(index) = book.review_jobs.iter().position(|j| j.id == id) {
         &mut book.review_jobs[index]
     } else {
-        book.review_jobs.push(review_queue::Job { id, ..Default::default() });
+        book.review_jobs.push(review_queue::Job {
+            id,
+            ..Default::default()
+        });
         book.review_jobs.last_mut().unwrap()
     };
     job.reviewed_title = Some(title);
-    job.author_decision = Some(if accept { "Accepted by author" } else { "Dismissed by author" }.into());
+    job.author_decision = Some(
+        if accept {
+            "Accepted by author"
+        } else {
+            "Dismissed by author"
+        }
+        .into(),
+    );
     job.result_id = result;
     job.state = "done".into();
     job.error = None;
@@ -1114,8 +1215,8 @@ fn answer_question(
     book.records[index].editorial = None;
     if book.records[index].pending {
         let title = book.records[index].finding.title.clone();
-        let saved=approve(root,book,index)?;
-        review_queue::record_result(book,record_id,saved,review::Decision::Approve,&title);
+        let saved = approve(root, book, index)?;
+        review_queue::record_result(book, record_id, saved, review::Decision::Approve, &title);
         Ok(saved)
     } else {
         Ok(record_id)
@@ -1143,10 +1244,10 @@ pub(crate) fn studio_save_skill(
     draft: SkillDraft,
 ) -> Result<(), String> {
     let root = registered_root(&state, &project_id)?;
-    save_project_skill(&root,Uuid::now_v7(),&draft)
+    save_project_skill(&root, Uuid::now_v7(), &draft)
 }
 
-fn save_project_skill(root:&Path,id:Uuid,draft:&SkillDraft)->Result<(),String>{
+fn save_project_skill(root: &Path, id: Uuid, draft: &SkillDraft) -> Result<(), String> {
     validate_skill(draft)?;
     let title = draft.title.trim();
     let instructions = draft.instructions.trim();
